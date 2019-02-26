@@ -6,6 +6,23 @@ a {
   font-size: 1.8em !important;
 }
 
+.btn-primary {
+  background-color: #50C0FF !important;
+  border-color: #50C0FF !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: rgb(60,172,235, 0.7) !important;
+  box-shadow: none !important;
+}
+
+.bitn-secondary:hover,
+.btn-secondary:focus {
+  border-color: #50C0FF !important;
+  box-shadow: none !important;
+  background-color: #5A6065;
+}
 
 .post {
   background-color: #2A3237 !important;
@@ -36,6 +53,14 @@ a {
 .user {
   width: 2.3rem;
   height: 2.3rem;
+}
 
-  
+.navbar-brand {
+  text-decoration: underline !important;
+  text-decoration-color: #50C0FF !important;
+}
+
+.navbar-brand:hover {
+  transition: transform .2s;
+  transform: scale(1.05);
 }
