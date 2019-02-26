@@ -1,3 +1,41 @@
 body {
-  background: #2A3237 !important;
+  background: #1A2227 !important;
+}
+
+a {
+  font-size: 1.8em !important;
+}
+
+
+.post {
+  background-color: #2A3237 !important;
+  color: #fff;
+  border-color: #555 !important;
+  border: 1px;
+  border-style: solid;
+}
+
+.post:hover {
+  -moz-box-shadow: 0 0 1px 1px #50C0FF;
+  -webkit-box-shadow: 0 0 1px 1px #50C0FF;
+  box-shadow: 0 0 1px 1px #50C0FF;
+}
+
+.comment {
+  background-color: #252C32 !important;
+  color: #fff;
+  border-color: #222 !important;
+  border: 1px;
+  border-style: solid;
+}
+
+.top {
+  padding-top: 5rem;
+}
+
+.user {
+  width: 2.3rem;
+  height: 2.3rem;
+
+  
 }
