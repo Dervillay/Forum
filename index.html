@@ -25,8 +25,8 @@
   <!-- Navbar -->
   <nav class="navbar fixed-top navbar-dark bg-dark" role="navigation">
     <a class="navbar-brand mb-0 h1" href="#">Forum</a>
-    <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+    <form id="search" class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="text" id="query" onkeyup="searchPage()" placeholder="Search..." id="txtSearch">
       <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
     </form>
     <div class="btn-group btn-group-toggle" role="group">
@@ -36,46 +36,96 @@
   </nav>
 
   <!-- Posts -->
-  <div class="container-fluid container-user top">
-    <div class="jumbotron post p-3">
-      <img src="images/default_user.jpeg" class="user"> <p>Sample User</p>
-      <div class="jumbotron comment p-3">
-        <p>Sample text sample text sample text sample text sample text sample text
-        sample text sample text sample text sample text sample text sample text</p>
-      </div>
-    </div>
-  </div>
+  <ul id=posts class="top"
 
+  <li>
+  <a>
   <div class="container-fluid container-user">
     <div class="jumbotron post p-3">
-      <img src="images/default_user.jpeg" class="user"> <p>Sample User</p>
+      <img src="images/default_user.jpeg" class="user"> <p>User 1</p>
       <div class="jumbotron comment p-3">
-        <p>Sample text sample text sample text sample text sample text sample text
-        sample text sample text sample text sample text sample text sample text</p>
+        Sample text sample text sample text sample text sample text sample text
+        sample text sample text sample text sample text sample text sample text
       </div>
     </div>
   </div>
+  </a>
+  </li>
 
+  <li>
+  <a>
   <div class="container-fluid container-user">
     <div class="jumbotron post p-3">
-      <img src="images/default_user.jpeg" class="user"> <p>Sample User</p>
+      <img src="images/default_user.jpeg" class="user"> <p>User 2</p>
       <div class="jumbotron comment p-3">
-        <p>Sample text sample text sample text sample text sample text sample text
-        sample text sample text sample text sample text sample text sample text</p>
+        Sample text sample text sample text sample text sample text sample text
+        sample text sample text sample text sample text sample text sample text
       </div>
     </div>
   </div>
+  </a>
+  </li>
 
+  <li>
+  <a>
   <div class="container-fluid container-user">
     <div class="jumbotron post p-3">
-      <img src="images/default_user.jpeg" class="user"> <p>Sample User</p>
+      <img src="images/default_user.jpeg" class="user"> <p>User 3</p>
       <div class="jumbotron comment p-3">
-        <p>Sample text sample text sample text sample text sample text sample text
-        sample text sample text sample text sample text sample text sample text</p>
+        Sample text sample text sample text sample text sample text sample text
+        sample text sample text sample text sample text sample text sample text
       </div>
     </div>
   </div>
+  </a>
+  </li>
 
+  <li>
+  <a>
+  <div class="container-fluid container-user">
+    <div class="jumbotron post p-3">
+      <img src="images/default_user.jpeg" class="user"> <p>User 4</p>
+      <div class="jumbotron comment p-3">
+        Sample text sample text sample text sample text sample text sample text
+        sample text sample text sample text sample text sample text sample text
+      </div>
+    </div>
+  </div>
+  </a>
+  </li>
+
+  </ul>
+
+  <!-- Script for search function -->
+  <script type="text/javascript">
+    function searchPage() {
+
+      // Declares all relevant variables
+      var input, filter, ul, li, a, i, txtValue;
+      input = document.getElementById('query');
+
+      // Makes search function case insensitive
+      filter = input.value.toUpperCase();
+
+
+      ul = document.getElementById("posts");
+      li = ul.getElementsByTagName('li');
+
+      // Loop through all list items, and hide those that don't match the query
+      for (i = 0; i < li.length; i++) {
+
+        a = li[i].getElementsByTagName("a")[0];
+        txtValue = a.textContent || a.innerText;
+
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          li[i].style.display = "";
+        } else {
+          li[i].style.display = "none";
+        }
+
+      }
+    }
+  </script>
 
 </body>
 

@@ -2,8 +2,8 @@ body {
   background: #1A2227 !important;
 }
 
-a {
-  font-size: 1.8em !important;
+ul {
+  padding: 0rem;
 }
 
 .btn-primary {
@@ -58,6 +58,7 @@ a {
 .navbar-brand {
   text-decoration: underline !important;
   text-decoration-color: #50C0FF !important;
+  font-size: 1.8em !important;
 }
 
 .navbar-brand:hover {
