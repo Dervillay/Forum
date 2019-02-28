@@ -23,23 +23,23 @@
 <body>
 
   <!-- Navbar -->
-  <nav class="navbar fixed-top navbar-dark bg-dark" role="navigation">
+  <nav class="navbar fixed-top navbar-dark bg-dark">
     <a class="navbar-brand mb-0 h1" href="#">Forum</a>
     <form id="search" class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="text" id="query" onkeyup="searchPage()" placeholder="Search..." id="txtSearch">
+      <input class="form-control mr-sm-2" type="text" id="query" onkeyup="searchPage()" placeholder="Search...">
       <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
     </form>
     <button type="button" class="btn btn-primary">Make a Post</button>
   </nav>
 
   <!-- Posts -->
-  <ul id=posts class="top"
+  <ul id="posts" class="top">
 
   <li>
   <a>
   <div class="container-fluid container-user">
     <div class="jumbotron post p-3">
-      <img src="images/default_user.jpeg" class="user"> <p>User 1</p>
+      <img src="images/default_user.jpeg" alt="user_icon" class="user"> <p>User 1</p>
       <div class="jumbotron comment p-3">
         Sample text sample text sample text sample text sample text sample text
         sample text sample text sample text sample text sample text sample text
@@ -53,7 +53,7 @@
   <a>
   <div class="container-fluid container-user">
     <div class="jumbotron post p-3">
-      <img src="images/default_user.jpeg" class="user"> <p>User 2</p>
+      <img src="images/default_user.jpeg" alt="user_icon" class="user"> <p>User 2</p>
       <div class="jumbotron comment p-3">
         Sample text sample text sample text sample text sample text sample text
         sample text sample text sample text sample text sample text sample text
@@ -67,7 +67,7 @@
   <a>
   <div class="container-fluid container-user">
     <div class="jumbotron post p-3">
-      <img src="images/default_user.jpeg" class="user"> <p>User 3</p>
+      <img src="images/default_user.jpeg" alt="user_icon" class="user"> <p>User 3</p>
       <div class="jumbotron comment p-3">
         Sample text sample text sample text sample text sample text sample text
         sample text sample text sample text sample text sample text sample text
@@ -81,7 +81,7 @@
   <a>
   <div class="container-fluid container-user">
     <div class="jumbotron post p-3">
-      <img src="images/default_user.jpeg" class="user"> <p>User 4</p>
+      <img src="images/default_user.jpeg" alt="user_icon" class="user"> <p>User 4</p>
       <div class="jumbotron comment p-3">
         Sample text sample text sample text sample text sample text sample text
         sample text sample text sample text sample text sample text sample text
@@ -94,16 +94,17 @@
   </ul>
 
   <!-- Script for search function -->
-  <script type="text/javascript">
+  <script>
     function searchPage() {
 
       // Declares all relevant variables
       var input, filter, ul, li, a, i, txtValue;
+
+      // Gets search query
       input = document.getElementById('query');
 
       // Makes search function case insensitive
       filter = input.value.toUpperCase();
-
 
       ul = document.getElementById("posts");
       li = ul.getElementsByTagName('li');
