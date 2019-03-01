@@ -18,22 +18,38 @@
   <!-- Page Title -->
   <title>Forum</title>
 
-</head>
-
-<body>
-
   <!-- Navbar -->
   <nav class="navbar fixed-top navbar-dark bg-dark">
     <a class="navbar-brand mb-0 h1" href="#">Forum</a>
     <form id="search" class="form-inline my-2 my-lg-0">
       <input class="form-control mr-sm-2" type="text" id="query" onkeyup="searchPage()" placeholder="Search...">
-      <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+      <button class="btn btn-secondary my-2 my-sm-0 center" type="submit">Search</button>
     </form>
-    <button type="button" class="btn btn-primary">Make a Post</button>
+    <a href="#"><button type="button" class="btn btn-primary" id="makePost" onclick="openForm()">Make a Post</button></a>
   </nav>
 
+  <!-- Pop-up form -->
+  <div class="form-popup hidden" id="form">
+        <form class="jumbotron form p-3 m-3">
+          <h1>Make a Post</h1>
+
+          <input type="text" placeholder="Enter Username" id="username" class="m-1" required><br>
+          <textarea rows="4" cols="85" placeholder="Enter Message" id="message" class="m-1" required></textarea>
+
+          <div>
+            <button type="submit" class="btn btn-primary">Post</button>
+            <button type="submit" class="btn btn-secondary cancel" onclick="closeForm()">Close</button>
+          </div>
+
+        </form>
+  </div>
+
+</head>
+
+<body>
+
   <!-- Posts -->
-  <ul id="posts" class="top">
+  <ul id="posts">
 
   <li>
   <a>
@@ -122,6 +138,16 @@
         }
 
       }
+    }
+
+    function openForm() {
+      document.getElementById("form").style.display = "block";
+      document.getElementById("makePost").style.display = "none";
+    }
+
+    function closeForm() {
+      document.getElementById("form").style.display = "none";
+      document.getElementById("makePost").style.display = "block";
     }
   </script>
 
