@@ -9,7 +9,7 @@ app.use(express.urlencoded());
 
 app.post('/addUser', function(req, res) {
   users.push(req.body.username);
-  console.log(users);
+  
 });
 
 app.get("/",function(req,res){
