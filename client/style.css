@@ -91,3 +91,7 @@ label textarea {
   bottom: 0rem;
   right: 0rem !important;
 }
+
+.no-decoration {
+  text-decoration: none;
+}
