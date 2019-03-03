@@ -30,10 +30,10 @@
 
   <!-- Pop-up form -->
   <div class="form-popup hidden" id="form">
-        <form class="jumbotron form p-3 m-3">
+        <form action="http://127.0.0.1:8090/addUser" method="POST" class="jumbotron form p-3 m-3">
           <h1>Make a Post</h1>
 
-          <input type="text" placeholder="Enter Username" id="username" class="m-1" required><br>
+          <input type="text" placeholder="Enter Username" name="username" class="m-1" required><br>
           <textarea rows="4" cols="85" placeholder="Enter Message" id="message" class="m-1" required></textarea>
 
           <div>
