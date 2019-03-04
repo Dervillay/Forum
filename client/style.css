@@ -11,6 +11,10 @@ label textarea {
   vertical-align: top;
 }
 
+.default-text {
+  color: #666;
+}
+
 .btn-primary {
   background-color: #50C0FF !important;
   border-color: #50C0FF !important;
@@ -69,6 +73,13 @@ label textarea {
 
 .center {
   text-align: center;
+}
+
+.center-screen {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .hidden {

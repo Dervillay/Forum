@@ -21,7 +21,6 @@
   <!-- Navbar -->
   <nav class="navbar fixed-top navbar-dark bg-dark">
     <a class="navbar-brand mb-0 h1" href="#">Forum</a>
-    <button type="submit" id="refresh" class="btn btn-secondary cancel">Refresh</button>
     <form id="search" class="form-inline my-2 my-lg-0">
       <input class="form-control mr-sm-2" type="text" id="query" onkeyup="searchPage()" placeholder="Search...">
       <button class="btn btn-secondary my-2 my-sm-0 center" type="submit">Search</button>
@@ -31,14 +30,15 @@
 
   <!-- Pop-up form -->
   <div class="form-popup hidden" id="form">
-        <form method="POST" action="./add" class="jumbotron form p-3 m-3">
-          <h1>Make a Post</h1>
+        <form id="inner-form" method="post" action="./add" class="jumbotron form p-3 m-3">
+          <h3>Make a Post</h3>
 
           <input type="text" placeholder="Enter Username" name="username" class="m-1" required><br>
           <textarea rows="4" cols="85" placeholder="Enter Message" name="message" class="m-1" required></textarea>
+          <p class="default-text">'Post' will submit your message to the server; hit 'Close' to update the message board and see it.</p>
 
           <div>
-            <button type="submit" id="refresh" class="btn btn-primary" onclick="closeForm()">Post</button>
+            <button type="submit" class="btn btn-primary">Post</button>
             <button type="button" class="btn btn-secondary cancel" onclick="closeForm()">Close</button>
           </div>
 
@@ -51,7 +51,9 @@
 
   <!-- Posts -->
   <div id="content">
-
+    <div class="p-10">
+      <h5 class="m-10 default-text center-screen">It appears the forum is empty :(<br> Use 'Make a Post' to contribute.</h5>
+    </div>
   </div>
 
   <!-- Local JavaScript Import -->

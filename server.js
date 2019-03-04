@@ -13,6 +13,7 @@ let messages = [];
 app.post('/add', function(req, res) {
   users.push(req.body.username);
   messages.push(req.body.message);
+  console.log(users, messages);
 });
 
 // Gets list of users

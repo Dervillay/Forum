@@ -1,5 +1,5 @@
-// Refresh and update page when refresh button clicked
-document.getElementById("refresh").addEventListener("click", async function(event) {
+// Asynchronous function to update page with all users and messages
+async function refreshPage(event) {
 
   // Uses GET method 'users' to receive list of users
   let usersResponse = await fetch("http://127.0.0.1:8090/users");
@@ -39,7 +39,7 @@ document.getElementById("refresh").addEventListener("click", async function(even
 
   document.getElementById("content").innerHTML += "</ul>";
 
-});
+};
 
 // Searches page for posts with content matching query string
 function searchPage() {
@@ -77,8 +77,9 @@ function openForm() {
   document.getElementById("makePost").style.display = "none";
 }
 
-// Closes pop-up form
+// Closes pop-up form, updates page and restores form
 function closeForm() {
   document.getElementById("form").style.display = "none";
   document.getElementById("makePost").style.display = "block";
+  refreshPage();
 }
