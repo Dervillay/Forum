@@ -31,15 +31,15 @@
 
   <!-- Pop-up form -->
   <div class="form-popup hidden" id="form">
-        <form action="./add" method="POST" class="jumbotron form p-3 m-3">
+        <form method="POST" action="./add" class="jumbotron form p-3 m-3">
           <h1>Make a Post</h1>
 
           <input type="text" placeholder="Enter Username" name="username" class="m-1" required><br>
           <textarea rows="4" cols="85" placeholder="Enter Message" name="message" class="m-1" required></textarea>
 
           <div>
-            <button type="submit" class="btn btn-primary">Post</button>
-            <button class="btn btn-secondary cancel" onclick="closeForm()">Close</button>
+            <button type="submit" id="refresh" class="btn btn-primary" onclick="closeForm()">Post</button>
+            <button type="button" class="btn btn-secondary cancel" onclick="closeForm()">Close</button>
           </div>
 
         </form>
@@ -51,7 +51,7 @@
 
   <!-- Posts -->
   <div id="content">
-    
+
   </div>
 
   <!-- Local JavaScript Import -->
