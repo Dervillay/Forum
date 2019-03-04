@@ -1,31 +1,24 @@
 const express = require('express');
 const app = express();
 
-users = [];
-messages = [];
-
 app.use(express.static('client'));
 app.use(express.urlencoded());
 
-app.post('/addUser', function(req, res) {
+let users = [];
+let messages = [];
+
+app.post('/add', function(req, res) {
   users.push(req.body.username);
-  
+  messages.push(req.body.message);
+  console.log(users, messages);
 });
 
-app.get("/",function(req,res){
-	res.sendFile("client/index.html", {root: __dirname });
-});
+app.get('/users', function(req, res) {
+  res.send(users);
+})
 
-app.get("/style.css", function(req, res) {
-	res.sendFile(__dirname + "/client/" + "style.css");
-});
-
-app.get("/index.js", function(req, res) {
-	res.sendFile(__dirname + "/client/" + "index.js");
-});
-
-app.get("/default_user.jpeg", function(req, res) {
-	res.sendFile(__dirname + "/client/images/" + "default_user.jpeg");
-});
+app.get('/messages', function(req, res) {
+  res.send(messages);
+})
 
 app.listen(8090);

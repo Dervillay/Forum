@@ -15,15 +15,13 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 
-  <!-- Local JavaScript Import -->
-  <script src="index.js"></script>
-
   <!-- Page Title -->
   <title>Forum</title>
 
   <!-- Navbar -->
   <nav class="navbar fixed-top navbar-dark bg-dark">
     <a class="navbar-brand mb-0 h1" href="#">Forum</a>
+    <button type="submit" id="refresh" class="btn btn-secondary cancel">Refresh</button>
     <form id="search" class="form-inline my-2 my-lg-0">
       <input class="form-control mr-sm-2" type="text" id="query" onkeyup="searchPage()" placeholder="Search...">
       <button class="btn btn-secondary my-2 my-sm-0 center" type="submit">Search</button>
@@ -33,15 +31,15 @@
 
   <!-- Pop-up form -->
   <div class="form-popup hidden" id="form">
-        <form action="http://127.0.0.1:8090/addUser" method="POST" class="jumbotron form p-3 m-3">
+        <form action="./add" method="POST" class="jumbotron form p-3 m-3">
           <h1>Make a Post</h1>
 
           <input type="text" placeholder="Enter Username" name="username" class="m-1" required><br>
-          <textarea rows="4" cols="85" placeholder="Enter Message" id="message" class="m-1" required></textarea>
+          <textarea rows="4" cols="85" placeholder="Enter Message" name="message" class="m-1" required></textarea>
 
           <div>
             <button type="submit" class="btn btn-primary">Post</button>
-            <button type="submit" class="btn btn-secondary cancel" onclick="closeForm()">Close</button>
+            <button class="btn btn-secondary cancel" onclick="closeForm()">Close</button>
           </div>
 
         </form>
@@ -52,65 +50,12 @@
 <body>
 
   <!-- Posts -->
-  <ul id="posts">
-
-  <li>
-  <a>
-  <div class="container-fluid container-user">
-    <div class="jumbotron post p-3">
-      <img src="images/default_user.jpeg" alt="user_icon" class="user"> <p>User 1</p>
-      <div class="jumbotron comment p-3">
-        Sample text sample text sample text sample text sample text sample text
-        sample text sample text sample text sample text sample text sample text
-      </div>
-    </div>
+  <div id="content">
+    
   </div>
-  </a>
-  </li>
 
-  <li>
-  <a>
-  <div class="container-fluid container-user">
-    <div class="jumbotron post p-3">
-      <img src="images/default_user.jpeg" alt="user_icon" class="user"> <p>User 2</p>
-      <div class="jumbotron comment p-3">
-        Sample text sample text sample text sample text sample text sample text
-        sample text sample text sample text sample text sample text sample text
-      </div>
-    </div>
-  </div>
-  </a>
-  </li>
-
-  <li>
-  <a>
-  <div class="container-fluid container-user">
-    <div class="jumbotron post p-3">
-      <img src="images/default_user.jpeg" alt="user_icon" class="user"> <p>User 3</p>
-      <div class="jumbotron comment p-3">
-        Sample text sample text sample text sample text sample text sample text
-        sample text sample text sample text sample text sample text sample text
-      </div>
-    </div>
-  </div>
-  </a>
-  </li>
-
-  <li>
-  <a>
-  <div class="container-fluid container-user">
-    <div class="jumbotron post p-3">
-      <img src="images/default_user.jpeg" alt="user_icon" class="user"> <p>User 4</p>
-      <div class="jumbotron comment p-3">
-        Sample text sample text sample text sample text sample text sample text
-        sample text sample text sample text sample text sample text sample text
-      </div>
-    </div>
-  </div>
-  </a>
-  </li>
-
-  </ul>
+  <!-- Local JavaScript Import -->
+  <script src="index.js"></script>
 
 </body>
 
