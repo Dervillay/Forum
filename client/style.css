@@ -106,3 +106,7 @@ label textarea {
 .no-decoration {
   text-decoration: none;
 }
+
+.round-corners {
+  border-radius: 0.3rem;
+}

@@ -9,6 +9,7 @@ app.use(express.urlencoded());
 let users = [];
 let messages = [];
 
+// Defines search query as initially empty string
 let query = "";
 
 // Adds user and message to respective lists
@@ -31,6 +32,7 @@ app.get('/messages', function(req, res) {
   res.send(messages);
 });
 
+// Gets current value of query
 app.get('/query', function(req, res) {
   res.send(query);
 });

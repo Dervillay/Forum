@@ -20,7 +20,7 @@
 
   <!-- Navbar -->
   <nav class="navbar fixed-top navbar-dark bg-dark">
-    <a class="navbar-brand mb-0 h1" href="#">Forum</a>
+    <a class="navbar-brand mb-0 h1" onclick="refreshPage()" href="#">Forum</a>
     <form method="post" action="./query" class="form-inline my-2 my-lg-0">
       <input class="form-control mr-sm-2" type="text" name="query" placeholder="Search...">
       <button id="search" class="btn btn-secondary my-2 my-sm-0 center" type="submit">Search</button>
@@ -33,8 +33,8 @@
         <form id="inner-form" method="post" action="./add" class="jumbotron form p-3 m-3">
           <h3>Make a Post</h3>
 
-          <input type="text" placeholder="Enter Username" name="username" class="m-1" required><br>
-          <textarea rows="4" cols="85" placeholder="Enter Message" name="message" class="m-1" required></textarea>
+          <input type="text" placeholder="  Enter Username" name="username" class="m-1 round-corners" required><br>
+          <textarea rows="4" cols="85" placeholder="  Enter Message" name="message" class="m-1 round-corners" required></textarea>
           <p class="default-text">'Post' will submit your message to the server; hit 'Close' to update the message board and see it.</p>
 
           <div>
@@ -52,7 +52,7 @@
   <!-- Posts -->
   <div id="content">
     <div class="p-10">
-      <h5 class="m-10 default-text center-screen">It appears the forum is empty :(<br> Use 'Make a Post' to contribute.</h5>
+      <h5 class="m-10 default-text center-screen">It appears the forum is empty :(<br> Use 'Make a Post' to contribute or hit 'Forum' to update the page.</h5>
     </div>
   </div>
 
