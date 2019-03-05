@@ -42,34 +42,65 @@ async function refreshPage(event) {
 };
 
 // Searches page for posts with content matching query string
-function searchPage() {
+async function searchPage() {
 
-  // Declares all relevant variables
-  var input, filter, ul, li, a, i, txtValue;
+  // Uses GET method 'users' to receive list of users
+  let usersResponse = await fetch("http://127.0.0.1:8090/users");
+  let usersBody = await usersResponse.text();
 
-  // Gets search query
-  input = document.getElementById("query");
+  // Uses GET method 'messages' to receive list of messages
+  let messagesResponse = await fetch("http://127.0.0.1:8090/messages");
+  let messagesBody = await messagesResponse.text();
 
-  // Makes search function case insensitive
-  filter = input.value.toUpperCase();
+  // Uses GET method 'query' to receive search query
+  let queryResponse = await fetch("http://127.0.0.1:8090/query");
+  let queryBody = await queryResponse.text();
 
-  ul = document.getElementById("posts");
-  li = ul.getElementsByTagName('li');
+  // Parses data received by GET methods into JS objects
+  let usersPost = JSON.parse(usersBody);
+  let messagesPost = JSON.parse(messagesBody);
 
-  // Loop through all list items, and hide those that don't match the query
-  for (i = 0; i < li.length; i++) {
+  // New list to store users and messages matching the query
+  matchingUsers = []
+  matchingMessages = []
 
-    a = li[i].getElementsByTagName("a")[0];
-    txtValue = a.textContent || a.innerText;
-
-    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-      li[i].style.display = "";
-    } else {
-      li[i].style.display = "none";
-    }
-
+  for (let i = 0; i < usersPost.length; i++) {
+      if (usersPost[i].includes(queryBody) || messagesPost[i].includes(queryBody)) {
+        matchingUsers.push(usersPost[i]);
+        matchingMessages.push(messagesPost[i]);
+      }
   }
+
+
+  document.getElementById("content").innerHTML = "";
+
+  // Iterates and updates all posts in matching lists
+  for (let i = 0; i < matchingUsers.length; i++) {
+    document.getElementById("content").innerHTML +=
+    `
+    <li>
+    <a>
+    <div class=\"container-fluid container-user\">
+      <div class=\"jumbotron post p-3\">
+        <img src=\"images/default_user.jpeg\" alt=\"user_icon\" class=\"user\"> <p>` + matchingUsers[i] + `</p>
+        <div class=\"jumbotron comment p-3\">
+          `
+          + matchingMessages[i] +
+          `
+        </div>
+      </div>
+    </div>
+    </a>
+    </li>
+    `
+  };
+
+  document.getElementById("content").innerHTML += "</ul>";
+
+
 }
+
+document.getElementById('search').addEventListener('click', searchPage);
 
 // Opens pop-up form
 function openForm() {
