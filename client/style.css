@@ -7,8 +7,11 @@ ul {
   padding: 0rem;
 }
 
-label textarea {
-  vertical-align: top;
+textarea {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .default-text {
@@ -109,4 +112,8 @@ label textarea {
 
 .round-corners {
   border-radius: 0.3rem;
+}
+
+.back {
+  z-index: -1;
 }
