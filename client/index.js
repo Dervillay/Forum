@@ -139,21 +139,20 @@ async function searchPage() {
 
 
 
-/* Opens pop-up form by setting
- * form's display to 'block' and
- * the 'make a post' button to 'none' */
+/* Opens pop-up form by setting form's display to 'block'
+ * and both makePost and defaultText's display to 'none' */
 function openForm() {
   document.getElementById("form").style.display = "block";
   document.getElementById("makePost").style.display = "none";
+  document.getElementById("defaultText").style.display = "none";
 }
 
-/* Closes pop-up form by setting
- * form's display to 'none' and
- * the 'make a post' button to 'block'
- * it then updates the page */
+/* Closes pop-up form by setting form's display to 'none'
+ *and both makePost and defaultTest's display to 'none' */
 function closeForm() {
   document.getElementById("form").style.display = "none";
   document.getElementById("makePost").style.display = "block";
+  document.getElementById("defaultText").style.display = "block";
   refreshPage();
 }
 
