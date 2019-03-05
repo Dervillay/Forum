@@ -13,7 +13,7 @@ let messages = [];
 let query = "";
 
 // Adds user and message to respective lists
-app.post('/add', function(req, res) {
+app.post('/addPost', function(req, res) {
   users.push(req.body.username);
   messages.push(req.body.message);
 });
@@ -34,7 +34,7 @@ app.get('/messages', function(req, res) {
 
 // Gets current value of query
 app.get('/query', function(req, res) {
-  res.send(query);
+  res.send(query.toLowerCase());
 });
 
 // Listens on port 8090

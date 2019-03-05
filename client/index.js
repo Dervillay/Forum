@@ -102,8 +102,9 @@ async function searchPage() {
   matchingUsers = []
   matchingMessages = []
 
+  // Iterates through (lower case versions of) all users and messages and finds matches
   for (let i = 0; i < usersPost.length; i++) {
-      if (usersPost[i].includes(queryBody) || messagesPost[i].includes(queryBody)) {
+      if (usersPost[i].toLowerCase().includes(queryBody) || messagesPost[i].toLowerCase().includes(queryBody)) {
         matchingUsers.push(usersPost[i]);
         matchingMessages.push(messagesPost[i]);
       }
@@ -149,7 +150,7 @@ function openForm() {
 /* Closes pop-up form by setting
  * form's display to 'none' and
  * the 'make a post' button to 'block'
- * it then updates the page */ 
+ * it then updates the page */
 function closeForm() {
   document.getElementById("form").style.display = "none";
   document.getElementById("makePost").style.display = "block";
