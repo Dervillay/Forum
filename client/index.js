@@ -1,4 +1,8 @@
-// Asynchronous function to update page with all users and messages
+/* Asynchronous function to update page with all users and messages.
+ * Uses GET methods of server to recieve current list of users and
+ * messages. It then iterates through them and inserts the final posts
+ * in index.html
+ */
 async function refreshPage() {
 
   // Uses GET method 'users' to receive list of users
@@ -72,7 +76,10 @@ async function restoreForm() {
 */
 
 
-// Searches page for posts with content matching query string
+/* Searches page for posts with content matching query string.
+ * Takes current query value and compares it to currnently held
+ * values for users and messages, rendering posts that match.
+ */
 async function searchPage() {
 
   // Uses GET method 'users' to receive list of users
@@ -129,18 +136,27 @@ async function searchPage() {
   document.getElementById("content").innerHTML += "</ul>";
 }
 
-// Add listener for search button
-document.getElementById('search').addEventListener('click', searchPage);
 
-// Opens pop-up form
+
+/* Opens pop-up form by setting
+ * form's display to 'block' and
+ * the 'make a post' button to 'none' */
 function openForm() {
   document.getElementById("form").style.display = "block";
   document.getElementById("makePost").style.display = "none";
 }
 
-// Closes pop-up form, updates page and restores form
+/* Closes pop-up form by setting
+ * form's display to 'none' and
+ * the 'make a post' button to 'block'
+ * it then updates the page */ 
 function closeForm() {
   document.getElementById("form").style.display = "none";
   document.getElementById("makePost").style.display = "block";
   refreshPage();
 }
+
+/* Event listeners */
+
+// Add listener for search button
+document.getElementById('search').addEventListener('click', searchPage);
