@@ -111,7 +111,7 @@ async function searchPage() {
   }
 
   // Clears out message board area
-  document.getElementById("content").innerHTML = "";
+  document.getElementById("content").innerHTML = "<ul id=\"posts\">";
 
   // Iterates and updates all posts in matching lists
   for (let i = 0; i < matchingUsers.length; i++) {
