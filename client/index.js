@@ -140,7 +140,7 @@ async function searchPage() {
 /* Opens pop-up form by setting form's display to 'block'
  * and both makePost and defaultText's display to 'none' */
 function openForm() {
-  document.getElementById("form").style.display = "block";
+  document.getElementById("form").setAttribute('style', 'display:block !important');
   document.getElementById("makePost").style.display = "none";
   document.getElementById("defaultText").style.display = "none";
 }
@@ -149,18 +149,32 @@ function openForm() {
  *and both makePost and defaultTest's display to 'none' */
 function closeForm() {
   document.getElementById("form").style.display = "none";
-  document.getElementById("makePost").style.display = "block";
+  document.getElementById("makePost").setAttribute('style', 'display:block !important');
   document.getElementById("defaultText").style.display = "block";
   refreshPage();
 }
 
-/* Google sign-in function */
+/* Google sign-in function.
+ * Gets user's name and puts it in the navbar */
 function onSignIn(googleUser) {
   var profile = googleUser.getBasicProfile();
-  users += profile.getName();
-  users[profile.getName()] = [img = profile.getImageUrl()];
-
   var id_token = googleUser.getAuthResponse().id_token;
+  document.getElementById("googleSignIn").setAttribute('style', 'display:none !important');
+  document.getElementById("googleSignOut").setAttribute('style', 'display:block !important');
+  document.getElementById("makePost").setAttribute('style', 'display:block !important');
+  document.getElementById("welcome").innerHTML = "<h6 class=\"welcome\">Welcome, " + profile.getName() + " </h6>";
+}
+
+/* Google sign-out function.
+ * Signs user out, hides the sign out button
+ * and displays the sign in button again */
+function signOut() {
+  var auth2 = gapi.auth2.getAuthInstance();
+  auth2.signOut();
+  document.getElementById("welcome").innerHTML = null;
+  document.getElementById("googleSignOut").style.display = "none";
+  document.getElementById("makePost").style.display= "none";
+  document.getElementById("googleSignIn").style.display = "block";
 }
 
 /* Event listeners */

@@ -31,12 +31,14 @@
       <input class="form-control mr-sm-2" type="text" name="query" placeholder="Search...">
       <button id="search" class="btn btn-secondary my-2 my-sm-0 center" type="submit">Search</button>
     </form>
-    <div class="g-signin2" data-onsuccess="onSignIn()" data-theme="dark"></div>
-    <a class="no-decoration" href="#"><button type="button" class="btn btn-primary" id="makePost" onclick="openForm()">Make a Post</button></a>
+    <div id="googleSignIn" class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+    <div id="welcome"></div>
+    <button id="googleSignOut" class="btn btn-secondary hidden" onclick="signOut()">Sign Out</button>
+    <button id="makePost" class="btn btn-primary hidden" onclick="openForm()">Make a Post</button>
   </nav>
 
   <!-- Pop-up form -->
-  <div class="form-popup hidden center-screen" id="form">
+  <div id="form" class="form-popup hidden center-screen">
         <form id="inner-form" method="post" action="./addPost" class="jumbotron form p-3 m-3">
           <h3>Make a Post</h3>
 
@@ -59,7 +61,7 @@
   <!-- Posts -->
   <div id="content">
     <div class="p-10">
-      <h5 id="defaultText" class="m-10 default-text center-screen back">It appears the forum is empty :(<br> Use 'Make a Post' to contribute or hit 'Forum' to update the page.</h5>
+      <h5 id="defaultText" class="m-10 default-text center-screen back">It appears the forum is empty :(<br> Sign in and make a post to contribute or hit 'Forum' to update the page.</h5>
     </div>
   </div>
 

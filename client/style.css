@@ -14,6 +14,10 @@ textarea {
     width: 100%;
 }
 
+.welcome {
+  color: #fff;
+}
+
 .default-text {
   color: #666;
 }
@@ -86,7 +90,7 @@ textarea {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .form {
@@ -107,7 +111,7 @@ textarea {
 }
 
 .no-decoration {
-  text-decoration: none;
+  text-decoration: none !important;
 }
 
 .round-corners {
