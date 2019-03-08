@@ -7,6 +7,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+  <!-- Tags for Google sign-in -->
+  <meta name="google-signin-scope" content="profile email">
+  <meta name="google-signin-client_id" content="1034407414873-1fo0nujkkqin2mbnj0fr5c4ms6ildhhi.apps.googleusercontent.com">
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
+
   <!-- Import CSS stylesheet -->
   <link rel="stylesheet" type="text/css" href="style.css">
 
@@ -25,6 +31,7 @@
       <input class="form-control mr-sm-2" type="text" name="query" placeholder="Search...">
       <button id="search" class="btn btn-secondary my-2 my-sm-0 center" type="submit">Search</button>
     </form>
+    <div class="g-signin2" data-onsuccess="onSignIn()" data-theme="dark"></div>
     <a class="no-decoration" href="#"><button type="button" class="btn btn-primary" id="makePost" onclick="openForm()">Make a Post</button></a>
   </nav>
 

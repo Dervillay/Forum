@@ -19,13 +19,13 @@ textarea {
 }
 
 .btn-primary {
-  background-color: #50C0FF !important;
-  border-color: #50C0FF !important;
+  background-color: #4285F4 !important;
+  border-color: #4285F4 !important;
 }
 
 .btn-primary:hover,
 .btn-primary:focus {
-  background-color: rgb(60,172,235, 0.7) !important;
+  background-color: rgb(36,103,214) !important;
   box-shadow: none !important;
 }
 
@@ -65,7 +65,7 @@ textarea {
 
 .navbar-brand {
   text-decoration: underline !important;
-  text-decoration-color: #50C0FF !important;
+  text-decoration-color: #4285F4 !important;
   font-size: 1.8em !important;
 }
 

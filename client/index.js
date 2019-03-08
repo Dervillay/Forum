@@ -137,8 +137,6 @@ async function searchPage() {
   document.getElementById("content").innerHTML += "</ul>";
 }
 
-
-
 /* Opens pop-up form by setting form's display to 'block'
  * and both makePost and defaultText's display to 'none' */
 function openForm() {
@@ -154,6 +152,15 @@ function closeForm() {
   document.getElementById("makePost").style.display = "block";
   document.getElementById("defaultText").style.display = "block";
   refreshPage();
+}
+
+/* Google sign-in function */
+function onSignIn(googleUser) {
+  var profile = googleUser.getBasicProfile();
+  users += profile.getName();
+  users[profile.getName()] = [img = profile.getImageUrl()];
+
+  var id_token = googleUser.getAuthResponse().id_token;
 }
 
 /* Event listeners */
