@@ -1,8 +1,10 @@
 // Initial setup
 const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
 
 app.use(express.static('client'));
+app.use(bodyParser.json());
 app.use(express.urlencoded());
 
 // Defines intially empty lists: users and messages
