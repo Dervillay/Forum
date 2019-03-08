@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Dervillay/Forum/issues"
   },
-  "homepage": "https://github.com/Dervillay/Forum#readme"
+  "homepage": "https://github.com/Dervillay/Forum#readme",
+  "devDependencies": {
+    "standard": "^11.0.1"
+  }
 }
