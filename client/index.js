@@ -137,34 +137,6 @@ async function searchPage() {
   document.getElementById("content").innerHTML += "</ul>";
 }
 
-/* Creates user from form inputs
- * and returns it as a JSON object */
-async function createUser() {
-  // Creates new date object to find user's join date
-  var d = new Date();
-
-  // Gets form inputs and stores them in variables
-  var username = document.getElementById("username").value;
-  var password = document.getElementById("password").value;
-  var email = document.getElementById("email").value;
-
-  // Checks inputs match on submission
-  if (!checkEmail() || !checkPassword()) {
-    return false
-  }
-
-  // Transforms user's info into a JSON object and stores it in user
-  var user = '{ \"username\":\"' + username + '\", ' +
-              '\"email\":\"' + email + '\", ' +
-              '\"password\":\"' + password + '\", ' +
-              '\"dateJoined\":\"' + d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear() + '\"' +
-              '}';
-
-  // Converts user to JSON and returns it
-  return JSON.parse(user);
-
-}
-
 /* Checks if email inputs are matching */
 function checkEmail() {
   // Gets email inputs and stores them in variables
