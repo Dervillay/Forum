@@ -34,15 +34,40 @@
     <div id="googleSignIn" class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
     <div id="welcome"></div>
     <button id="googleSignOut" class="btn btn-secondary hidden" onclick="signOut()">Sign Out</button>
+    <div class="btn-group" role="group" aria-label="Basic example">
+      <button type="button" class="btn btn-primary" onclick="openSignUp()">Sign up</button>
+      <button type="button" class="btn btn-secondary">Sign in</button>
+  </div>
     <button id="makePost" class="btn btn-primary hidden" onclick="openForm()">Make a Post</button>
   </nav>
+
+</head>
+
+<body>
+
+  <!-- Pop-up sign up Form -->
+  <div id="signup" class="form-popup hidden center-screen">
+        <form id="inner-sign-up" method="post" action="./addUser" class="jumbotron form p-3 m-3">
+          <h3>Create an account</h3>
+
+          <input id="username" name="username" type="text" placeholder="Username" class="m-1 round-corners" required><br>
+          <input id="email" name="email" type="text" placeholder="Email" class="m-1 round-corners" required></textarea>
+          <input id="confirmemail" name="confirmemail" type="text" placeholder="Confirm email" onblur="checkEmail()" class="m-1 round-corners" required></textarea>
+          <input id="password" name="password" type="password" placeholder="Password" class="m-1 round-corners" required></textarea>
+          <input id="confirmpassword" name="confirmpassword" type="password" placeholder=" Confirm password" onblur="checkPassword()" class="m-1 round-corners" required></textarea>
+          <div>
+            <button type="submit" class="btn btn-primary">Sign up</button>
+            <button type="button" class="btn btn-secondary cancel" onclick="closeForm()">Close</button>
+          </div>
+
+        </form>
+  </div>
 
   <!-- Pop-up form -->
   <div id="form" class="form-popup hidden center-screen">
         <form id="inner-form" method="post" action="./addPost" class="jumbotron form p-3 m-3">
           <h3>Make a Post</h3>
 
-          <input type="text" placeholder="  Enter Username" name="username" class="m-1 round-corners" required><br>
           <textarea rows="4" placeholder="  Enter Message" name="message" class="m-1 round-corners" required></textarea>
           <p class="default-text">'Post' will submit your message to the server; hit 'Close' to update the message board and see it.</p>
 
@@ -53,10 +78,6 @@
 
         </form>
   </div>
-
-</head>
-
-<body>
 
   <!-- Posts -->
   <div id="content">

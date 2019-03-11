@@ -5,6 +5,7 @@ const app = express();
 
 app.use(express.static('client'));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded());
 
 // Defines intially empty lists: users and messages
@@ -18,6 +19,18 @@ let query = "";
 app.post('/addPost', function(req, res) {
   users.push(req.body.username);
   messages.push(req.body.message);
+});
+
+// Adds user to users
+app.post('/addUser', function(req, res) {
+  var d = new Date();
+  var user = '{ \"username\":\"' + req.body.username + '\",' +
+              '\"email\":\"' + req.body.email + '\",' +
+              '\"password\":\"' + req.body.password + '\",' +
+              '\"dateJoined\":\"' + d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear() + '\"' +
+              '}';
+
+  users.push(JSON.parse(user));
 });
 
 app.post('/query', function(req, res) {

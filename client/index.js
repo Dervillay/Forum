@@ -99,8 +99,8 @@ async function searchPage() {
   let messagesPost = JSON.parse(messagesBody);
 
   // New list to store users and messages matching the query
-  matchingUsers = []
-  matchingMessages = []
+  var matchingUsers = []
+  var matchingMessages = []
 
   // Iterates through (lower case versions of) all users and messages and finds matches
   for (let i = 0; i < usersPost.length; i++) {
@@ -135,6 +135,69 @@ async function searchPage() {
     `
   };
   document.getElementById("content").innerHTML += "</ul>";
+}
+
+/* Creates user from form inputs
+ * and returns it as a JSON object */
+async function createUser() {
+  // Creates new date object to find user's join date
+  var d = new Date();
+
+  // Gets form inputs and stores them in variables
+  var username = document.getElementById("username").value;
+  var password = document.getElementById("password").value;
+  var email = document.getElementById("email").value;
+
+  // Checks inputs match on submission
+  if (!checkEmail() || !checkPassword()) {
+    return false
+  }
+
+  // Transforms user's info into a JSON object and stores it in user
+  var user = '{ \"username\":\"' + username + '\", ' +
+              '\"email\":\"' + email + '\", ' +
+              '\"password\":\"' + password + '\", ' +
+              '\"dateJoined\":\"' + d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear() + '\"' +
+              '}';
+
+  // Converts user to JSON and returns it
+  return JSON.parse(user);
+
+}
+
+/* Checks if email inputs are matching */
+function checkEmail() {
+  // Gets email inputs and stores them in variables
+  var email = document.getElementById("email").value;
+  var confirmEmail = document.getElementById("confirmemail").value;
+
+  if (email != confirmEmail) {
+    alert('Inputted emails must match');
+    return false;
+  } else {
+    return true;
+  }
+}
+
+/* Checks if password inputs are matching */
+function checkPassword() {
+  // Gets email inputs and stores them in variables
+  var password = document.getElementById("password").value;
+  var confirmPassword = document.getElementById("confirmpassword").value;
+
+  if (password != confirmPassword) {
+    alert('Inputted passwords must match');
+    return false;
+  } else {
+    return true;
+  }
+}
+
+/* Opens pop-up form by setting sign up form's display
+ * to 'block' defaultText's display to 'none' */
+function openSignUp() {
+  document.getElementById("signup").setAttribute('style', 'display:block !important');
+  document.getElementById("defaultText").style.display = "none";
 }
 
 /* Opens pop-up form by setting form's display to 'block'
