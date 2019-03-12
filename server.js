@@ -33,21 +33,29 @@ app.post('/addUser', function(req, res) {
               '\"dateJoined\":\"' + d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear() + '\"' +
               '}';
 
-
   // Turns user into a JSON object
   let userJSON = JSON.parse(user);
 
-  // Creates unique 10 round salt
-  let salt = bcrypt.genSaltSync(10);
+  // Generates salt with 10 rounds
+  bcrypt.genSalt(10)
 
-  // Sets userJSON's property password to hashed password
-  userJSON["password"] = bcrypt.hashSync(req.body.password, salt);
+  // Stores salt in user object
+  .then(salt => {
+    userJSON["salt"] = salt;
 
-  // Sets userJSON's property salt to salt
-  userJSON["salt"] = salt;
+    return bcrypt.hash(req.body.password, salt);
+  })
+  // Stores hashed password in user object
+  .then(hash => {
+    userJSON["password"] = hash;
 
-  // Pushes user as JSON object to users
-  users.push(userJSON);
+    // Adds userJSON to users
+    users.push(userJSON);
+  })
+  // Catches and handles errors
+  .catch(err => {
+    throw (new Error(err))
+  });
 });
 
 app.post('/query', function(req, res) {
