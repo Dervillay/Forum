@@ -143,6 +143,7 @@ function checkEmail() {
   var email = document.getElementById("email").value;
   var confirmEmail = document.getElementById("confirmemail").value;
 
+  // Checks if both input fields are equal
   if (email != confirmEmail) {
     alert('Inputted emails must match');
     return false;
@@ -157,6 +158,7 @@ function checkPassword() {
   var password = document.getElementById("password").value;
   var confirmPassword = document.getElementById("confirmpassword").value;
 
+  // Checks if both input fields are equal
   if (password != confirmPassword) {
     alert('Inputted passwords must match');
     return false;

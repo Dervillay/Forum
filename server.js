@@ -1,11 +1,12 @@
 // Initial setup
+const bcrypt = require('bcryptjs');
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 
 app.use(express.static('client'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.urlencoded());
 
 // Defines intially empty lists: users and messages
@@ -23,14 +24,30 @@ app.post('/addPost', function(req, res) {
 
 // Adds user to users
 app.post('/addUser', function(req, res) {
-  var d = new Date();
-  var user = '{ \"username\":\"' + req.body.username + '\",' +
+  // Creates new Date object to calculate date account was created
+  let d = new Date();
+
+  // Creates variable user to store info
+  let user = '{ \"username\":\"' + req.body.username + '\",' +
               '\"email\":\"' + req.body.email + '\",' +
-              '\"password\":\"' + req.body.password + '\",' +
               '\"dateJoined\":\"' + d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear() + '\"' +
               '}';
 
-  users.push(JSON.parse(user));
+
+  // Turns user into a JSON object
+  let userJSON = JSON.parse(user);
+
+  // Creates unique 10 round salt
+  let salt = bcrypt.genSaltSync(10);
+
+  // Sets userJSON's property password to hashed password
+  userJSON["password"] = bcrypt.hashSync(req.body.password, salt);
+
+  // Sets userJSON's property salt to salt
+  userJSON["salt"] = salt;
+
+  // Pushes user as JSON object to users
+  users.push(userJSON);
 });
 
 app.post('/query', function(req, res) {
