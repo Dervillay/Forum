@@ -174,6 +174,21 @@ function openSignUp() {
   document.getElementById("defaultText").style.display = "none";
 }
 
+/* Closes pop-up form by setting sign up form's display
+ * value to 'none' */
+function closeSignUp() {
+  document.getElementById("signup").setAttribute('style', 'display: none !important');
+}
+
+/* Submits sign up form and creates alert informing user
+ * that submission was successful and closes the form */
+function submitSignUp() {
+  alert("Account created successfully.");
+  document.forms["signup"].submit();
+  window.close();
+  closeSignUp();
+}
+
 /* Opens pop-up form by setting form's display to 'block'
  * and both makePost and defaultText's display to 'none' */
 function openForm() {

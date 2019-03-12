@@ -47,7 +47,7 @@
 
   <!-- Pop-up sign up Form -->
   <div id="signup" class="form-popup hidden center-screen">
-        <form id="inner-sign-up" method="post" action="./addUser" class="jumbotron form p-3 m-3">
+        <form id="inner-sign-up" name="signup" method="post" action="./addUser" class="jumbotron form p-3 m-3">
           <h3>Create an account</h3>
 
           <input id="username" name="username" type="text" placeholder="Username" class="m-1 round-corners" required><br>
@@ -56,8 +56,8 @@
           <input id="password" name="password" type="password" placeholder="Password" class="m-1 round-corners" required></textarea>
           <input id="confirmpassword" name="confirmpassword" type="password" placeholder=" Confirm password" onblur="checkPassword()" class="m-1 round-corners" required></textarea>
           <div>
-            <button type="submit" class="btn btn-primary">Sign up</button>
-            <button type="button" class="btn btn-secondary cancel" onclick="closeForm()">Close</button>
+            <button type="submit" class="btn btn-primary" onclick="submitSignUp()">Sign up</button>
+            <button type="button" class="btn btn-secondary cancel" onclick="closeSignUp()">Close</button>
           </div>
 
         </form>
