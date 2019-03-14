@@ -143,9 +143,9 @@ function checkEmail() {
   var email = document.getElementById("email").value;
   var confirmEmail = document.getElementById("confirmemail").value;
 
-  // Checks if both input fields are equal
+  // Checks if both input fields are equal and that email is valid
   if (email != confirmEmail) {
-    alert('Inputted emails must match');
+    alert("Inputted emails are invalid or do not match");
     return false;
   } else {
     return true;
@@ -160,7 +160,7 @@ function checkPassword() {
 
   // Checks if both input fields are equal
   if (password != confirmPassword) {
-    alert('Inputted passwords must match');
+    alert('Inputted passwords do not match');
     return false;
   } else {
     return true;
@@ -183,10 +183,14 @@ function closeSignUp() {
 /* Submits sign up form and creates alert informing user
  * that submission was successful and closes the form */
 function submitSignUp() {
-  alert("Account created successfully.");
-  document.forms["signup"].submit();
-  window.close();
-  closeSignUp();
+  if (checkEmail() && checkPassword()) {
+    alert("Account created successfully.");
+    document.forms["signup"].submit();
+    window.close();
+    closeSignUp();
+  } else {
+    alert("Please fill out the full form before trying to submit");
+  }
 }
 
 /* Opens pop-up form by setting form's display to 'block'
