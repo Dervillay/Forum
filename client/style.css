@@ -14,6 +14,23 @@ textarea {
     width: 100%;
 }
 
+hr {
+  border: 1px solid #555 !important;
+  margin-bottom: 25px;
+}
+
+input[type=text], input[type=password] {
+  width: 100%;
+  display: inline-block;
+  border: none;
+  background: #f1f1f1;
+}
+
+input[type=text]:focus, input[type=password]:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
 .welcome {
   color: #fff;
 }
@@ -22,9 +39,18 @@ textarea {
   color: #666;
 }
 
+.secondary-text {
+  color: #AAA;
+}
+
 .btn-primary {
   background-color: #4285F4 !important;
   border-color: #4285F4 !important;
+  margin: 5px 0 5px 0;
+}
+
+.btn-secondary {
+  margin: 5px 0 5px 0;
 }
 
 .btn-primary:hover,
@@ -38,6 +64,11 @@ textarea {
   border-color: #50C0FF !important;
   box-shadow: none !important;
   background-color: #5A6065;
+}
+
+.container {
+  padding: 16px;
+  text-align: left;
 }
 
 .post {
@@ -103,6 +134,17 @@ textarea {
 
 .form-popup {
   text-align: center;
+  overflow: auto;
+}
+
+.form-content {
+  margin: 5% auto 15% auto;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+.form-input {
+  margin: 0 0 1.5rem 0 !important;
 }
 
 .bottom {

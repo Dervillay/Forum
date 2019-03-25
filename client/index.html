@@ -34,11 +34,11 @@
     <div id="googleSignIn" class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
     <div id="welcome"></div>
     <button id="googleSignOut" class="btn btn-secondary hidden" onclick="signOut()">Sign Out</button>
-    <div class="btn-group" role="group" aria-label="Basic example">
+    <div id="signUpBar" class="btn-group" role="group">
       <button type="button" class="btn btn-primary" onclick="openSignUp()">Sign up</button>
       <button type="button" class="btn btn-secondary">Sign in</button>
   </div>
-    <button id="makePost" class="btn btn-primary hidden" onclick="openForm()">Make a Post</button>
+    <button id="makePost" class="btn btn-primary hidden" onclick="openMessageForm()">Make a Post</button>
   </nav>
 
 </head>
@@ -48,17 +48,30 @@
   <!-- Pop-up sign up Form -->
   <div id="signup" class="form-popup hidden center-screen">
         <form id="inner-sign-up" name="signup" method="post" action="./addUser" class="jumbotron form p-3 m-3">
-          <h3>Create an account</h3>
-          <input id="username" name="username" type="text" placeholder="Username" class="m-1 round-corners" required><br>
-          <input id="email" name="email" type="text" placeholder="Email" class="m-1 round-corners" required><br>
-          <input id="confirmemail" name="confirmemail" type="text" placeholder="Confirm email" onblur="checkEmail()" class="m-1 round-corners" required><br>
-          <input id="password" name="password" type="password" placeholder="Password" class="m-1 round-corners" required><br>
-          <input id="confirmpassword" name="confirmpassword" type="password" placeholder="Confirm password" onblur="checkPassword()" class="m-1 round-corners" required>
-          <div>
-            <button type="submit" class="btn btn-primary" onclick="submitSignUp()">Sign up</button>
-            <button type="button" class="btn btn-secondary cancel" onclick="closeSignUp()">Close</button>
-          </div>
+          <div class="container">
+            <h2>Create an account</h2>
+            <p class="secondary-text">Please fill in this form to register an account</p>
+            <hr>
 
+            <label for="username">Username</label>
+            <input id="username" name="username" type="text" placeholder="Enter username" class="p-2 round-corners form-input" required><br>
+
+            <label for="email">Email</label>
+            <input id="email" name="email" type="text" placeholder="Enter email" class="p-2 round-corners form-input" required><br>
+
+            <label for="confirmemail">Confirm Email</label>
+            <input id="confirmEmail" name="confirmemail" type="text" placeholder="Confirm email" onblur="checkEmail()" class="p-2 round-corners form-input" required><br>
+
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" placeholder="Enter password" class="p-2 round-corners form-input" required><br>
+
+            <label for="confirmpassword">Confirm Password</label>
+            <input id="confirmPassword" name="confirmpassword" type="password" placeholder="Confirm password" onblur="checkPassword()" class="p-2 round-corners form-input" required>
+            <div>
+              <button type="button" class="btn btn-primary" onclick="submitSignUp()">Sign up</button>
+              <button type="button" class="btn btn-secondary cancel" onclick="closeSignUp()">Close</button>
+            </div>
+          </div>
         </form>
   </div>
 
@@ -72,7 +85,7 @@
 
           <div>
             <button type="submit" class="btn btn-primary">Post</button>
-            <button type="button" class="btn btn-secondary cancel" onclick="closeForm()">Close</button>
+            <button type="button" class="btn btn-secondary cancel" onclick="closeMessageForm()">Close</button>
           </div>
 
         </form>

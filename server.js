@@ -14,7 +14,7 @@ let users = [];
 let messages = [];
 
 // Defines search query as initially empty string
-let query = "";
+let query = '';
 
 // Adds user and message to respective lists
 app.post('/addPost', function(req, res) {
@@ -47,7 +47,7 @@ app.post('/addUser', function(req, res) {
   })
   // Stores hashed password in user object
   .then(hash => {
-    userJSON["password"] = hash;
+    userJSON['password'] = hash;
 
     // Adds userJSON to users
     users.push(userJSON);

@@ -47,35 +47,6 @@ async function refreshPage() {
   }
 }
 
-/*
-async function successfulSubmit() {
-  // Clears out message board area
-  document.getElementById("inner-form").innerHTML =
-  `
-  <h6>Post submitted successfully!</h6>
-  <button type="button" class="btn btn-secondary cancel" onclick="closeForm()">Close</button>
-  `;
-}
-*/
-
-/*
-async function restoreForm() {
-  document.getElementById("inner-form").innerHTML =
-  `
-  <h3>Make a Post</h3>
-
-  <input type="text" placeholder="Enter Username" name="username" class="m-1" required><br>
-  <textarea rows="4" cols="85" placeholder="Enter Message" name="message" class="m-1" required></textarea>
-
-  <div>
-    <button type="submit" class="btn btn-primary" onclick="successfulSubmit()">Post</button>
-    <button type="button" class="btn btn-secondary cancel" onclick="closeForm()">Close</button>
-  </div>
-  `;
-}
-*/
-
-
 /* Searches page for posts with content matching query string.
  * Takes current query value and compares it to currnently held
  * values for users and messages, rendering posts that match.
@@ -137,15 +108,57 @@ async function searchPage() {
   document.getElementById("content").innerHTML += "</ul>";
 }
 
+/* Checks whether current inputted information can be
+ * found in existsing user accounts */
+async function checkAccount() {
+  // Gets username and email from form
+  var username = await document.getElementById("username").value;
+  var email = await document.getElementById("email").value;
+
+  // Fetches existing users' information and formats it to JSON
+  let usersResponse = await fetch("http://127.0.0.1:8090/users");
+  let usersBody = await usersResponse.text();
+  let usersJSON = JSON.parse(usersBody);
+
+  // Loops through all users returned to usersResponse
+  for (let i = 0; i < usersJSON.length; i++) {
+
+    // Checks if user's username matches that in the form
+    if (usersJSON[i]["username"] == username) {
+      // Alerts user that the username is taken and returns false
+      alert("An account with that username already exists");
+      return false;
+    // Checks if user's email matches that in the form
+    } else if (usersJSON[i]["email"] == email) {
+      // Alerts user that the email is taken and returns false
+      alert("An account with that email address already exists");
+      return false;
+    }
+  }
+
+  // If no issues found, closes the form, adjusts the items in the navbar and returns true
+  successfulSignIn();
+  return true;
+
+}
+
 /* Checks if email inputs are matching */
 function checkEmail() {
   // Gets email inputs and stores them in variables
   var email = document.getElementById("email").value;
-  var confirmEmail = document.getElementById("confirmemail").value;
+  var confirmEmail = document.getElementById("confirmEmail").value;
 
-  // Checks if both input fields are equal and that email is valid
-  if (email != confirmEmail) {
-    alert("Inputted emails are invalid or do not match");
+  // Checks if email has been left blank, if so gives an alert and returns false
+  if (email == "") {
+    alert("Please enter an email")
+    return false;
+  // Checks if email and confirmation email are matching
+  } else if (email != confirmEmail) {
+    alert("Inputted emails do not match");
+    return false;
+  // Uses regex to determine whether the email is in a valid format
+  } else if (!email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
+    alert("Please enter a valid email address")
     return false;
   } else {
     return true;
@@ -156,11 +169,14 @@ function checkEmail() {
 function checkPassword() {
   // Gets email inputs and stores them in variables
   var password = document.getElementById("password").value;
-  var confirmPassword = document.getElementById("confirmpassword").value;
+  var confirmPassword = document.getElementById("confirmPassword").value;
 
   // Checks if both input fields are equal
   if (password != confirmPassword) {
     alert('Inputted passwords do not match');
+    return false;
+  } else if (password == "") {
+    alert('Please enter a password');
     return false;
   } else {
     return true;
@@ -180,33 +196,44 @@ function closeSignUp() {
   document.getElementById("signup").setAttribute('style', 'display: none !important');
 }
 
-/* Submits sign up form and creates alert informing user
- * that submission was successful and closes the form */
-function submitSignUp() {
-  if (checkEmail() && checkPassword()) {
-    alert("Account created successfully.");
+/* Submits sign up form if information is valid and
+ * creates an alert appropriate to the outcome. */
+async function submitSignUp() {
+  // sets accountFree to boolean value returned by checkAccount
+  let accountFree = await checkAccount();
+
+  // Checks if inputted values already correspond to an existing user
+  // and checks if the inputted emails and passwords are valid
+  if (accountFree && checkEmail() && checkPassword()) {
+    // Submits form and informs user that the account creation was successful, then closes the form
     document.forms["signup"].submit();
-    window.close();
+    alert("Account created successfully.");
     closeSignUp();
-  } else {
-    alert("Please fill out the full form before trying to submit");
   }
 }
 
-/* Opens pop-up form by setting form's display to 'block'
+/* Sets the display qualities of items in the
+ * navbar when a successful sign-in occurs */
+function successfulSignIn() {
+  document.getElementById("signUpBar").style.display = "none";
+  document.getElementById("googleSignIn").setAttribute('style', 'display:none !important');
+  document.getElementById("makePost").setAttribute('style', 'display:block !important');
+}
+
+/* Opens pop-up message form by setting form's display to 'block'
  * and both makePost and defaultText's display to 'none' */
-function openForm() {
+function openMessageForm() {
   document.getElementById("form").setAttribute('style', 'display:block !important');
   document.getElementById("makePost").style.display = "none";
   document.getElementById("defaultText").style.display = "none";
+  document.getElementById("signUpBar").style.display = "none";
 }
 
-/* Closes pop-up form by setting form's display to 'none'
- *and both makePost and defaultTest's display to 'none' */
-function closeForm() {
+/* Closes pop-up message form by setting form's display to 'none'
+ * and both makePost and defaultTest's display to 'none' */
+function closeMessageForm() {
   document.getElementById("form").style.display = "none";
   document.getElementById("makePost").setAttribute('style', 'display:block !important');
-  document.getElementById("defaultText").style.display = "block";
   refreshPage();
 }
 
@@ -215,10 +242,10 @@ function closeForm() {
 function onSignIn(googleUser) {
   var profile = googleUser.getBasicProfile();
   var id_token = googleUser.getAuthResponse().id_token;
-  document.getElementById("googleSignIn").setAttribute('style', 'display:none !important');
   document.getElementById("googleSignOut").setAttribute('style', 'display:block !important');
-  document.getElementById("makePost").setAttribute('style', 'display:block !important');
   document.getElementById("welcome").innerHTML = "<h6 class=\"welcome\">Welcome, " + profile.getName() + " </h6>";
+  // Adjusts items in navbar to inform the user they are signed in
+  successfulSignIn();
 }
 
 /* Google sign-out function.
