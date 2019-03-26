@@ -184,16 +184,31 @@ function checkPassword() {
 }
 
 /* Opens pop-up form by setting sign up form's display
- * to 'block' defaultText's display to 'none' */
+ * to 'block' and both sign in & defaultTexts' display to 'none' */
 function openSignUp() {
   document.getElementById("signup").setAttribute('style', 'display:block !important');
   document.getElementById("defaultText").style.display = "none";
+  document.getElementById("signin").style.display = "none";
+}
+
+/* Opens pop-up form by setting sign in form's display
+ * to 'block', and both sign up & defaultTexts' display to 'none' */
+function openSignIn() {
+  document.getElementById("signin").setAttribute('style', 'display:block !important');
+  document.getElementById("defaultText").style.display = "none";
+  document.getElementById("signup").style.display = "none";
 }
 
 /* Closes pop-up form by setting sign up form's display
  * value to 'none' */
 function closeSignUp() {
   document.getElementById("signup").setAttribute('style', 'display: none !important');
+}
+
+/* Closes pop-up form by setting sign up form's display
+ * value to 'none' */
+function closeSignIn() {
+  document.getElementById("signin").setAttribute('style', 'display: none !important');
 }
 
 /* Submits sign up form if information is valid and
