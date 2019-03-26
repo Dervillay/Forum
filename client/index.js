@@ -150,7 +150,7 @@ function checkEmail() {
 
   // Checks if email has been left blank, if so gives an alert and returns false
   if (email == "") {
-    alert("Please enter an email")
+    alert("Please enter an email");
     return false;
   // Checks if email and confirmation email are matching
   } else if (email != confirmEmail) {
@@ -158,7 +158,7 @@ function checkEmail() {
     return false;
   // Uses regex to determine whether the email is in a valid format
   } else if (!email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
-    alert("Please enter a valid email address")
+    alert("Please enter a valid email address");
     return false;
   } else {
     return true;
