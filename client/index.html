@@ -77,17 +77,17 @@
 
   <!-- Pop-up sign in Form -->
   <div id="signin" class="form-popup hidden center-screen">
-        <form id="inner-sign-in" name="signup" method="post" action="./addUser" class="jumbotron form p-3 m-3">
+        <form id="inner-sign-in" name="signin" method="post" action="./signIn" class="jumbotron form p-3 m-3">
           <div class="container">
             <h2>Sign In</h2>
             <p class="secondary-text">Log in to an existing account</p>
             <hr>
 
-            <label for="username-email">Username or Email</label>
-            <input id="username-email" name="username" type="text" placeholder="Enter username or email" class="p-2 round-corners form-input" required><br>
+            <label for="usernameEmail">Username or Email</label>
+            <input id="usernameEmail" name="usernameEmail" type="text" placeholder="Enter username or email" class="p-2 round-corners form-input" required><br>
 
-            <label for="password">Password</label>
-            <input id="password" name="password" type="password" placeholder="Enter password" class="p-2 round-corners form-input" required><br>
+            <label for="signInPassword">Password</label>
+            <input id="signInPassword" name="signInPassword" type="password" placeholder="Enter password" class="p-2 round-corners form-input" required><br>
 
             <div class="form-buttons">
               <button type="button" class="btn btn-primary" onclick="submitSignIn()">Sign In</button>

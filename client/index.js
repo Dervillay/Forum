@@ -142,6 +142,30 @@ async function checkAccount() {
 
 }
 
+/* Checks if user with inputted username or email exists */
+async function checkUsernameEmail() {
+  // Gets input from sign in form
+  var usernameEmail = await document.getElementById("usernameEmail").value;
+
+  // Fetches existing users' information and formats it to JSON
+  let usersResponse = await fetch("http://127.0.0.1:8090/users");
+  let usersBody = await usersResponse.text();
+  let usersJSON = JSON.parse(usersBody);
+
+  // Loops through all users returned to usersResponse
+  for (let i = 0; i < usersJSON.length; i++) {
+    // Checks if user's username matches that in the form
+    if (usersJSON[i]["username"] == usernameEmail) {
+      return true;
+    } else if (usersJSON[i]["email"] == usernameEmail) {
+      return true;
+    }
+  }
+
+  // If not, returns false
+  return false;
+}
+
 /* Checks if email inputs are matching */
 function checkEmail() {
   // Gets email inputs and stores them in variables
@@ -214,7 +238,7 @@ function closeSignIn() {
 /* Submits sign up form if information is valid and
  * creates an alert appropriate to the outcome. */
 async function submitSignUp() {
-  // sets accountFree to boolean value returned by checkAccount
+  // Sets accountFree to boolean value returned by checkAccount
   let accountFree = await checkAccount();
 
   // Checks if inputted values already correspond to an existing user
@@ -224,6 +248,23 @@ async function submitSignUp() {
     document.forms["signup"].submit();
     alert("Account created successfully.");
     closeSignUp();
+  }
+}
+
+/* Submits sign in form if information is valid and
+ * creates an alert appropriate to the outcome. */
+async function submitSignIn() {
+  // Sets usernameEmail to the results of calling checkUsernameEmail
+  let usernameEmail = await checkUsernameEmail();
+
+  // Checks if inputted values correspond to an existing user and their password
+  if (usernameEmail) {
+    // Submits form and informs user that the account creation was successful, then closes the form
+    document.forms["signup"].submit();
+    closeSignIn();
+  }
+  else {
+    alert("No account with that username or email address exists");
   }
 }
 
