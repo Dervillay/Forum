@@ -27,8 +27,10 @@ app.post('/addUser', function(req, res) {
   // Creates new Date object to calculate date account was created
   let d = new Date();
 
+  username = req.body.username;
+
   // Creates variable user to store info
-  let user = '{ \"username\":\"' + req.body.username + '\",' +
+  let user =  '{ \"username\":\"' + username + '\",' +
               '\"email\":\"' + req.body.email + '\",' +
               '\"dateJoined\":\"' + d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear() + '\"' +
               '}';
@@ -47,7 +49,7 @@ app.post('/addUser', function(req, res) {
   })
   // Stores hashed password in user object
   .then(hash => {
-    userJSON['password'] = hash;
+    userJSON["password"] = hash;
 
     // Adds userJSON to users
     users.push(userJSON);
@@ -55,6 +57,20 @@ app.post('/addUser', function(req, res) {
   // Catches and handles errors
   .catch(err => {
     throw (new Error(err))
+  });
+});
+
+// Signs a user in
+app.post('/signIn', function(req, res) {
+
+  for (let i = 0; i < users.length; i++) {
+    if (users[i]["username"] == req.body.usernameEmail) {
+      password = users[i]["password"];
+    }
+  }
+  console.log(req.body.signInPassword, password);
+  bcrypt.compare(req.body.signInPassword, password, function(err, res) {
+    console.log(res);
   });
 });
 

@@ -260,7 +260,7 @@ async function submitSignIn() {
   // Checks if inputted values correspond to an existing user and their password
   if (usernameEmail) {
     // Submits form and informs user that the account creation was successful, then closes the form
-    document.forms["signup"].submit();
+    document.forms["signin"].submit();
     closeSignIn();
   }
   else {
