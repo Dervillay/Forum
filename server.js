@@ -13,6 +13,9 @@ app.use(express.urlencoded());
 let users = [];
 let messages = [];
 
+// List to track currently signed in users
+let signedIn = [];
+
 // Defines search query as initially empty string
 let query = '';
 
@@ -62,15 +65,19 @@ app.post('/addUser', function(req, res) {
 
 // Signs a user in
 app.post('/signIn', function(req, res) {
-
+  // Iterates through all users and gets the correct encrypted password
   for (let i = 0; i < users.length; i++) {
     if (users[i]["username"] == req.body.usernameEmail) {
       password = users[i]["password"];
     }
   }
-  console.log(req.body.signInPassword, password);
+  // Compares the inputted password and encrypted password
   bcrypt.compare(req.body.signInPassword, password, function(err, res) {
-    console.log(res);
+    if (res) {
+      // If they match, adds the current user to signedIn
+      signedIn.push(req.body.usernameEmail);
+    }
+    // needs error handling or alert if unsuccessful
   });
 });
 
