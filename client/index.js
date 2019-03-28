@@ -261,7 +261,20 @@ async function submitSignIn() {
   if (usernameEmail) {
     // Submits form and informs user that the account creation was successful, then closes the form
     document.forms["signin"].submit();
-    closeSignIn();
+
+    // Gets signedIn
+    let signedInResponse = await fetch("http://127.0.0.1:8090/signedIn");
+    let signedInBody = await signedInResponse.text();
+    let signedInPost = JSON.parse(signedInBody);
+
+    // Checks that user is in signedIn
+    if (signedInPost.includes(usernameEmail)) {
+      // If so, closes the form
+      closeSignIn();
+    } else {
+      // If not, informs user that their password is incorrect
+      alert('The password you entered is incorrect');
+    }
   }
   else {
     alert("No account with that username or email address exists");

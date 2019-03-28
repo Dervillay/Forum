@@ -41,19 +41,10 @@ app.post('/addUser', function(req, res) {
   // Turns user into a JSON object
   let userJSON = JSON.parse(user);
 
-  // Generates salt with 10 rounds
-  bcrypt.genSalt(10)
-
-  // Stores salt in user object
-  .then(salt => {
-    userJSON["salt"] = salt;
-
-    return bcrypt.hash(req.body.password, salt);
-  })
-  // Stores hashed password in user object
-  .then(hash => {
+  // Encrypts password with 10 salt rounds and stores in userJSON
+  bcrypt.hash(req.body.password, 10)
+  .then(function(hash, err) {
     userJSON["password"] = hash;
-
     // Adds userJSON to users
     users.push(userJSON);
   })
@@ -76,6 +67,7 @@ app.post('/signIn', function(req, res) {
     if (res) {
       // If they match, adds the current user to signedIn
       signedIn.push(req.body.usernameEmail);
+      console.log(signedIn);
     }
     // needs error handling or alert if unsuccessful
   });
@@ -93,6 +85,11 @@ app.get('/users', function(req, res) {
 // Gets list of messages
 app.get('/messages', function(req, res) {
   res.send(messages);
+});
+
+// Gets list of currently signed in users
+app.get('/signedIn', function(req, res) {
+  res.send(signedIn);
 });
 
 // Gets current value of query
