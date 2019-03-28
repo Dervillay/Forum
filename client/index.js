@@ -248,9 +248,9 @@ function closeSignUp() {
 
 /* Closes pop-up form by setting sign up form's display
  * value to 'none' */
-function closeSignIn() {
+async function closeSignIn() {
   // Checks if the sign in was a success
-  response = checkSignedIn();
+  response = await checkSignedIn();
   // Sets up the page appropriately
   if (response) {
     signedInSetup();
