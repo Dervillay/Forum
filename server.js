@@ -2,8 +2,10 @@
 const bcrypt = require('bcryptjs');
 const express = require('express');
 const bodyParser = require('body-parser');
+const alert = require('alert-node');
 const app = express();
 
+// Adds all necessary packages
 app.use(express.static('client'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -65,9 +67,13 @@ app.post('/signIn', function(req, res) {
   // Compares the inputted password and encrypted password
   bcrypt.compare(req.body.signInPassword, password, function(err, res) {
     if (res) {
-      // If they match, adds the current user to signedIn
+      // If they match, adds the current user to signedIn and alerts them of success
       signedIn.push(req.body.usernameEmail);
-      console.log(signedIn);
+      alert('You have signed in successfully. Please press close to continue to the site')
+
+    // If not, asks them to try again
+    } else {
+      alert('Password was incorrect, please try again');
     }
     // needs error handling or alert if unsuccessful
   });
@@ -114,4 +120,6 @@ app.get("/default_user.jpeg", function(req, res) {
 });
 
 // Listens on port 8090
-app.listen(8090);
+app.listen(8090, () => {
+  console.log('Listening on localhost:8090')
+});

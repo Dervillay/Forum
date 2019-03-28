@@ -18,7 +18,11 @@
   },
   "homepage": "https://github.com/Dervillay/Forum#readme",
   "devDependencies": {
+    "alert-node": "^1.2.3",
     "bcryptjs": "^2.4.3",
-    "standard": "^11.0.1"
+    "body-parser": "^1.18.3",
+    "express-session": "^1.15.6",
+    "standard": "^11.0.1",
+    "uuid": "^3.3.2"
   }
 }

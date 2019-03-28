@@ -166,6 +166,23 @@ async function checkUsernameEmail() {
   return false;
 }
 
+async function checkSignedIn() {
+
+  username = document.getElementById("usernameEmail").value
+
+  // Gets signedIn from server
+  let signedInResponse = await fetch("http://127.0.0.1:8090/signedIn");
+  let signedInBody = await signedInResponse.text();
+  let signedInPost = JSON.parse(signedInBody);
+
+  // Checks that user is in signedIn
+  if (signedInPost.includes(username)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 /* Checks if email inputs are matching */
 function checkEmail() {
   // Gets email inputs and stores them in variables
@@ -232,7 +249,21 @@ function closeSignUp() {
 /* Closes pop-up form by setting sign up form's display
  * value to 'none' */
 function closeSignIn() {
+  // Checks if the sign in was a success
+  response = checkSignedIn();
+  // Sets up the page appropriately
+  if (response) {
+    signedInSetup();
+  }
   document.getElementById("signin").setAttribute('style', 'display: none !important');
+}
+
+/* Adds welcome banner on non-google sign in
+ * and removes sign up and sign in buttons */
+function signedInSetup() {
+  document.getElementById("welcome").innerHTML = "<h6 class=\"welcome\">Welcome, " + document.getElementById("usernameEmail").value + " </h6>";
+  document.getElementById("signUpBar").style.display = "none";
+  document.getElementById("googleSignIn").setAttribute('style', 'display:none');
 }
 
 /* Submits sign up form if information is valid and
@@ -261,21 +292,8 @@ async function submitSignIn() {
   if (usernameEmail) {
     // Submits form and informs user that the account creation was successful, then closes the form
     document.forms["signin"].submit();
-
-    // Gets signedIn
-    let signedInResponse = await fetch("http://127.0.0.1:8090/signedIn");
-    let signedInBody = await signedInResponse.text();
-    let signedInPost = JSON.parse(signedInBody);
-
-    // Checks that user is in signedIn
-    if (signedInPost.includes(usernameEmail)) {
-      // If so, closes the form
-      closeSignIn();
-    } else {
-      // If not, informs user that their password is incorrect
-      alert('The password you entered is incorrect');
-    }
   }
+  // If username is incorrect, alerts user
   else {
     alert("No account with that username or email address exists");
   }
