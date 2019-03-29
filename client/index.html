@@ -27,18 +27,26 @@
   <!-- Navbar -->
   <nav class="navbar fixed-top navbar-dark bg-dark">
     <a class="navbar-brand mb-0 h1" onclick="refreshPage()" href="#">Forum</a>
+
     <form method="post" action="./query" class="form-inline my-2 my-lg-0">
       <input class="form-control mr-sm-2" type="text" name="query" placeholder="Search...">
       <button id="search" class="btn btn-secondary my-2 my-sm-0 center" type="submit">Search</button>
     </form>
-    <div id="googleSignIn" class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+
+    <div id="googleSignIn" class="g-signin2" data-onsuccess="googleSignIn" data-theme="dark"></div>
+
     <div id="welcome"></div>
-    <button id="googleSignOut" class="btn btn-secondary hidden" onclick="signOut()">Sign Out</button>
+
+    <button id="googleSignOut" class="btn btn-secondary hidden" onclick="googleSignOut()">Sign Out</button>
+
     <div id="signUpBar" class="btn-group" role="group">
-      <button type="button" class="btn btn-primary" onclick="openSignUp()">Sign up</button>
-      <button type="button" class="btn btn-secondary" onclick="openSignIn()">Sign in</button>
-  </div>
+      <button id="signUp" type="button" class="btn btn-primary" onclick="openSignUp()">Sign up</button>
+      <button id="signIn" type="button" class="btn btn-secondary" onclick="openSignIn()">Sign in</button>
+    </div>
+
     <button id="makePost" class="btn btn-primary hidden" onclick="openMessageForm()">Make a Post</button>
+    <button id="signOut" class="btn btn-secondary hidden" onclick="signOut()">Sign Out</button>
+
   </nav>
 
 </head>
@@ -83,8 +91,8 @@
             <p class="secondary-text">Log in to an existing account</p>
             <hr>
 
-            <label for="signInUsername">Username or Email</label>
-            <input id="signInUsername" name="signInUsername" type="text" placeholder="Enter username or email" class="p-2 round-corners form-input" required><br>
+            <label for="signInUsername">Username</label>
+            <input id="signInUsername" name="signInUsername" type="text" placeholder="Enter username" class="p-2 round-corners form-input" required><br>
 
             <label for="signInPassword">Password</label>
             <input id="signInPassword" name="signInPassword" type="password" placeholder="Enter password" class="p-2 round-corners form-input" required><br>

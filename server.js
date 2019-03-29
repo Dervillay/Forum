@@ -47,8 +47,21 @@ app.post('/addUser', function(req, res) {
   bcrypt.hash(req.body.password, 10)
   .then(function(hash, err) {
     userJSON["password"] = hash;
-    // Adds userJSON to users
+    // Adds userJSON to users and their username to signedIn
     users.push(userJSON);
+    signedIn.push(userJSON['username']);
+
+    // Gets current date and time and stores it in dateTime
+    let dateTime = new Date().toLocaleDateString(undefined, {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    // Logs to server console that the user has logged in
+    console.log('> User \'' + userJSON['username'] + '\' logged in at ' + dateTime);
   })
   // Catches and handles errors
   .catch(err => {
@@ -108,6 +121,19 @@ app.get('/messages', function(req, res) {
 // Gets list of currently signed in users
 app.get('/signedIn', function(req, res) {
   res.send(signedIn);
+});
+
+app.get('/signOut', function(req, res) {
+  userSignUp = req.body.username;
+  userSignIn = req.body.signInUsername;
+
+  if (users.includes(userSignUp)) {
+    res.send(users.indexOf(userSignIn))
+    users.splice(users.indexOf(userSignUp), 1);
+  } else if (users.includes(userSignIn)) {
+    res.send(users.indexOf(userSignIn))
+    users.splice(users.indexOf(userSignIn), 1);
+  }
 });
 
 // Gets current value of query

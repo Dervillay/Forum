@@ -264,6 +264,7 @@ function signedInSetup() {
   document.getElementById("welcome").innerHTML = "<h6 class=\"welcome\">Welcome, " + document.getElementById("signInUsername").value + " </h6>";
   document.getElementById("signUpBar").style.display = "none";
   document.getElementById("googleSignIn").setAttribute('style', 'display:none');
+  document.getElementById("signOut").setAttribute('style', 'display:block !important');
 }
 
 /* Submits sign up form if information is valid and
@@ -299,12 +300,18 @@ async function submitSignIn() {
   }
 }
 
+async function signOut() {
+  repsonse = await fetch('http:/127.0.0.1:8090/signOut');
+  console.log(response);
+}
+
 /* Sets the display qualities of items in the
  * navbar when a successful sign-in occurs */
 function successfulSignIn() {
   document.getElementById("signUpBar").style.display = "none";
   document.getElementById("googleSignIn").setAttribute('style', 'display:none !important');
   document.getElementById("makePost").setAttribute('style', 'display:block !important');
+  document.getElementById("welcome").innerHTML = "<h6 class=\"welcome\">Welcome, " + document.getElementById("username").value; + " </h6>";
 }
 
 /* Opens pop-up message form by setting form's display to 'block'
@@ -326,7 +333,7 @@ function closeMessageForm() {
 
 /* Google sign-in function.
  * Gets user's name and puts it in the navbar */
-function onSignIn(googleUser) {
+function googleSignIn(googleUser) {
   var profile = googleUser.getBasicProfile();
   var id_token = googleUser.getAuthResponse().id_token;
   document.getElementById("googleSignOut").setAttribute('style', 'display:block !important');
@@ -338,13 +345,14 @@ function onSignIn(googleUser) {
 /* Google sign-out function.
  * Signs user out, hides the sign out button
  * and displays the sign in button again */
-function signOut() {
+function googleSignOut() {
   var auth2 = gapi.auth2.getAuthInstance();
   auth2.signOut();
   document.getElementById("welcome").innerHTML = null;
   document.getElementById("googleSignOut").style.display = "none";
   document.getElementById("makePost").style.display= "none";
   document.getElementById("googleSignIn").style.display = "block";
+  document.getElementById("signUpBar").style.display = "block";
 }
 
 /* Event listeners */
