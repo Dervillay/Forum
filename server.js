@@ -60,7 +60,7 @@ app.post('/addUser', function(req, res) {
 app.post('/signIn', function(req, res) {
   // Iterates through all users and gets the correct encrypted password
   for (let i = 0; i < users.length; i++) {
-    if (users[i]["username"] == req.body.usernameEmail) {
+    if (users[i]["username"] == req.body.signInUsername) {
       password = users[i]["password"];
     }
   }
@@ -68,7 +68,7 @@ app.post('/signIn', function(req, res) {
   bcrypt.compare(req.body.signInPassword, password, function(err, res) {
     if (res) {
       // If they match, adds the current user to signedIn and alerts them of success
-      signedIn.push(req.body.usernameEmail);
+      signedIn.push(req.body.signInUsername);
       alert('You have signed in successfully. Please press close to continue to the site')
 
     // If not, asks them to try again

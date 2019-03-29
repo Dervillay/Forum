@@ -143,9 +143,9 @@ async function checkAccount() {
 }
 
 /* Checks if user with inputted username or email exists */
-async function checkUsernameEmail() {
+async function checksignInUsername() {
   // Gets input from sign in form
-  var usernameEmail = await document.getElementById("usernameEmail").value;
+  var signInUsername = await document.getElementById("signInUsername").value;
 
   // Fetches existing users' information and formats it to JSON
   let usersResponse = await fetch("http://127.0.0.1:8090/users");
@@ -155,9 +155,9 @@ async function checkUsernameEmail() {
   // Loops through all users returned to usersResponse
   for (let i = 0; i < usersJSON.length; i++) {
     // Checks if user's username matches that in the form
-    if (usersJSON[i]["username"] == usernameEmail) {
+    if (usersJSON[i]["username"] == signInUsername) {
       return true;
-    } else if (usersJSON[i]["email"] == usernameEmail) {
+    } else if (usersJSON[i]["email"] == signInUsername) {
       return true;
     }
   }
@@ -168,7 +168,7 @@ async function checkUsernameEmail() {
 
 async function checkSignedIn() {
 
-  username = document.getElementById("usernameEmail").value
+  username = document.getElementById("signInUsername").value
 
   // Gets signedIn from server
   let signedInResponse = await fetch("http://127.0.0.1:8090/signedIn");
@@ -261,7 +261,7 @@ async function closeSignIn() {
 /* Adds welcome banner on non-google sign in
  * and removes sign up and sign in buttons */
 function signedInSetup() {
-  document.getElementById("welcome").innerHTML = "<h6 class=\"welcome\">Welcome, " + document.getElementById("usernameEmail").value + " </h6>";
+  document.getElementById("welcome").innerHTML = "<h6 class=\"welcome\">Welcome, " + document.getElementById("signInUsername").value + " </h6>";
   document.getElementById("signUpBar").style.display = "none";
   document.getElementById("googleSignIn").setAttribute('style', 'display:none');
 }
@@ -285,11 +285,11 @@ async function submitSignUp() {
 /* Submits sign in form if information is valid and
  * creates an alert appropriate to the outcome. */
 async function submitSignIn() {
-  // Sets usernameEmail to the results of calling checkUsernameEmail
-  let usernameEmail = await checkUsernameEmail();
+  // Sets signInUsername to the results of calling checksignInUsername
+  let signInUsername = await checksignInUsername();
 
   // Checks if inputted values correspond to an existing user and their password
-  if (usernameEmail) {
+  if (signInUsername) {
     // Submits form and informs user that the account creation was successful, then closes the form
     document.forms["signin"].submit();
   }
