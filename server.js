@@ -69,7 +69,19 @@ app.post('/signIn', function(req, res) {
     if (res) {
       // If they match, adds the current user to signedIn and alerts them of success
       signedIn.push(req.body.signInUsername);
-      alert('You have signed in successfully. Please press close to continue to the site')
+
+      // Gets current date and time and stores it in dateTime
+      let dateTime = new Date().toLocaleDateString(undefined, {
+        day: 'numeric',
+        month: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      // Logs to server console that the user has logged in
+      console.log('> User \'' + req.body.signInUsername + '\' logged in at ' + dateTime);
+      alert('You have signed in successfully. Please press close to continue to the site');
 
     // If not, asks them to try again
     } else {
