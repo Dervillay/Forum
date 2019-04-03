@@ -32,7 +32,7 @@ app.post('/addUser', function(req, res) {
   // Creates new Date object to calculate date account was created
   let d = new Date();
 
-  username = req.body.username;
+  let username = req.body.username;
 
   // Creates variable user to store info
   let user =  '{ \"username\":\"' + username + '\",' +
@@ -123,17 +123,28 @@ app.get('/signedIn', function(req, res) {
   res.send(signedIn);
 });
 
-app.get('/signOut', function(req, res) {
-  userSignUp = req.body.username;
-  userSignIn = req.body.signInUsername;
+// Signs out user
+app.get('/signOut/:user', function(req, res) {
+  // Takes user from parameter passed to method
+  let user = req.params.user;
 
-  if (users.includes(userSignUp)) {
-    res.send(users.indexOf(userSignIn))
-    users.splice(users.indexOf(userSignUp), 1);
-  } else if (users.includes(userSignIn)) {
-    res.send(users.indexOf(userSignIn))
-    users.splice(users.indexOf(userSignIn), 1);
-  }
+  // Gets current date and time and stores it in dateTime
+  let dateTime = new Date().toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  // Removes user from list of signed in users
+  signedIn.splice(signedIn.indexOf(user), 1);
+
+  // Logs to server that this user has logged out
+  console.log('> User \'' + user + '\' signed out at ' + dateTime);
+
+  // Sends success response
+  res.send('success');
 });
 
 // Gets current value of query
@@ -159,5 +170,5 @@ app.get("/default_user.jpeg", function(req, res) {
 
 // Listens on port 8090
 app.listen(8090, () => {
-  console.log('Listening on localhost:8090')
+  console.log('> Listening on localhost:8090')
 });

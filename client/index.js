@@ -168,7 +168,7 @@ async function checksignInUsername() {
 
 async function checkSignedIn() {
 
-  username = document.getElementById("signInUsername").value
+  username = document.getElementById("signInUsername").value;
 
   // Gets signedIn from server
   let signedInResponse = await fetch("http://127.0.0.1:8090/signedIn");
@@ -243,6 +243,7 @@ function openSignIn() {
 /* Closes pop-up form by setting sign up form's display
  * value to 'none' */
 function closeSignUp() {
+  document.getElementById("signOut").setAttribute('style', 'display:block !important');
   document.getElementById("signup").setAttribute('style', 'display: none !important');
 }
 
@@ -300,8 +301,17 @@ async function submitSignIn() {
   }
 }
 
+/* Calls get method signOut and stores the response to check
+ * whether the sign out was successful */
 async function signOut() {
-  repsonse = await fetch('http:/127.0.0.1:8090/signOut');
+  // Grabs current user's username from sign in or sign up form
+  if (document.getElementById("username").value != '') {
+    var user = document.getElementById("username").value;
+  } else if (document.getElementById("signInUsername").value != '') {
+    var user = document.getElementById("signInUsername").value;
+  }
+  // Fetches response from passing user's username to signOut
+  let response = await fetch('http://127.0.0.1:8090/signOut/' + user);
   console.log(response);
 }
 
