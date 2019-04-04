@@ -141,10 +141,10 @@ app.get('/signOut/:user', function(req, res) {
   signedIn.splice(signedIn.indexOf(user), 1);
 
   // Logs to server that this user has logged out
-  console.log('> User \'' + user + '\' signed out at ' + dateTime);
+  console.log('> User \'' + user + '\' logged out at ' + dateTime);
 
   // Sends success response
-  res.send('success');
+  res.send(signedIn);
 });
 
 // Gets current value of query

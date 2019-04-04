@@ -254,18 +254,9 @@ async function closeSignIn() {
   response = await checkSignedIn();
   // Sets up the page appropriately
   if (response) {
-    signedInSetup();
+    successfulSignIn();
   }
   document.getElementById("signin").setAttribute('style', 'display: none !important');
-}
-
-/* Adds welcome banner on non-google sign in
- * and removes sign up and sign in buttons */
-function signedInSetup() {
-  document.getElementById("welcome").innerHTML = "<h6 class=\"welcome\">Welcome, " + document.getElementById("signInUsername").value + " </h6>";
-  document.getElementById("signUpBar").style.display = "none";
-  document.getElementById("googleSignIn").setAttribute('style', 'display:none');
-  document.getElementById("signOut").setAttribute('style', 'display:block !important');
 }
 
 /* Submits sign up form if information is valid and
@@ -292,7 +283,7 @@ async function submitSignIn() {
 
   // Checks if inputted values correspond to an existing user and their password
   if (signInUsername) {
-    // Submits form and informs user that the account creation was successful, then closes the form
+    // Submits form and informs user that the account creation was successful, then sets up page appropriately
     document.forms["signin"].submit();
   }
   // If username is incorrect, alerts user
@@ -310,17 +301,24 @@ async function signOut() {
   } else if (document.getElementById("signInUsername").value != '') {
     var user = document.getElementById("signInUsername").value;
   }
-  // Fetches response from passing user's username to signOut
-  let response = await fetch('http://127.0.0.1:8090/signOut/' + user);
-  console.log(response);
+  // Calls get method signOut with user as parameter
+  await fetch('http://127.0.0.1:8090/signOut/' + user);
+
+  document.getElementById("signUpBar").style.display = "block";
+  document.getElementById("signOut").style.display = "none";
+  document.getElementById("googleSignIn").setAttribute('style', 'display:block !important');
+  document.getElementById("makePost").setAttribute('style', 'display:none !important');
+  document.getElementById("welcome").innerHTML = null;
+
 }
 
 /* Sets the display qualities of items in the
  * navbar when a successful sign-in occurs */
 function successfulSignIn() {
   document.getElementById("signUpBar").style.display = "none";
-  document.getElementById("googleSignIn").setAttribute('style', 'display:none !important');
+  document.getElementById("googleSignIn").setAttribute('style', 'display:none');
   document.getElementById("makePost").setAttribute('style', 'display:block !important');
+  document.getElementById("signOut").setAttribute('style', 'display:block !important');
   document.getElementById("welcome").innerHTML = "<h6 class=\"welcome\">Welcome, " + document.getElementById("username").value; + " </h6>";
 }
 
@@ -346,10 +344,13 @@ function closeMessageForm() {
 function googleSignIn(googleUser) {
   var profile = googleUser.getBasicProfile();
   var id_token = googleUser.getAuthResponse().id_token;
-  document.getElementById("googleSignOut").setAttribute('style', 'display:block !important');
+
+  // Sets up items in navbar to inform user they are signed in
   document.getElementById("welcome").innerHTML = "<h6 class=\"welcome\">Welcome, " + profile.getName() + " </h6>";
-  // Adjusts items in navbar to inform the user they are signed in
-  successfulSignIn();
+  document.getElementById("googleSignOut").setAttribute('style', 'display:block !important');
+  document.getElementById("signUpBar").style.display = "none";
+  document.getElementById("googleSignIn").setAttribute('style', 'display:none');
+  document.getElementById("makePost").setAttribute('style', 'display:block !important');
 }
 
 /* Google sign-out function.
