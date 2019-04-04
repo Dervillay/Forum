@@ -105,16 +105,18 @@
         </form>
   </div>
 
-  <!-- Pop-up form -->
+  <!-- Pop-up make post form -->
   <div id="form" class="form-popup hidden center-screen">
         <form id="inner-form" method="post" action="./addPost" class="jumbotron form p-3 m-3">
           <h3>Make a Post</h3>
+          <p class="secondary-text">What do you have on your mind?</p>
+          <hr>
 
           <textarea rows="4" placeholder="  Enter Message" name="message" class="m-1 round-corners" required></textarea>
-          <p class="default-text">'Post' will submit your message to the server; hit 'Close' to update the message board and see it.</p>
+          <input id="postUsername" name="postUsername" style="display: none;">
 
           <div>
-            <button type="submit" class="btn btn-primary">Post</button>
+            <button class="btn btn-primary" onclick="postMessage()">Post</button>
             <button type="button" class="btn btn-secondary cancel" onclick="closeMessageForm()">Close</button>
           </div>
 

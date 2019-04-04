@@ -107,6 +107,17 @@ async function searchPage() {
   document.getElementById("content").innerHTML += "</ul>";
 }
 
+function postMessage() {
+  var user = document.getElementById("welcome").innerHTML.slice(29, -5);
+
+  document.getElementById("postUsername").value = user;
+
+
+  document.forms["signup"].submit();
+  alert("Post submitted successfully.");
+  closeMessageForm();
+}
+
 /* Checks whether current inputted information can be
  * found in existsing user accounts */
 async function checkAccount() {
@@ -364,7 +375,7 @@ async function googleSignOut() {
 
   // Gets currently signed in user's username
   var user = document.getElementById("welcome").innerHTML.slice(29, -6);
-  
+
   // Signs user out using get method
   await fetch("http://localhost:8090/googleSignOut/" + user);
 

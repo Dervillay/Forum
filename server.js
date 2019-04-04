@@ -32,8 +32,19 @@ let dateTime = new Date().toLocaleDateString(undefined, {
 
 // Adds user and message to respective lists
 app.post('/addPost', function(req, res) {
-  users.push(req.body.username);
-  messages.push(req.body.message);
+  // Gets user who posted the message
+  let user = req.body.postUsername;
+
+  // Creates variable message to store the info of the message
+  let message =  '{ \"postedBy\":\"' + user + '\",' +
+              '\"content\":\"' + req.body.message + '\",' +
+              '\"datePosted\":\"' + dateTime + '\"' +
+              '}';
+
+  // Turns user into a JSON object
+  let messageJSON = JSON.parse(message);
+
+  messages.push(messageJSON);
 });
 
 // Adds user to users
