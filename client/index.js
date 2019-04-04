@@ -1,8 +1,7 @@
 /* Asynchronous function to update page with all users and messages.
  * Uses GET methods of server to recieve current list of users and
  * messages. It then iterates through them and inserts the final posts
- * in index.html
- */
+ * in index.html */
 async function refreshPage() {
 
   // Uses GET method 'users' to receive list of users
@@ -341,9 +340,12 @@ function closeMessageForm() {
 
 /* Google sign-in function.
  * Gets user's name and puts it in the navbar */
-function googleSignIn(googleUser) {
+async function googleSignIn(googleUser) {
   var profile = googleUser.getBasicProfile();
   var id_token = googleUser.getAuthResponse().id_token;
+
+  // Signs user in using get method
+  await fetch("http://localhost:8090/googleSignIn/" + profile.getName());
 
   // Sets up items in navbar to inform user they are signed in
   document.getElementById("welcome").innerHTML = "<h6 class=\"welcome\">Welcome, " + profile.getName() + " </h6>";
@@ -356,9 +358,17 @@ function googleSignIn(googleUser) {
 /* Google sign-out function.
  * Signs user out, hides the sign out button
  * and displays the sign in button again */
-function googleSignOut() {
+async function googleSignOut() {
   var auth2 = gapi.auth2.getAuthInstance();
   auth2.signOut();
+
+  // Gets currently signed in user's username
+  var user = document.getElementById("welcome").innerHTML.slice(29, -6);
+  
+  // Signs user out using get method
+  await fetch("http://localhost:8090/googleSignOut/" + user);
+
+    // Sets up items in navbar to inform user they are signed out
   document.getElementById("welcome").innerHTML = null;
   document.getElementById("googleSignOut").style.display = "none";
   document.getElementById("makePost").style.display= "none";

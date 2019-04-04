@@ -21,6 +21,15 @@ let signedIn = [];
 // Defines search query as initially empty string
 let query = '';
 
+// Gets current date and time and stores it in dateTime
+let dateTime = new Date().toLocaleDateString(undefined, {
+  day: 'numeric',
+  month: 'numeric',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+});
+
 // Adds user and message to respective lists
 app.post('/addPost', function(req, res) {
   users.push(req.body.username);
@@ -51,15 +60,6 @@ app.post('/addUser', function(req, res) {
     users.push(userJSON);
     signedIn.push(userJSON['username']);
 
-    // Gets current date and time and stores it in dateTime
-    let dateTime = new Date().toLocaleDateString(undefined, {
-      day: 'numeric',
-      month: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-
     // Logs to server console that the user has logged in
     console.log('> User \'' + userJSON['username'] + '\' logged in at ' + dateTime);
   })
@@ -83,15 +83,6 @@ app.post('/signIn', function(req, res) {
       // If they match, adds the current user to signedIn and alerts them of success
       signedIn.push(req.body.signInUsername);
 
-      // Gets current date and time and stores it in dateTime
-      let dateTime = new Date().toLocaleDateString(undefined, {
-        day: 'numeric',
-        month: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-
       // Logs to server console that the user has logged in
       console.log('> User \'' + req.body.signInUsername + '\' logged in at ' + dateTime);
       alert('You have signed in successfully. Please press close to continue to the site');
@@ -107,6 +98,25 @@ app.post('/signIn', function(req, res) {
 app.post('/query', function(req, res) {
   query = req.body.query;
 });
+
+app.get('/googleSignIn/:user', function(req, res) {
+  // Takes user from parameter passed to method and pushes it to signedIn
+  let user = req.params.user;
+  signedIn.push(user);
+
+  // Logs to server that this user has logged in
+  console.log('> User \'' + user + '\' logged in via Google at ' + dateTime);
+  res.send(signedIn);
+})
+
+app.get('/googleSignOut/:user', function(req, res) {
+  // Takes user from parameter passed to method
+  let user = req.params.user;
+
+  // Logs to server that this user has logged out
+  console.log('> User \'' + user + '\' logged out via Google at ' + dateTime);
+  res.send(signedIn);
+})
 
 // Gets list of users
 app.get('/users', function(req, res) {
@@ -127,15 +137,6 @@ app.get('/signedIn', function(req, res) {
 app.get('/signOut/:user', function(req, res) {
   // Takes user from parameter passed to method
   let user = req.params.user;
-
-  // Gets current date and time and stores it in dateTime
-  let dateTime = new Date().toLocaleDateString(undefined, {
-    day: 'numeric',
-    month: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
 
   // Removes user from list of signed in users
   signedIn.splice(signedIn.indexOf(user), 1);
