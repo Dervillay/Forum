@@ -3,38 +3,36 @@
  * messages. It then iterates through them and inserts the final posts
  * in index.html */
 async function refreshPage() {
-
-  // Uses GET method 'users' to receive list of users
-  let usersResponse = await fetch("http://127.0.0.1:8090/users");
-  let usersBody = await usersResponse.text();
-
   // Uses GET method 'messages' to receive list of messages
   let messagesResponse = await fetch("http://127.0.0.1:8090/messages");
   let messagesBody = await messagesResponse.text();
 
-  // Parses data received by GET methods into JS objects
-  let usersPost = JSON.parse(usersBody);
+  // Parses data received by GET method
   let messagesPost = JSON.parse(messagesBody);
 
   // Only updates page with posts if they exist
-  if (usersPost.length > 0) {
+  if (messagesPost.length > 0) {
 
     // Creates <ul> tag with id 'posts' in main body of HTML
     document.getElementById("content").innerHTML = "<ul id=\"posts\">";
 
     // Iterates through users and messages and prduces forum posts using their information
-    for (let i = 0; i < usersPost.length; i++) {
+    for (let i = 0; i < messagesPost.length; i++) {
       document.getElementById("content").innerHTML +=
       `
       <li>
       <a>
       <div class=\"container-fluid container-user\">
-        <div class=\"jumbotron post p-3\">
-          <img src=\"images/default_user.jpeg\" alt=\"user_icon\" class=\"user\"> <p>` + usersPost[i] + `</p>
-          <div class=\"jumbotron comment p-3\">
-            `
-            + messagesPost[i] +
-            `
+        <div class=\"jumbotron post p-3 parent\">
+          <img src=\"images/default_user.jpeg\" alt=\"user_icon\" class=\"user\">
+          <div class=\"child inline-block-child p-3\">
+            <p>` + messagesPost[i]["postedBy"] + `</p>
+          </div>
+          <div class="child inline-block-child date-text p-3">
+            <p class="date-text">` + messagesPost[i]["datePosted"] + `</p>
+          </div>
+          <div class="jumbotron comment p-3">
+            ` + messagesPost[i]["content"] + `
           </div>
         </div>
       </div>
@@ -51,11 +49,8 @@ async function refreshPage() {
  * values for users and messages, rendering posts that match.
  */
 async function searchPage() {
-
-  // Uses GET method 'users' to receive list of users
-  let usersResponse = await fetch("http://127.0.0.1:8090/users");
-  let usersBody = await usersResponse.text();
-
+  // Submits form
+  document.forms["submitSearch"].submit();
   // Uses GET method 'messages' to receive list of messages
   let messagesResponse = await fetch("http://127.0.0.1:8090/messages");
   let messagesBody = await messagesResponse.text();
@@ -65,46 +60,52 @@ async function searchPage() {
   let queryBody = await queryResponse.text();
 
   // Parses data received by GET methods into JS objects
-  let usersPost = JSON.parse(usersBody);
   let messagesPost = JSON.parse(messagesBody);
 
   // New list to store users and messages matching the query
-  var matchingUsers = []
   var matchingMessages = []
 
   // Iterates through (lower case versions of) all users and messages and finds matches
-  for (let i = 0; i < usersPost.length; i++) {
-      if (usersPost[i].toLowerCase().includes(queryBody) || messagesPost[i].toLowerCase().includes(queryBody)) {
-        matchingUsers.push(usersPost[i]);
+  for (let i = 0; i < messagesPost.length; i++) {
+      if (messagesPost[i]["postedBy"].toLowerCase().includes(queryBody) || messagesPost[i]["content"].toLowerCase().includes(queryBody)) {
         matchingMessages.push(messagesPost[i]);
       }
   }
 
-  // Clears out message board area
-  document.getElementById("content").innerHTML = "<ul id=\"posts\">";
+  if (matchingMessages.length > 0) {
+    // Clears out message board area and initialises list of messages
+    document.getElementById("content").innerHTML = "<ul id=\"posts\">";
 
-  // Iterates and updates all posts in matching lists
-  for (let i = 0; i < matchingUsers.length; i++) {
+    // Iterates and updates all posts in matching lists
+    for (let i = 0; i < matchingMessages.length; i++) {
 
-    document.getElementById("content").innerHTML +=
-    `
-    <li>
-    <a>
-    <div class=\"container-fluid container-user\">
-      <div class=\"jumbotron post p-3\">
-        <img src=\"images/default_user.jpeg\" alt=\"user_icon\" class=\"user\"> <p>` + matchingUsers[i] + `</p>
-        <div class=\"jumbotron comment p-3\">
-          `
-          + matchingMessages[i] +
-          `
+      document.getElementById("content").innerHTML +=
+      `
+      <li>
+      <a>
+      <div class=\"container-fluid container-user\">
+        <div class=\"jumbotron post p-3 parent\">
+          <img src=\"images/default_user.jpeg\" alt=\"user_icon\" class=\"user\">
+          <div class=\"child inline-block-child p-3\">
+            <p>` + matchingMessages[i]["postedBy"] + `</p>
+          </div>
+          <div class="child inline-block-child date-text p-3">
+            <p class="date-text">` + matchingMessages[i]["datePosted"] + `</p>
+          </div>
+          <div class="jumbotron comment p-3">
+            ` + matchingMessages[i]["content"] + `
+          </div>
         </div>
       </div>
-    </div>
-    </a>
-    </li>
-    `
-  };
-  document.getElementById("content").innerHTML += "</ul>";
+      </a>
+      </li>
+      `
+    };
+    document.getElementById("content").innerHTML += "</ul>";
+  } else {
+    // Clears out message board area
+    document.getElementById("content").innerHTML = null;
+  }
 }
 
 function postMessage() {
@@ -386,8 +387,3 @@ async function googleSignOut() {
   document.getElementById("googleSignIn").style.display = "block";
   document.getElementById("signUpBar").style.display = "block";
 }
-
-/* Event listeners */
-
-// Add listener for search button
-document.getElementById('search').addEventListener('click', searchPage);

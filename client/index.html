@@ -28,9 +28,9 @@
   <nav class="navbar fixed-top navbar-dark bg-dark">
     <a class="navbar-brand mb-0 h1" onclick="refreshPage()" href="#">Forum</a>
 
-    <form method="post" action="./query" class="form-inline my-2 my-lg-0">
+    <form id="submitSearch" method="post" action="./sendQuery" class="form-inline my-2 my-lg-0">
       <input class="form-control mr-sm-2" type="text" name="query" placeholder="Search...">
-      <button id="search" class="btn btn-secondary my-2 my-sm-0 center" type="submit">Search</button>
+      <button id="search" class="btn btn-secondary my-2 my-sm-0 center" onclick="searchPage()">Search</button>
     </form>
 
     <div id="googleSignIn" class="g-signin2" data-onsuccess="googleSignIn" data-theme="dark"></div>

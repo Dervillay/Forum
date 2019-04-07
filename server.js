@@ -21,29 +21,25 @@ let signedIn = [];
 // Defines search query as initially empty string
 let query = '';
 
-// Gets current date and time and stores it in dateTime
-let dateTime = new Date().toLocaleDateString(undefined, {
-  day: 'numeric',
-  month: 'numeric',
-  year: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit'
-});
-
 // Adds user and message to respective lists
 app.post('/addPost', function(req, res) {
-  // Gets user who posted the message
-  let user = req.body.postUsername;
+  // Gets current date and time and stores it in dateTime
+  let dateTime = new Date().toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
 
   // Creates variable message to store the info of the message
-  let message =  '{ \"postedBy\":\"' + user + '\",' +
+  let message =  '{ \"postedBy\":\"' + req.body.postUsername + '\",' +
               '\"content\":\"' + req.body.message + '\",' +
               '\"datePosted\":\"' + dateTime + '\"' +
               '}';
 
-  // Turns user into a JSON object
+  // Turns user into a JSON object and pushes it to messages
   let messageJSON = JSON.parse(message);
-
   messages.push(messageJSON);
 });
 
@@ -52,7 +48,17 @@ app.post('/addUser', function(req, res) {
   // Creates new Date object to calculate date account was created
   let d = new Date();
 
+  // Gets username from HTML form
   let username = req.body.username;
+
+  // Gets current date and time and stores it in dateTime
+  let dateTime = new Date().toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
 
   // Creates variable user to store info
   let user =  '{ \"username\":\"' + username + '\",' +
@@ -82,6 +88,15 @@ app.post('/addUser', function(req, res) {
 
 // Signs a user in
 app.post('/signIn', function(req, res) {
+  // Gets current date and time and stores it in dateTime
+  let dateTime = new Date().toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
   // Iterates through all users and gets the correct encrypted password
   for (let i = 0; i < users.length; i++) {
     if (users[i]["username"] == req.body.signInUsername) {
@@ -102,15 +117,23 @@ app.post('/signIn', function(req, res) {
     } else {
       alert('Password was incorrect, please try again');
     }
-    // needs error handling or alert if unsuccessful
   });
 });
 
-app.post('/query', function(req, res) {
+app.post('/sendQuery', function(req, res) {
   query = req.body.query;
 });
 
 app.get('/googleSignIn/:user', function(req, res) {
+  // Gets current date and time and stores it in dateTime
+  let dateTime = new Date().toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
   // Takes user from parameter passed to method and pushes it to signedIn
   let user = req.params.user;
   signedIn.push(user);
@@ -121,6 +144,15 @@ app.get('/googleSignIn/:user', function(req, res) {
 })
 
 app.get('/googleSignOut/:user', function(req, res) {
+  // Gets current date and time and stores it in dateTime
+  let dateTime = new Date().toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
   // Takes user from parameter passed to method
   let user = req.params.user;
 
@@ -149,6 +181,15 @@ app.get('/signedIn', function(req, res) {
 
 // Signs out user
 app.get('/signOut/:user', function(req, res) {
+  // Gets current date and time and stores it in dateTime
+  let dateTime = new Date().toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
   // Takes user from parameter passed to method
   let user = req.params.user;
 

@@ -93,6 +93,11 @@ input[type=text]:focus, input[type=password]:focus {
   border-style: solid;
 }
 
+.date-text {
+  text-align: right;
+  color: #AAA;
+}
+
 .user {
   width: 2.3rem;
   height: 2.3rem;
@@ -166,4 +171,12 @@ input[type=text]:focus, input[type=password]:focus {
 
 .back {
   z-index: -1;
+}
+
+.inline-block-child {
+  display: inline-block;
+}
+
+.date-text {
+  float: right;
 }
