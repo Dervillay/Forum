@@ -48,6 +48,7 @@ async function refreshPage() {
  * Takes current query value and compares it to currnently held
  * values for users and messages, rendering posts that match.
  */
+
 async function searchPage() {
   // Submits form
   document.forms["submitSearch"].submit();
@@ -280,7 +281,16 @@ async function submitSignUp() {
   // and checks if the inputted emails and passwords are valid
   if (accountFree && checkEmail() && checkPassword()) {
     // Submits form and informs user that the account creation was successful, then closes the form
-    document.forms["signup"].submit();
+    //document.forms["signup"].submit()
+
+    let username = document.getElementById("username");
+    let email = document.getElementById("email");
+    let confirmEmail = document.getElementById("confirmEmail");
+    let password = document.getElementById("password");
+    let confirmPassword = document.getElementById("confirmPassword");
+
+    $.post("http://127.0.0.1:8090/addUser", {username: username.value, email: email.value, password: password.value});
+
     alert("Account created successfully.");
     closeSignUp();
   }

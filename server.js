@@ -79,6 +79,7 @@ app.post('/addUser', function(req, res) {
 
     // Logs to server console that the user has logged in
     console.log('> User \'' + userJSON['username'] + '\' logged in on ' + dateTime);
+    res.json(userJSON);
   })
   // Catches and handles errors
   .catch(err => {
@@ -112,7 +113,6 @@ app.post('/signIn', function(req, res) {
       // Logs to server console that the user has logged in
       console.log('> User \'' + req.body.signInUsername + '\' logged in on ' + dateTime);
       alert('You have signed in successfully. Please press close to continue to the site');
-
     // If not, asks them to try again
     } else {
       alert('Password was incorrect, please try again');
@@ -140,8 +140,7 @@ app.get('/googleSignIn/:user', function(req, res) {
 
   // Logs to server that this user has logged in
   console.log('> User \'' + user + '\' logged in via Google on ' + dateTime);
-  res.send(signedIn);
-})
+});
 
 app.get('/googleSignOut/:user', function(req, res) {
   // Gets current date and time and stores it in dateTime
@@ -162,7 +161,7 @@ app.get('/googleSignOut/:user', function(req, res) {
   // Logs to server that this user has logged out
   console.log('> User \'' + user + '\' logged out via Google on ' + dateTime);
   res.send(signedIn);
-})
+});
 
 // Gets list of users
 app.get('/users', function(req, res) {
