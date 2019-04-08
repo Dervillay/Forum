@@ -304,8 +304,11 @@ async function submitSignIn() {
 
   // Checks if inputted values correspond to an existing user and their password
   if (signInUsername) {
+
+    let signInUsername = document.getElementById("signInUsername");
+    let signInPassword = document.getElementById("signInPassword");
     // Submits form and informs user that the account creation was successful, then sets up page appropriately
-    document.forms["signin"].submit();
+    $.post("http://127.0.0.1:8090/signIn", {signInUsername: signInUsername.value, signInPassword: signInPassword.value});
   }
   // If username is incorrect, alerts user
   else {

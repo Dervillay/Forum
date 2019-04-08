@@ -79,7 +79,7 @@ app.post('/addUser', function(req, res) {
 
     // Logs to server console that the user has logged in
     console.log('> User \'' + userJSON['username'] + '\' logged in on ' + dateTime);
-    res.json(userJSON);
+    res.json({status: "success", code: "200"});
   })
   // Catches and handles errors
   .catch(err => {
@@ -105,7 +105,7 @@ app.post('/signIn', function(req, res) {
     }
   }
   // Compares the inputted password and encrypted password
-  bcrypt.compare(req.body.signInPassword, password, function(err, res) {
+  bcrypt.compare(req.body.signInPassword, password, function(err, resp) {
     if (res) {
       // If they match, adds the current user to signedIn and alerts them of success
       signedIn.push(req.body.signInUsername);
@@ -113,6 +113,8 @@ app.post('/signIn', function(req, res) {
       // Logs to server console that the user has logged in
       console.log('> User \'' + req.body.signInUsername + '\' logged in on ' + dateTime);
       alert('You have signed in successfully. Please press close to continue to the site');
+
+      res.json({status: "success", code: "200"});
     // If not, asks them to try again
     } else {
       alert('Password was incorrect, please try again');
