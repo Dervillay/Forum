@@ -258,7 +258,6 @@ function openSignIn() {
 /* Closes pop-up form by setting sign up form's display
  * value to 'none' */
 function closeSignUp() {
-  document.getElementById("signOut").setAttribute('style', 'display:block !important');
   document.getElementById("signup").setAttribute('style', 'display: none !important');
 }
 
@@ -271,6 +270,8 @@ async function closeSignIn() {
   if (response) {
     successfulSignIn();
   }
+
+  // Closes sign in form
   document.getElementById("signin").setAttribute('style', 'display: none !important');
 }
 
@@ -298,9 +299,12 @@ async function submitSignUp() {
       data: {username: username.value, email: email.value, password: password.value},
       dataType: "json",
       success: function(response_data_json) {
+        // Gets response data from post request and checks for success
         view_data = response_data_json;
+        // If post was successful, closes sign up form, shows sign out button and alerts user 
         if (view_data["status"] == "success") {
           closeSignUp();
+          document.getElementById("signOut").setAttribute('style', 'display:block !important');
           alert("Account created successfully");
         } else {
           alert("Account creation was unsuccessful, please try again");
@@ -414,3 +418,21 @@ async function googleSignOut() {
   document.getElementById("googleSignIn").style.display = "block";
   document.getElementById("signUpBar").style.display = "block";
 }
+
+/* Listens for a page refresh and signs the user out */
+window.addEventListener('beforeunload', async function(e) {
+  // Cancels the user prompt event
+  e.preventDefault();
+
+  // Finds currently loggin in user's username
+  if (document.getElementById("username").value != '') {
+    var user = document.getElementById("username").value;
+  } else if (document.getElementById("signInUsername").value != '') {
+    var user = document.getElementById("signInUsername").value;
+  }
+  // Calls get method signOut with user as parameter
+  await fetch('http://127.0.0.1:8090/signOut/' + user);
+
+  // returnValue reuired for users using chrome
+  e.returnValue = '';
+})
