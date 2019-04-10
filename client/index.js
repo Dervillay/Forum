@@ -152,7 +152,7 @@ async function checkAccount() {
   }
 
   // If no issues found, closes the form, adjusts the items in the navbar and returns true
-  successfulSignIn();
+  successfulSignIn(username);
   return true;
 
 }
@@ -268,7 +268,8 @@ async function closeSignIn() {
   response = await checkSignedIn();
   // Sets up the page appropriately
   if (response) {
-    successfulSignIn();
+    // Passes inputted username to successful sign in to setup sign in page
+    successfulSignIn(document.getElementById("signInUsername").value);
   }
 
   // Closes sign in form
@@ -301,7 +302,7 @@ async function submitSignUp() {
       success: function(response_data_json) {
         // Gets response data from post request and checks for success
         view_data = response_data_json;
-        // If post was successful, closes sign up form, shows sign out button and alerts user 
+        // If post was successful, closes sign up form, shows sign out button and alerts user
         if (view_data["status"] == "success") {
           closeSignUp();
           document.getElementById("signOut").setAttribute('style', 'display:block !important');
@@ -326,7 +327,24 @@ async function submitSignIn() {
     let signInUsername = document.getElementById("signInUsername");
     let signInPassword = document.getElementById("signInPassword");
     // Submits form and informs user that the account creation was successful, then sets up page appropriately
-    $.post("http://127.0.0.1:8090/signIn", {signInUsername: signInUsername.value, signInPassword: signInPassword.value});
+    $.ajax({
+      type: "POST",
+      url: "http://127.0.0.1:8090/signIn",
+      data: {signInUsername: signInUsername.value, signInPassword: signInPassword.value},
+      dataType: "json",
+      success: function(response_data_json) {
+        // Gets response data from post request and checks for success
+        view_data = response_data_json;
+        // If post was successful, closes sign up form, shows sign out button and alerts user
+        if (view_data["status"] == "success") {
+          closeSignIn();
+          document.getElementById("signOut").setAttribute('style', 'display:block !important');
+          alert('You have signed in successfully.');
+        } else {
+          alert('The password you entered was incorrect, please try again');
+        }
+      }
+    });
   }
   // If username is incorrect, alerts user
   else {
@@ -356,12 +374,12 @@ async function signOut() {
 
 /* Sets the display qualities of items in the
  * navbar when a successful sign-in occurs */
-function successfulSignIn() {
+function successfulSignIn(username) {
   document.getElementById("signUpBar").style.display = "none";
   document.getElementById("googleSignIn").setAttribute('style', 'display:none');
   document.getElementById("makePost").setAttribute('style', 'display:block !important');
   document.getElementById("signOut").setAttribute('style', 'display:block !important');
-  document.getElementById("welcome").innerHTML = "<h6 class=\"welcome\">Welcome, " + document.getElementById("username").value; + " </h6>";
+  document.getElementById("welcome").innerHTML = "<h6 class=\"welcome\">Welcome, " + username + " </h6>";
 }
 
 /* Opens pop-up message form by setting form's display to 'block'
@@ -419,7 +437,8 @@ async function googleSignOut() {
   document.getElementById("signUpBar").style.display = "block";
 }
 
-/* Listens for a page refresh and signs the user out */
+/* Listens for a page refresh and signs the user out
+ * using asynchronous function */
 window.addEventListener('beforeunload', async function(e) {
   // Cancels the user prompt event
   e.preventDefault();
@@ -433,6 +452,6 @@ window.addEventListener('beforeunload', async function(e) {
   // Calls get method signOut with user as parameter
   await fetch('http://127.0.0.1:8090/signOut/' + user);
 
-  // returnValue reuired for users using chrome
+  // returnValue reuired for Google Chrome
   e.returnValue = '';
 })

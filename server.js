@@ -98,27 +98,33 @@ app.post('/signIn', function(req, res) {
     hour: '2-digit',
     minute: '2-digit'
   });
+  // Stores username of user trying to sign in
+  let username = req.body.signInUsername;
 
   // Iterates through all users and gets the correct encrypted password
   for (let i = 0; i < users.length; i++) {
-    if (users[i]["username"] == req.body.signInUsername) {
-      password = users[i]["password"];
+    if (users[i]["username"] == username) {
+      var password = users[i]["password"];
     }
   }
   // Compares the inputted password and encrypted password
   bcrypt.compare(req.body.signInPassword, password, function(err, resp) {
-    if (res) {
-      // If they match, adds the current user to signedIn and alerts them of success
-      signedIn.push(req.body.signInUsername);
+    if (resp) {
+
+      /* If they match, adds the current user to signedIn and alerts them of success
+      and uses if statement to prevent multiple logins from confusing the server */
+      if (!signedIn.includes(username)) {
+        signedIn.push(username);
+      }
 
       // Logs to server console that the user has logged in
-      console.log('> User \'' + req.body.signInUsername + '\' logged in on ' + dateTime);
-      alert('You have signed in successfully. Please press close to continue to the site');
+      console.log('> User \'' + username + '\' logged in on ' + dateTime);
 
+      // Sends successful response
       res.json({status: "success", code: "200"});
-    // If not, asks them to try again
     } else {
-      alert('Password was incorrect, please try again');
+      // Sends unsuccessful response with forbidden error code since password was incorrect
+      res.json({status: "unsuccessful", code: "403"});
     }
   });
 });
