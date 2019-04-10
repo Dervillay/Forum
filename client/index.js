@@ -52,8 +52,20 @@ async function refreshPage() {
 async function searchPage() {
   let query = document.getElementById("search");
   // Submits form
-  // SORT AJAX HERE
-  $.post("http://127.0.0.1:8090/sendQuery", {query: search.value});
+  $.ajax({
+    type: "POST",
+    url: "http://127.0.0.1:8090/sendQuery",
+    data: {query: search.value},
+    dataType: "json",
+    success: function(response_data_json) {
+      // Gets response data from post request and checks for success
+      view_data = response_data_json;
+      // If post request was unsuccessful, alerts user
+      if (view_data["status"] != "success") {
+        alert("Search request unsuccessful, please try again");
+      }
+    }
+  });
 
   // Uses GET method 'messages' to receive list of messages
   let messagesResponse = await fetch("http://127.0.0.1:8090/messages");
@@ -443,14 +455,23 @@ window.addEventListener('beforeunload', async function(e) {
   // Cancels the user prompt event
   e.preventDefault();
 
+  // Gets signedIn from server
+  let signedInResponse = await fetch("http://127.0.0.1:8090/signedIn");
+  let signedInBody = await signedInResponse.text();
+  let signedInPost = JSON.parse(signedInBody);
+
   // Finds currently loggin in user's username
   if (document.getElementById("username").value != '') {
     var user = document.getElementById("username").value;
   } else if (document.getElementById("signInUsername").value != '') {
     var user = document.getElementById("signInUsername").value;
   }
-  // Calls get method signOut with user as parameter
-  await fetch('http://127.0.0.1:8090/signOut/' + user);
+
+  // Checks if user is already signed in
+  if (signedInPost.includes(user)) {
+    // Calls get method signOut with user as parameter
+    await fetch('http://127.0.0.1:8090/signOut/' + user);
+  }
 
   // returnValue reuired for Google Chrome
   e.returnValue = '';

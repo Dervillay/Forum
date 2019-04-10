@@ -2,7 +2,6 @@
 const bcrypt = require('bcryptjs');
 const express = require('express');
 const bodyParser = require('body-parser');
-const alert = require('alert-node');
 const app = express();
 
 // Adds all necessary packages
@@ -41,6 +40,9 @@ app.post('/addPost', function(req, res) {
   // Turns user into a JSON object and pushes it to messages
   let messageJSON = JSON.parse(message);
   messages.push(messageJSON);
+
+  // Sends success response
+  res.json({status: "success", code: "200"});
 });
 
 // Adds user to users
@@ -77,8 +79,8 @@ app.post('/addUser', function(req, res) {
     users.push(userJSON);
     signedIn.push(userJSON['username']);
 
-    // Logs to server console that the user has logged in
-    console.log('> User \'' + userJSON['username'] + '\' logged in on ' + dateTime);
+    // Logs to server console that the user has created an account and logged in
+    console.log('> New account \'' + userJSON['username'] + '\' logged in on ' + dateTime);
     res.json({status: "success", code: "200"});
   })
   // Catches and handles errors
@@ -214,7 +216,7 @@ app.get('/signOut/:user', function(req, res) {
 
 // Gets current value of query
 app.get('/query', function(req, res) {
-  res.send(query.toLowerCase());
+  res.json({result:query.toLowerCase()});
 });
 
 app.get("/",function(req,res){
