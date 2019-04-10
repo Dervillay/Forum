@@ -8,7 +8,7 @@ const app = express();
 // Adds all necessary packages
 app.use(express.static('client'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded());
 
 // Defines intially empty lists: users and messages
@@ -84,6 +84,7 @@ app.post('/addUser', function(req, res) {
   // Catches and handles errors
   .catch(err => {
     throw (new Error(err))
+    res.json({status: "unsuccessful", code: "500"})
   });
 });
 
@@ -124,6 +125,7 @@ app.post('/signIn', function(req, res) {
 
 app.post('/sendQuery', function(req, res) {
   query = req.body.query;
+  res.json({status: "success", code: "200"});
 });
 
 app.get('/googleSignIn/:user', function(req, res) {

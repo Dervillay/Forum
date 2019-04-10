@@ -50,8 +50,11 @@ async function refreshPage() {
  */
 
 async function searchPage() {
+  let query = document.getElementById("search");
   // Submits form
-  document.forms["submitSearch"].submit();
+  // SORT AJAX HERE
+  $.post("http://127.0.0.1:8090/sendQuery", {query: search.value});
+
   // Uses GET method 'messages' to receive list of messages
   let messagesResponse = await fetch("http://127.0.0.1:8090/messages");
   let messagesBody = await messagesResponse.text();
@@ -280,19 +283,30 @@ async function submitSignUp() {
   // Checks if inputted values already correspond to an existing user
   // and checks if the inputted emails and passwords are valid
   if (accountFree && checkEmail() && checkPassword()) {
-    // Submits form and informs user that the account creation was successful, then closes the form
-    //document.forms["signup"].submit()
 
+    // Gets all data in the HTML form and stores it in variable
     let username = document.getElementById("username");
     let email = document.getElementById("email");
     let confirmEmail = document.getElementById("confirmEmail");
     let password = document.getElementById("password");
     let confirmPassword = document.getElementById("confirmPassword");
 
-    $.post("http://127.0.0.1:8090/addUser", {username: username.value, email: email.value, password: password.value});
-
-    alert("Account created successfully.");
-    closeSignUp();
+    // Uses AJAX to post this data to the server and handles the response on success
+    $.ajax({
+      type: "POST",
+      url: "http://127.0.0.1:8090/addUser",
+      data: {username: username.value, email: email.value, password: password.value},
+      dataType: "json",
+      success: function(response_data_json) {
+        view_data = response_data_json;
+        if (view_data["status"] == "success") {
+          closeSignUp();
+          alert("Account created successfully");
+        } else {
+          alert("Account creation was unsuccessful, please try again");
+        }
+      }
+    });
   }
 }
 
