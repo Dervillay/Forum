@@ -8,7 +8,7 @@ const app = express();
 app.use(express.static('client'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.urlencoded());
+//app.use(express.urlencoded());
 
 // Defines intially empty lists: users and messages
 let users = [];
@@ -21,7 +21,7 @@ let signedIn = [];
 let query = '';
 
 // Adds user and message to respective lists
-app.post('/addPost', function(req, res) {
+app.post('/addMessage', function(req, res) {
   // Gets current date and time and stores it in dateTime
   let dateTime = new Date().toLocaleDateString(undefined, {
     day: 'numeric',
@@ -80,7 +80,7 @@ app.post('/addUser', function(req, res) {
     signedIn.push(userJSON['username']);
 
     // Logs to server console that the user has created an account and logged in
-    console.log('> New account \'' + userJSON['username'] + '\' logged in on ' + dateTime);
+    console.log('> New user \'' + userJSON['username'] + '\' logged in on ' + dateTime);
     res.json({status: "success", code: "200"});
   })
   // Catches and handles errors

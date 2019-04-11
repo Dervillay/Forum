@@ -6,8 +6,6 @@ async function refreshPage() {
   // Uses GET method 'messages' to receive list of messages
   let messagesResponse = await fetch("http://127.0.0.1:8090/messages");
   let messagesBody = await messagesResponse.text();
-
-  // Parses data received by GET method
   let messagesPost = JSON.parse(messagesBody);
 
   // Only updates page with posts if they exist
@@ -124,15 +122,28 @@ async function searchPage() {
   }
 }
 
-function postMessage() {
-  var user = document.getElementById("welcome").innerHTML.slice(29, -5);
+async function addMessage() {
+  // Gets currently logged in user's name and submitted message
+  let user = document.getElementById("welcome").innerHTML.slice(29, -5);
+  let message = document.getElementById("message");
 
-  document.getElementById("postUsername").value = user;
-
-
-  document.forms["signup"].submit();
-  alert("Post submitted successfully.");
-  closeMessageForm();
+  $.ajax({
+    type: "POST",
+    url: "http://127.0.0.1:8090/addMessage",
+    data: {postUsername: user.value, message: message.value},
+    dataType: "json",
+    success: function(response_data_json) {
+      // Gets response data from post request and checks for success
+      view_data = response_data_json;
+      // If post was successful, closes sign up form, shows sign out button and alerts user
+      if (view_data["status"] == "success") {
+        alert("Post submitted successfully.");
+        closeMessageForm();
+      } else {
+        alert("Post submission was unsuccessful, please try again");
+      }
+    }
+  });
 }
 
 /* Checks whether current inputted information can be
@@ -195,7 +206,7 @@ async function checksignInUsername() {
 
 async function checkSignedIn() {
 
-  username = document.getElementById("signInUsername").value;
+  let username = document.getElementById("signInUsername").value;
 
   // Gets signedIn from server
   let signedInResponse = await fetch("http://127.0.0.1:8090/signedIn");
@@ -397,7 +408,7 @@ function successfulSignIn(username) {
 /* Opens pop-up message form by setting form's display to 'block'
  * and both makePost and defaultText's display to 'none' */
 function openMessageForm() {
-  document.getElementById("form").setAttribute('style', 'display:block !important');
+  document.getElementById("messageForm").setAttribute('style', 'display:block !important');
   document.getElementById("makePost").style.display = "none";
   document.getElementById("defaultText").style.display = "none";
   document.getElementById("signUpBar").style.display = "none";
@@ -406,9 +417,8 @@ function openMessageForm() {
 /* Closes pop-up message form by setting form's display to 'none'
  * and both makePost and defaultTest's display to 'none' */
 function closeMessageForm() {
-  document.getElementById("form").style.display = "none";
+  document.getElementById("messageForm").style.display = "none";
   document.getElementById("makePost").setAttribute('style', 'display:block !important');
-  refreshPage();
 }
 
 /* Google sign-in function.
@@ -452,9 +462,6 @@ async function googleSignOut() {
 /* Listens for a page refresh and signs the user out
  * using asynchronous function */
 window.addEventListener('beforeunload', async function(e) {
-  // Cancels the user prompt event
-  e.preventDefault();
-
   // Gets signedIn from server
   let signedInResponse = await fetch("http://127.0.0.1:8090/signedIn");
   let signedInBody = await signedInResponse.text();
