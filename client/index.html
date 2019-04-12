@@ -25,12 +25,14 @@
   <title>Forum</title>
 
   <!-- Navbar -->
+  <div class="fixed-nav">
+  <span>
   <nav class="navbar fixed-top navbar-dark bg-dark">
     <a class="navbar-brand mb-0 h1" onclick="refreshPage()" href="#">Forum</a>
 
     <form id="submitSearch" class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="text" name="query" placeholder="Search...">
-      <button id="search" class="btn btn-secondary my-2 my-sm-0 center" onclick="searchPage()">Search</button>
+      <input id="search" name="search" class="form-control mr-sm-2" type="text" placeholder="Search...">
+      <button type="button" class="btn btn-secondary my-2 my-sm-0 center" onclick="searchPage()">Search</button>
     </form>
 
     <div id="googleSignIn" class="g-signin2" data-onsuccess="googleSignIn" data-theme="dark"></div>
@@ -48,6 +50,7 @@
     <button id="makePost" class="btn btn-primary hidden" onclick="openMessageForm()">Make a Post</button>
 
   </nav>
+</span>
 
 </head>
 
@@ -128,6 +131,7 @@
     <div class="p-10">
       <h5 id="defaultText" class="m-10 default-text center-screen back">It appears the forum is empty :(<br> Sign in and make a post to contribute or hit 'Forum' to update the page.</h5>
     </div>
+  </div>
   </div>
 
   <!-- Local JavaScript Import -->

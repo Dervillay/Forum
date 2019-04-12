@@ -103,6 +103,14 @@ input[type=text]:focus, input[type=password]:focus {
   height: 2.3rem;
 }
 
+.fixed-nav {
+  line-height:1rem !important;
+}
+
+.fixed-nav > span {
+  position: fixed !important;
+}
+
 .navbar-brand {
   text-decoration: underline !important;
   text-decoration-color: #4285F4 !important;

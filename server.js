@@ -216,7 +216,7 @@ app.get('/signOut/:user', function(req, res) {
 
 // Gets current value of query
 app.get('/query', function(req, res) {
-  res.json({result:query.toLowerCase()});
+  res.json({result: query.toLowerCase()});
 });
 
 app.get("/",function(req,res){

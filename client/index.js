@@ -50,10 +50,10 @@ async function refreshPage() {
 async function searchPage() {
   let query = document.getElementById("search");
   // Submits form
-  $.ajax({
+  await $.ajax({
     type: "POST",
     url: "http://127.0.0.1:8090/sendQuery",
-    data: {query: search.value},
+    data: {query: query.value},
     dataType: "json",
     success: function(response_data_json) {
       // Gets response data from post request and checks for success
@@ -75,16 +75,21 @@ async function searchPage() {
 
   // Parses data received by GET methods into JS objects
   let messagesPost = JSON.parse(messagesBody);
+  let queryPost = JSON.parse(queryBody)
+
+  console.log(messagesPost[0], queryPost["result"])
 
   // New list to store users and messages matching the query
   var matchingMessages = []
 
   // Iterates through (lower case versions of) all users and messages and finds matches
   for (let i = 0; i < messagesPost.length; i++) {
-      if (messagesPost[i]["postedBy"].toLowerCase().includes(queryBody) || messagesPost[i]["content"].toLowerCase().includes(queryBody)) {
+      if (messagesPost[i]["postedBy"].toLowerCase().includes(queryPost["result"]) || messagesPost[i]["content"].toLowerCase().includes(queryPost["result"])) {
         matchingMessages.push(messagesPost[i]);
       }
   }
+
+  console.log(matchingMessages);
 
   if (matchingMessages.length > 0) {
     // Clears out message board area and initialises list of messages
@@ -124,13 +129,13 @@ async function searchPage() {
 
 async function addMessage() {
   // Gets currently logged in user's name and submitted message
-  let user = document.getElementById("welcome").innerHTML.slice(29, -5);
-  let message = document.getElementById("message");
+  let user = await document.getElementById("welcome").innerHTML.slice(29, -5);
+  let message = await document.getElementById("message");
 
   $.ajax({
     type: "POST",
     url: "http://127.0.0.1:8090/addMessage",
-    data: {postUsername: user.value, message: message.value},
+    data: {postUsername: user, message: message.value},
     dataType: "json",
     success: function(response_data_json) {
       // Gets response data from post request and checks for success
@@ -139,6 +144,7 @@ async function addMessage() {
       if (view_data["status"] == "success") {
         alert("Post submitted successfully.");
         closeMessageForm();
+        refreshPage();
       } else {
         alert("Post submission was unsuccessful, please try again");
       }
@@ -266,7 +272,6 @@ function checkPassword() {
  * to 'block' and both sign in & defaultTexts' display to 'none' */
 function openSignUp() {
   document.getElementById("signup").setAttribute('style', 'display:block !important');
-  document.getElementById("defaultText").style.display = "none";
   document.getElementById("signin").style.display = "none";
 }
 
@@ -274,7 +279,6 @@ function openSignUp() {
  * to 'block', and both sign up & defaultTexts' display to 'none' */
 function openSignIn() {
   document.getElementById("signin").setAttribute('style', 'display:block !important');
-  document.getElementById("defaultText").style.display = "none";
   document.getElementById("signup").style.display = "none";
 }
 
@@ -410,7 +414,6 @@ function successfulSignIn(username) {
 function openMessageForm() {
   document.getElementById("messageForm").setAttribute('style', 'display:block !important');
   document.getElementById("makePost").style.display = "none";
-  document.getElementById("defaultText").style.display = "none";
   document.getElementById("signUpBar").style.display = "none";
 }
 
