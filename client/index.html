@@ -25,9 +25,7 @@
   <title>Forum</title>
 
   <!-- Navbar -->
-  <div class="fixed-nav">
-  <span>
-  <nav class="navbar fixed-top navbar-dark bg-dark">
+  <nav id="header" class=" fixed-menu navbar fixed-top navbar-dark bg-dark">
     <a class="navbar-brand mb-0 h1" onclick="refreshPage()" href="#">Forum</a>
 
     <form id="submitSearch" class="form-inline my-2 my-lg-0">
@@ -48,13 +46,12 @@
 
     <button id="signOut" class="btn btn-secondary hidden" onclick="signOut()">Sign Out</button>
     <button id="makePost" class="btn btn-primary hidden" onclick="openMessageForm()">Make a Post</button>
-
   </nav>
-</span>
 
 </head>
 
 <body>
+  <div id="body-content">
 
   <!-- Pop-up sign up Form -->
   <div id="signup" class="form-popup hidden center-screen">
@@ -126,12 +123,14 @@
         </form>
   </div>
 
+
   <!-- Posts -->
   <div id="content">
     <div class="p-10">
       <h5 id="defaultText" class="m-10 default-text center-screen back">It appears the forum is empty :(<br> Sign in and make a post to contribute or hit 'Forum' to update the page.</h5>
     </div>
   </div>
+
   </div>
 
   <!-- Local JavaScript Import -->

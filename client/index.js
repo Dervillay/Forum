@@ -8,6 +8,9 @@ async function refreshPage() {
   let messagesBody = await messagesResponse.text();
   let messagesPost = JSON.parse(messagesBody);
 
+  /* Keeps navbar dynamic when screen is resized */
+  setNavbarHeight();
+
   // Only updates page with posts if they exist
   if (messagesPost.length > 0) {
 
@@ -77,8 +80,6 @@ async function searchPage() {
   let messagesPost = JSON.parse(messagesBody);
   let queryPost = JSON.parse(queryBody)
 
-  console.log(messagesPost[0], queryPost["result"])
-
   // New list to store users and messages matching the query
   var matchingMessages = []
 
@@ -89,7 +90,8 @@ async function searchPage() {
       }
   }
 
-  console.log(matchingMessages);
+  /* Keeps navbar dynamic when screen is resized */
+  setNavbarHeight();
 
   if (matchingMessages.length > 0) {
     // Clears out message board area and initialises list of messages
@@ -486,3 +488,12 @@ window.addEventListener('beforeunload', async function(e) {
   // returnValue reuired for Google Chrome
   e.returnValue = '';
 })
+
+/* Adapts the height of message posts to appear below navbar */
+function setNavbarHeight() {
+  $(document).ready(function() {
+      var contentPlacement = $('#header').position().top + $('#header').height() - 70;
+      console.log(contentPlacement);
+      $('#body-content').css('padding-top', contentPlacement);
+  });
+}
