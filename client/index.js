@@ -8,9 +8,6 @@ async function refreshPage() {
   let messagesBody = await messagesResponse.text();
   let messagesPost = JSON.parse(messagesBody);
 
-  /* Keeps navbar dynamic when screen is resized */
-  setNavbarHeight();
-
   // Only updates page with posts if they exist
   if (messagesPost.length > 0) {
 
@@ -23,7 +20,7 @@ async function refreshPage() {
       `
       <li>
       <a>
-      <div class=\"container-fluid container-user\">
+      <div class=\"container-fluid\">
         <div class=\"jumbotron post p-3 parent\">
           <img src=\"images/default_user.jpeg\" alt=\"user_icon\" class=\"user\">
           <div class=\"child inline-block-child p-3\">
@@ -89,9 +86,6 @@ async function searchPage() {
         matchingMessages.push(messagesPost[i]);
       }
   }
-
-  /* Keeps navbar dynamic when screen is resized */
-  setNavbarHeight();
 
   if (matchingMessages.length > 0) {
     // Clears out message board area and initialises list of messages
@@ -489,11 +483,20 @@ window.addEventListener('beforeunload', async function(e) {
   e.returnValue = '';
 })
 
+var repeater;
+
 /* Adapts the height of message posts to appear below navbar */
 function setNavbarHeight() {
   $(document).ready(function() {
-      var contentPlacement = $('#header').position().top + $('#header').height() - 70;
+      var contentPlacement = $('#header').position().top + $('#header').height() - 50;
       console.log(contentPlacement);
-      $('#body-content').css('padding-top', contentPlacement);
+      if (contentPlacement >= 0) {
+        $('#content').css('padding-top', contentPlacement);
+      } else {
+        $('#content').css('padding-top', 0);
+      }
+      repeater = setTimeout(setNavbarHeight, 1000);
   });
 }
+
+setNavbarHeight();
