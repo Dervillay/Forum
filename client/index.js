@@ -27,7 +27,7 @@ async function refreshPage() {
             <p>` + messagesPost[i]["postedBy"] + `</p>
           </div>
           <div class="child inline-block-child date-text p-3">
-            <p class="date-text">` + messagesPost[i]["datePosted"] + `</p>
+            <p class="date-text">Posted ` + messagesPost[i]["datePosted"] + `</p>
           </div>
           <div class="jumbotron comment p-3">
             ` + messagesPost[i]["content"] + `
@@ -483,19 +483,18 @@ window.addEventListener('beforeunload', async function(e) {
   e.returnValue = '';
 })
 
-var repeater;
+let repeater;
 
 /* Adapts the height of message posts to appear below navbar */
 function setNavbarHeight() {
   $(document).ready(function() {
-      var contentPlacement = $('#header').position().top + $('#header').height() - 50;
-      console.log(contentPlacement);
+      const contentPlacement = $('#header').position().top + $('#header').height() - 50;
       if (contentPlacement >= 0) {
         $('#content').css('padding-top', contentPlacement);
       } else {
         $('#content').css('padding-top', 0);
       }
-      repeater = setTimeout(setNavbarHeight, 1000);
+      repeater = setTimeout(setNavbarHeight, 500);
   });
 }
 
