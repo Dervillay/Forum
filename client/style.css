@@ -35,7 +35,7 @@ input[type=text]:focus, input[type=password]:focus {
   -moz-box-sizing: border-box !important;
   -ms-box-sizing: border-box !important;
   box-sizing: border-box !important;
-  z-index: 0;
+  z-index: 0 !important;
 }
 
 .welcome {
@@ -191,4 +191,13 @@ input[type=text]:focus, input[type=password]:focus {
   float: right;
   position: absolute !important;
   right: 2.5rem;
+}
+
+.g-signin2 {
+  padding-right: 1rem;
+  padding-top: 0.42rem;
+}
+
+.welcome {
+  padding-top: 0.2rem;
 }

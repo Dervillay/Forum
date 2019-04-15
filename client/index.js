@@ -287,14 +287,6 @@ function closeSignUp() {
 /* Closes pop-up form by setting sign up form's display
  * value to 'none' */
 async function closeSignIn() {
-  // Checks if the sign in was a success
-  response = await checkSignedIn();
-  // Sets up the page appropriately
-  if (response) {
-    // Passes inputted username to successful sign in to setup sign in page
-    successfulSignIn(document.getElementById("signInUsername").value);
-  }
-
   // Closes sign in form
   document.getElementById("signin").setAttribute('style', 'display: none !important');
 }
@@ -361,7 +353,7 @@ async function submitSignIn() {
         // If post was successful, closes sign up form, shows sign out button and alerts user
         if (view_data["status"] == "success") {
           closeSignIn();
-          document.getElementById("signOut").setAttribute('style', 'display:block !important');
+          successfulSignIn(signInUsername);
           alert('You have signed in successfully.');
         } else {
           alert('The password you entered was incorrect, please try again');
@@ -431,10 +423,11 @@ async function googleSignIn(googleUser) {
 
   // Sets up items in navbar to inform user they are signed in
   document.getElementById("welcome").innerHTML = "<h6 class=\"welcome\">Welcome, " + profile.getName() + " </h6>";
-  document.getElementById("googleSignOut").setAttribute('style', 'display:block !important');
-  document.getElementById("signUpBar").style.display = "none";
   document.getElementById("googleSignIn").setAttribute('style', 'display:none');
+  document.getElementById("googleSignOut").setAttribute('style', 'display:block !important');
   document.getElementById("makePost").setAttribute('style', 'display:block !important');
+  document.getElementById("signUpBar").style.display = "none";
+  document.getElementById("signin").style.display = "none";
 }
 
 /* Google sign-out function.
