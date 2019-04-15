@@ -24,6 +24,10 @@
   <!-- Page Title -->
   <title>Forum</title>
 
+</head>
+
+<body>
+
   <!-- Navbar -->
   <nav id="header" class="fixed-menu navbar fixed-top navbar-dark bg-dark">
     <a class="navbar-brand mb-0 h1" onclick="refreshPage()" href="#">Forum</a>
@@ -46,10 +50,6 @@
     <button id="makePost" class="btn btn-primary hidden" onclick="openMessageForm()">Make a Post</button>
   </nav>
 
-</head>
-
-<body>
-
   <!-- Pop-up sign up Form -->
   <div id="signup" class="form-popup hidden center-screen">
         <form id="inner-sign-up" name="signup" class="jumbotron form p-3 m-3">
@@ -64,13 +64,13 @@
             <label for="email">Email</label>
             <input id="email" name="email" type="text" placeholder="Enter email" class="p-2 round-corners form-input" required><br>
 
-            <label for="confirmemail">Confirm Email</label>
+            <label for="confirmEmail">Confirm Email</label>
             <input id="confirmEmail" name="confirmemail" type="text" placeholder="Confirm email" onblur="checkEmail()" class="p-2 round-corners form-input" required><br>
 
             <label for="password">Password</label>
             <input id="password" name="password" type="password" placeholder="Enter password" class="p-2 round-corners form-input" required><br>
 
-            <label for="confirmpassword">Confirm Password</label>
+            <label for="confirmPassword">Confirm Password</label>
             <input id="confirmPassword" name="confirmpassword" type="password" placeholder="Confirm password" onblur="checkPassword()" class="p-2 round-corners form-input" required>
             <div class="form-buttons">
               <button type="button" class="btn btn-primary" onclick="submitSignUp()">Sign up</button>
