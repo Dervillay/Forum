@@ -26,8 +26,8 @@ async function refreshPage() {
           <div class=\"child inline-block-child p-3\">
             <p>` + messagesPost[i]["postedBy"] + `</p>
           </div>
-          <div class="child inline-block-child date-text p-3">
-            <p class="date-text">Posted ` + messagesPost[i]["datePosted"] + `</p>
+          <div class=\"child inline-block-child date-text p-3\">
+            <p>Posted ` + messagesPost[i]["datePosted"] + `</p>
           </div>
           <div class="jumbotron comment p-3">
             ` + messagesPost[i]["content"] + `
@@ -98,14 +98,14 @@ async function searchPage() {
       `
       <li>
       <a>
-      <div class=\"container-fluid container-user\">
+      <div class=\"container-fluid\">
         <div class=\"jumbotron post p-3 parent\">
           <img src=\"images/default_user.jpeg\" alt=\"user_icon\" class=\"user\">
           <div class=\"child inline-block-child p-3\">
             <p>` + matchingMessages[i]["postedBy"] + `</p>
           </div>
-          <div class="child inline-block-child date-text p-3">
-            <p class="date-text">` + matchingMessages[i]["datePosted"] + `</p>
+          <div class=\"child inline-block-child date-text p-3\">
+            <p>Posted ` + matchingMessages[i]["datePosted"] + `</p>
           </div>
           <div class="jumbotron comment p-3">
             ` + matchingMessages[i]["content"] + `
