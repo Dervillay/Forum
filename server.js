@@ -1,7 +1,9 @@
 // Initial setup
-const bcrypt = require('bcryptjs');
 const express = require('express');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('./config');
 const app = express();
 
 // Adds all necessary packages
@@ -44,12 +46,12 @@ app.post('/addMessage', function(req, res) {
     messages.push(messageJSON);
 
     // Sends success response
-    res.json({status: "success", code: "200"});
+    res.status(200).json({status: "success"});
 
   }
   // Catches errors and sends appropriate response code
   catch (error) {
-    res.json({status: "unsuccessful", code: "500"});
+    res.status(500).json({status: "unsuccessful"});
   }
 });
 
@@ -84,23 +86,29 @@ app.post('/addUser', function(req, res) {
     bcrypt.hash(req.body.password, 10)
     .then(function(hash, err) {
       userJSON["password"] = hash;
+
+      // Creates unique user token using secret
+      var token = jwt.sign({id: username}, config.secret , {
+        expiresIn: 86400 // Expires in 24 hours
+      });
+
       // Adds userJSON to users and their username to signedIn
       users.push(userJSON);
       signedIn.push(userJSON['username']);
 
       // Logs to server console that the user has created an account and logged in
       console.log('> New user \'' + userJSON['username'] + '\' logged in on ' + dateTime);
-      res.json({status: "success", code: "200"});
+      res.status(200).json({status: "success", token: token});
     })
     // Catches and handles errors
     .catch(err => {
       throw (new Error(err))
-      res.json({status: "unsuccessful", code: "500"})
+      res.status(500).json({status: "unsuccessful"})
     });
   }
   // Catches errors and sends appropriate response code
   catch (error) {
-      res.json({status: "unsuccessful", code: "500"});
+      res.status(500).json({status: "unsuccessful"});
     }
 });
 
@@ -138,27 +146,27 @@ app.post('/signIn', function(req, res) {
         console.log('> User \'' + username + '\' logged in on ' + dateTime);
 
         // Sends successful response
-        res.json({status: "success", code: "200"});
+        res.status(200).json({status: "success"});
       } else {
         // Sends unsuccessful response with forbidden error code since password was incorrect
-        res.json({status: "unsuccessful", code: "403"});
+        res.status(403).json({status: "unsuccessful"});
       }
     });
   }
   // Catches errors and sends appropriate response code
   catch (error) {
-    res.json({status: "unsuccessful", code: "500"});
+    res.status(500).json({status: "unsuccessful"});
   }
 });
 
 app.post('/sendQuery', function(req, res) {
   try {
     query = req.body.query;
-    res.json({status: "success", code: "200"});
+    res.status(200).json({status: "success"});
   }
   // Catches errors and sends appropriate response code
   catch (error) {
-    res.json({status: "unsuccessful", code: "500"})
+    res.status(500).json({status: "unsuccessful"})
   }
 });
 
@@ -179,7 +187,7 @@ app.get('/googleSignIn/:user', function(req, res) {
 
   // Logs to server that this user has logged in
   console.log('> User \'' + user + '\' logged in via Google on ' + dateTime);
-  res.json(signedIn);
+  res.status(200).json(signedIn);
 });
 
 app.get('/googleSignOut/:user', function(req, res) {
@@ -200,22 +208,22 @@ app.get('/googleSignOut/:user', function(req, res) {
 
   // Logs to server that this user has logged out
   console.log('> User \'' + user + '\' logged out via Google on ' + dateTime);
-  res.json(signedIn);
+  res.status(200).json(signedIn);
 });
 
 // Gets list of users
 app.get('/users', function(req, res) {
-  res.json(users);
+  res.status(200).json(users);
 });
 
 // Gets list of messages
 app.get('/messages', function(req, res) {
-  res.json(messages);
+  res.status(200).json(messages);
 });
 
 // Gets list of currently signed in users
 app.get('/signedIn', function(req, res) {
-  res.json(signedIn);
+  res.status(200).json(signedIn);
 });
 
 // Signs out user
@@ -239,12 +247,12 @@ app.get('/signOut/:user', function(req, res) {
   console.log('> User \'' + user + '\' logged out at ' + dateTime);
 
   // Sends success response
-  res.json(signedIn);
+  res.status(200).json(signedIn);
 });
 
 // Gets current value of query
 app.get('/query', function(req, res) {
-  res.json({result: query.toLowerCase()});
+  res.status(200).json({result: query.toLowerCase()});
 });
 
 // Listens on port 8090
