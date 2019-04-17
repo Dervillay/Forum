@@ -1,3 +1,6 @@
+/* Local variable to store tokens recieved from server */
+let token;
+
 /* Asynchronous function to update page with all users and messages.
  * Uses GET methods of server to recieve current list of users and
  * messages. It then iterates through them and inserts the final posts
@@ -148,40 +151,6 @@ async function addMessage() {
   });
 }
 
-/* Checks whether current inputted information can be
- * found in existsing user accounts */
-async function checkAccount() {
-  // Gets username and email from form
-  var username = await document.getElementById("username").value;
-  var email = await document.getElementById("email").value;
-
-  // Fetches existing users' information and formats it to JSON
-  let usersResponse = await fetch("http://127.0.0.1:8090/users");
-  let usersBody = await usersResponse.text();
-  let usersJSON = JSON.parse(usersBody);
-
-  // Loops through all users returned to usersResponse
-  for (let i = 0; i < usersJSON.length; i++) {
-
-    // Checks if user's username matches that in the form
-    if (usersJSON[i]["username"] == username) {
-      // Alerts user that the username is taken and returns false
-      alert("An account with that username already exists");
-      return false;
-    // Checks if user's email matches that in the form
-    } else if (usersJSON[i]["email"] == email) {
-      // Alerts user that the email is taken and returns false
-      alert("An account with that email address already exists");
-      return false;
-    }
-  }
-
-  // If no issues found, closes the form, adjusts the items in the navbar and returns true
-  successfulSignIn(username);
-  return true;
-
-}
-
 /* Checks if user with inputted username or email exists */
 async function checksignInUsername() {
   // Gets input from sign in form
@@ -294,14 +263,10 @@ async function closeSignIn() {
 /* Submits sign up form if information is valid and
  * creates an alert appropriate to the outcome. */
 async function submitSignUp() {
-  // Sets accountFree to boolean value returned by checkAccount
-  let accountFree = await checkAccount();
+  // Checks if the inputted emails and passwords are valid
+  if (checkEmail() && checkPassword()) {
 
-  // Checks if inputted values already correspond to an existing user
-  // and checks if the inputted emails and passwords are valid
-  if (accountFree && checkEmail() && checkPassword()) {
-
-    // Gets all data in the HTML form and stores it in variable
+    // Gets all data in the HTML form and stores it in a variable
     let username = document.getElementById("username");
     let email = document.getElementById("email");
     let confirmEmail = document.getElementById("confirmEmail");
@@ -317,13 +282,15 @@ async function submitSignUp() {
       success: function(response_data_json) {
         // Gets response data from post request and checks for success
         view_data = response_data_json;
-        // If post was successful, closes sign up form, shows sign out button and alerts user
+        // If post was successful, closes sign up form, stores response token and alerts user
         if (view_data["status"] == "success") {
+          token = view_data["token"];
           closeSignUp();
           document.getElementById("signOut").setAttribute('style', 'display:block !important');
           alert("Account created successfully");
+        // If post was unsuccessful, shows reason for this in alert
         } else {
-          alert("Account creation was unsuccessful, please try again");
+          alert(view_data["message"]);
         }
       }
     });
@@ -476,6 +443,7 @@ window.addEventListener('beforeunload', async function(e) {
   e.returnValue = '';
 })
 
+// Variable for repeatedly calling setNavbarHeight
 let repeater;
 
 /* Adapts the height of message posts to appear below navbar */
@@ -491,4 +459,5 @@ function setNavbarHeight() {
   });
 }
 
+/* Calls setNavbarHeight to begin loop */
 setNavbarHeight();

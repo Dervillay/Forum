@@ -63,6 +63,14 @@ app.post('/addUser', function(req, res) {
 
     // Gets username from HTML form
     let username = req.body.username;
+    let email = req.body.email;
+
+    // Checks if user already exists
+    for (let i = 0; i < users.length; i++) {
+      if (users[i]["username"] == (username) || users[i]["email"].includes(email)) {
+        res.status(409).json({status: "unsuccessful", message:"A user with that username or email already exists."});
+      }
+    }
 
     // Gets current date and time and stores it in dateTime
     let dateTime = new Date().toLocaleDateString(undefined, {
@@ -75,7 +83,7 @@ app.post('/addUser', function(req, res) {
 
     // Creates variable user to store info
     let user =  '{ \"username\":\"' + username + '\",' +
-                '\"email\":\"' + req.body.email + '\",' +
+                '\"email\":\"' + email + '\",' +
                 '\"dateJoined\":\"' + d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear() + '\"' +
                 '}';
 
@@ -102,13 +110,13 @@ app.post('/addUser', function(req, res) {
     })
     // Catches and handles errors
     .catch(err => {
-      throw (new Error(err))
-      res.status(500).json({status: "unsuccessful"})
+      throw (new Error(err));
+      res.status(500).json({status: "unsuccessful", message: "Account creation was unsuccessful, please try again."});
     });
   }
   // Catches errors and sends appropriate response code
   catch (error) {
-      res.status(500).json({status: "unsuccessful"});
+      res.status(500).json({status: "unsuccessful", message: "Account creation was unsuccessful, please try again."});
     }
 });
 
@@ -213,7 +221,20 @@ app.get('/googleSignOut/:user', function(req, res) {
 
 // Gets list of users
 app.get('/users', function(req, res) {
-  res.status(200).json(users);
+
+  // Tries to get token from header and checks if one has been provided
+  var token = req.headers['x-access-token'];
+  if (!token) {
+    return res.status(401).json({status: "unsuccessful", message: "No token provided."});
+  }
+
+  // Attempts to verify the token and outputs a response appropriately
+  jwt.verify(token, config.secret, function(err, decoded) {
+    if (err) {
+      return res.status(500).json({status: "unsuccessful", message: "Failed to authenticate token."});
+    }
+    res.status(200).json(users);
+  });
 });
 
 // Gets list of messages
