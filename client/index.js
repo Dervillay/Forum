@@ -152,7 +152,7 @@ async function addMessage() {
 }
 
 /* Checks if user with inputted username or email exists */
-async function checksignInUsername() {
+async function checkSignInUsername() {
   // Gets input from sign in form
   var signInUsername = await document.getElementById("signInUsername").value;
 
@@ -300,8 +300,8 @@ async function submitSignUp() {
 /* Submits sign in form if information is valid and
  * creates an alert appropriate to the outcome. */
 async function submitSignIn() {
-  // Sets signInUsername to the results of calling checksignInUsername
-  let signInUsername = await checksignInUsername();
+  // Sets signInUsername to the results of calling checkSignInUsername
+  let signInUsername = await checkSignInUsername();
 
   // Checks if inputted values correspond to an existing user and their password
   if (signInUsername) {
