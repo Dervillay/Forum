@@ -151,29 +151,35 @@ async function addMessage() {
   });
 }
 
-/* Checks if user with inputted username or email exists */
-async function checkSignInUsername() {
-  // Gets input from sign in form
-  var signInUsername = await document.getElementById("signInUsername").value;
-
-  // Fetches existing users' information and formats it to JSON
-  let usersResponse = await fetch("http://127.0.0.1:8090/users");
-  let usersBody = await usersResponse.text();
-  let usersJSON = JSON.parse(usersBody);
-
-  // Loops through all users returned to usersResponse
-  for (let i = 0; i < usersJSON.length; i++) {
-    // Checks if user's username matches that in the form
-    if (usersJSON[i]["username"] == signInUsername) {
-      return true;
-    } else if (usersJSON[i]["email"] == signInUsername) {
-      return true;
-    }
-  }
-
-  // If not, returns false
-  return false;
-}
+// /* Checks if user with inputted username or email exists */
+// async function checkSignInUsername() {
+//   // Gets input from sign in form
+//   var signInUsername = await document.getElementById("signInUsername").value;
+//
+//   // Fetches existing users' information using stored token and formats it to JSON
+//   let usersResponse = await fetch("http://127.0.0.1:8090/users", {
+//     method: 'get',
+//     headers: {
+//       'x-access-token': token
+//     }
+//   });
+//
+//   let usersBody = await usersResponse.text();
+//   let usersJSON = JSON.parse(usersBody);
+//
+//   // Loops through all users returned to usersResponse
+//   for (let i = 0; i < usersJSON.length; i++) {
+//     // Checks if user's username matches that in the form
+//     if (usersJSON[i]["username"] == signInUsername) {
+//       return true;
+//     } else if (usersJSON[i]["email"] == signInUsername) {
+//       return true;
+//     }
+//   }
+//
+//   // If not, returns false
+//   return false;
+// }
 
 async function checkSignedIn() {
 
@@ -279,15 +285,13 @@ async function submitSignUp() {
       url: "http://127.0.0.1:8090/addUser",
       data: {username: username.value, email: email.value, password: password.value},
       dataType: "json",
-      success: function(response_data_json) {
-        // Gets response data from post request and checks for success
-        view_data = response_data_json;
+      success: function(view_data) {
         // If post was successful, closes sign up form, stores response token and alerts user
         if (view_data["status"] == "success") {
           token = view_data["token"];
           closeSignUp();
           document.getElementById("signOut").setAttribute('style', 'display:block !important');
-          alert("Account created successfully");
+          alert(view_data["message"]);
         // If post was unsuccessful, shows reason for this in alert
         } else {
           alert(view_data["message"]);
@@ -300,12 +304,6 @@ async function submitSignUp() {
 /* Submits sign in form if information is valid and
  * creates an alert appropriate to the outcome. */
 async function submitSignIn() {
-  // Sets signInUsername to the results of calling checkSignInUsername
-  let signInUsername = await checkSignInUsername();
-
-  // Checks if inputted values correspond to an existing user and their password
-  if (signInUsername) {
-
     let signInUsername = document.getElementById("signInUsername");
     let signInPassword = document.getElementById("signInPassword");
     // Submits form and informs user that the account creation was successful, then sets up page appropriately
@@ -314,24 +312,19 @@ async function submitSignIn() {
       url: "http://127.0.0.1:8090/signIn",
       data: {signInUsername: signInUsername.value, signInPassword: signInPassword.value},
       dataType: "json",
-      success: function(response_data_json) {
-        // Gets response data from post request and checks for success
-        view_data = response_data_json;
+      success: function(view_data) {
         // If post was successful, closes sign up form, shows sign out button and alerts user
         if (view_data["status"] == "success") {
+          token = view_data["token"];
           closeSignIn();
           successfulSignIn(signInUsername);
-          alert('You have signed in successfully.');
+          alert(view_data["message"]);
         } else {
-          alert('The password you entered was incorrect, please try again');
+          console.log(view_data)
+          alert(view_data["message"]);
         }
       }
     });
-  }
-  // If username is incorrect, alerts user
-  else {
-    alert("No account with that username or email address exists");
-  }
 }
 
 /* Calls get method signOut and stores the response to check

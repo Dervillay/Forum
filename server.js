@@ -106,7 +106,7 @@ app.post('/addUser', function(req, res) {
 
       // Logs to server console that the user has created an account and logged in
       console.log('> New user \'' + userJSON['username'] + '\' logged in on ' + dateTime);
-      res.status(200).json({status: "success", token: token});
+      res.status(200).json({status: "success", message: "Account created successfully.", token: token});
     })
     // Catches and handles errors
     .catch(err => {
@@ -140,12 +140,23 @@ app.post('/signIn', function(req, res) {
         var password = users[i]["password"];
       }
     }
+
+    // Checks if user matching the username submitted found via existence of variable password
+    if (!password) {
+      res.status(404).json({status: "unsuccessful", message: "No user with that username could be found."});
+    }
+
     // Compares the inputted password and encrypted password
     bcrypt.compare(req.body.signInPassword, password, function(err, resp) {
       if (resp) {
 
+        // Creates unique user token using secret
+        var token = jwt.sign({id: username}, config.secret , {
+          expiresIn: 86400 // Expires in 24 hours
+        });
+
         /* If they match, adds the current user to signedIn and alerts them of success
-        and uses if statement to prevent multiple logins from confusing the server */
+         * and uses if statement to prevent multiple logins from confusing the server */
         if (!signedIn.includes(username)) {
           signedIn.push(username);
         }
@@ -153,17 +164,17 @@ app.post('/signIn', function(req, res) {
         // Logs to server console that the user has logged in
         console.log('> User \'' + username + '\' logged in on ' + dateTime);
 
-        // Sends successful response
-        res.status(200).json({status: "success"});
+        // Sends successful response with sign in success message
+        res.status(200).json({status: "success", message: "Sign in successful.", token: token});
       } else {
-        // Sends unsuccessful response with forbidden error code since password was incorrect
-        res.status(403).json({status: "unsuccessful"});
+        // Sends unsuccessful response with incorrect password message
+        res.status(403).json({status: "unsuccessful", message: "The password entered was incorrect, please try again."});
       }
     });
   }
   // Catches errors and sends appropriate response code
   catch (error) {
-    res.status(500).json({status: "unsuccessful"});
+    res.status(500).json({status: "unsuccessful", message: "The server encountered an error."});
   }
 });
 
