@@ -43,34 +43,44 @@ app.post('/addMessage', function(req, res) {
 
     // Turns message into a JSON object and pushes it to messages
     let messageJSON = JSON.parse(message);
-    messages.push(messageJSON);
 
-    // Sends success response
-    res.status(200).json({status: "success"});
+    // Tries to get token from header and checks if one has been provided
+    var token = req.headers['x-access-token'];
+    if (!token) {
+      return res.status(401).json({status: "unsuccessful", message: "No token provided."});
+    }
+
+    // Attempts to verify the token and outputs a response appropriately
+    jwt.verify(token, config.secret, function(err, decoded) {
+      if (err) {
+        return res.status(500).json({status: "unsuccessful", message: "Failed to authenticate token."});
+      }
+      messages.push(messageJSON);
+      res.status(200).json({status: "successful", message: "Post submitted successfully."});
+    });
 
   }
   // Catches errors and sends appropriate response code
   catch (error) {
-    res.status(500).json({status: "unsuccessful"});
+    res.status(500).json({status: "unsuccessful", message: "Message was not posted. Server encountered an error"});
   }
 });
 
 // Adds user to users
 app.post('/addUser', function(req, res) {
   try {
-    // Creates new Date object to calculate date account was created
-    let d = new Date();
-
     // Gets username from HTML form
     let username = req.body.username;
     let email = req.body.email;
 
     // Checks if user already exists
     for (let i = 0; i < users.length; i++) {
-      if (users[i]["username"] == (username) || users[i]["email"].includes(email)) {
-        res.status(409).json({status: "unsuccessful", message:"A user with that username or email already exists."});
+      if (users[i]["username"] == username || users[i]["email"].includes(email)) {
+        res.status(409).json({status: "unsuccessful", message:"An account with that username or email already exists."});
       }
     }
+    // Creates new Date object to calculate date account was created
+    let d = new Date();
 
     // Gets current date and time and stores it in dateTime
     let dateTime = new Date().toLocaleDateString(undefined, {
@@ -91,33 +101,27 @@ app.post('/addUser', function(req, res) {
     let userJSON = JSON.parse(user);
 
     // Encrypts password with 10 salt rounds and stores in userJSON
-    bcrypt.hash(req.body.password, 10)
-    .then(function(hash, err) {
+    bcrypt.hash(req.body.password, 10, (err, hash) => {
       userJSON["password"] = hash;
-
-      // Creates unique user token using secret
-      var token = jwt.sign({id: username}, config.secret , {
-        expiresIn: 86400 // Expires in 24 hours
-      });
-
-      // Adds userJSON to users and their username to signedIn
-      users.push(userJSON);
-      signedIn.push(userJSON['username']);
-
-      // Logs to server console that the user has created an account and logged in
-      console.log('> New user \'' + userJSON['username'] + '\' logged in on ' + dateTime);
-      res.status(200).json({status: "success", message: "Account created successfully.", token: token});
-    })
-    // Catches and handles errors
-    .catch(err => {
-      throw (new Error(err));
-      res.status(500).json({status: "unsuccessful", message: "Account creation was unsuccessful, please try again."});
     });
+
+    // Adds userJSON to users and their username to signedIn
+    users.push(userJSON);
+    signedIn.push(userJSON['username']);
+
+    // Creates unique user token using secret
+    var token = jwt.sign({id: username}, config.secret , {
+      expiresIn: 86400 // Expires in 24 hours
+    });
+
+    // Logs to server console that the user has created an account and logged in
+    console.log('> New user \'' + userJSON['username'] + '\' logged in on ' + dateTime);
+    res.status(200).json({status: "success", message: "Account created successfully.", token: token});
   }
-  // Catches errors and sends appropriate response code
+  // Catches and handles errors
   catch (error) {
-      res.status(500).json({status: "unsuccessful", message: "Account creation was unsuccessful, please try again."});
-    }
+    res.status(500).json({status: "unsuccessful", message: "The server encountered an error. Account creation unsuccessful."});
+  }
 });
 
 // Signs a user in
@@ -131,32 +135,36 @@ app.post('/signIn', function(req, res) {
       hour: '2-digit',
       minute: '2-digit'
     });
+
     // Stores username of user trying to sign in
     let username = req.body.signInUsername;
+    let signInPassword = req.body.signInPassword;
+
+    // Variable to determine whether user already exists
+    let userExists = false;
 
     // Iterates through all users and gets the correct encrypted password
     for (let i = 0; i < users.length; i++) {
       if (users[i]["username"] == username) {
         var password = users[i]["password"];
+        userExists = true;
       }
     }
 
-    // Checks if user matching the username submitted found via existence of variable password
-    if (!password) {
+    // Checks if user matching the username submitted exists
+    if (!userExists) {
       res.status(404).json({status: "unsuccessful", message: "No user with that username could be found."});
-    }
+    } else {
+      // Compares the inputted password and encrypted password
+      let result = bcrypt.compareSync(req.body.signInPassword, password);
 
-    // Compares the inputted password and encrypted password
-    bcrypt.compare(req.body.signInPassword, password, function(err, resp) {
-      if (resp) {
-
+      if (result) {
         // Creates unique user token using secret
         var token = jwt.sign({id: username}, config.secret , {
           expiresIn: 86400 // Expires in 24 hours
         });
 
-        /* If they match, adds the current user to signedIn and alerts them of success
-         * and uses if statement to prevent multiple logins from confusing the server */
+        // Adds the current user to signedIn after checking they aren't already signed in from elsewhere
         if (!signedIn.includes(username)) {
           signedIn.push(username);
         }
@@ -170,11 +178,9 @@ app.post('/signIn', function(req, res) {
         // Sends unsuccessful response with incorrect password message
         res.status(403).json({status: "unsuccessful", message: "The password entered was incorrect, please try again."});
       }
-    });
-  }
-  // Catches errors and sends appropriate response code
-  catch (error) {
-    res.status(500).json({status: "unsuccessful", message: "The server encountered an error."});
+    }
+  } catch (error) {
+    res.status(500).json({status: "unsuccessful", message: "Sign in unsuccessful. Server encountered an error"});
   }
 });
 

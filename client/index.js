@@ -136,17 +136,17 @@ async function addMessage() {
     url: "http://127.0.0.1:8090/addMessage",
     data: {postUsername: user, message: message.value},
     dataType: "json",
-    success: function(response_data_json) {
-      // Gets response data from post request and checks for success
-      view_data = response_data_json;
+    beforeSend: function(request) {
+      request.setRequestHeader("x-access-token", token);
+    },
+    success: function(view_data) {
       // If post was successful, closes sign up form, shows sign out button and alerts user
-      if (view_data["status"] == "success") {
-        alert("Post submitted successfully.");
-        closeMessageForm();
-        refreshPage();
-      } else {
-        alert("Post submission was unsuccessful, please try again");
-      }
+      alert(view_data["message"]);
+      closeMessageForm();
+      refreshPage();
+    },
+    error: function(error) {
+      alert(error["responseJSON"]["message"]);
     }
   });
 }
@@ -287,15 +287,14 @@ async function submitSignUp() {
       dataType: "json",
       success: function(view_data) {
         // If post was successful, closes sign up form, stores response token and alerts user
-        if (view_data["status"] == "success") {
-          token = view_data["token"];
-          closeSignUp();
-          document.getElementById("signOut").setAttribute('style', 'display:block !important');
-          alert(view_data["message"]);
+        token = view_data["token"];
+        closeSignUp();
+        successfulSignIn(username.value);
+        alert(view_data["message"]);
+      },
+      error: function(error) {
         // If post was unsuccessful, shows reason for this in alert
-        } else {
-          alert(view_data["message"]);
-        }
+        alert(error["responseJSON"]["message"]);
       }
     });
   }
@@ -304,27 +303,26 @@ async function submitSignUp() {
 /* Submits sign in form if information is valid and
  * creates an alert appropriate to the outcome. */
 async function submitSignIn() {
-    let signInUsername = document.getElementById("signInUsername");
-    let signInPassword = document.getElementById("signInPassword");
-    // Submits form and informs user that the account creation was successful, then sets up page appropriately
-    $.ajax({
-      type: "POST",
-      url: "http://127.0.0.1:8090/signIn",
-      data: {signInUsername: signInUsername.value, signInPassword: signInPassword.value},
-      dataType: "json",
-      success: function(view_data) {
-        // If post was successful, closes sign up form, shows sign out button and alerts user
-        if (view_data["status"] == "success") {
-          token = view_data["token"];
-          closeSignIn();
-          successfulSignIn(signInUsername);
-          alert(view_data["message"]);
-        } else {
-          console.log(view_data)
-          alert(view_data["message"]);
-        }
-      }
-    });
+  let signInUsername = document.getElementById("signInUsername");
+  let signInPassword = document.getElementById("signInPassword");
+  // Submits form and informs user that the account creation was successful, then sets up page appropriately
+  $.ajax({
+    type: "POST",
+    url: "http://127.0.0.1:8090/signIn",
+    data: {signInUsername: signInUsername.value, signInPassword: signInPassword.value},
+    dataType: "json",
+    success: function(view_data) {
+      // If post was successful, closes sign up form, shows sign out button and alerts user
+      token = view_data["token"];
+      closeSignIn();
+      successfulSignIn(signInUsername.value);
+      alert(view_data["message"]);
+    },
+    error: function(error) {
+      // If post was unsuccessful, shows reason for this in alert
+      alert(error["responseJSON"]["message"]);
+    }
+  });
 }
 
 /* Calls get method signOut and stores the response to check
