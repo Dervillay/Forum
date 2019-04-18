@@ -58,7 +58,6 @@ app.post('/addMessage', function(req, res) {
       messages.push(messageJSON);
       res.status(200).json({status: "successful", message: "Post submitted successfully."});
     });
-
   }
   // Catches errors and sends appropriate response code
   catch (error) {
@@ -73,50 +72,57 @@ app.post('/addUser', function(req, res) {
     let username = req.body.username;
     let email = req.body.email;
 
+    let userExists = false;
+
     // Checks if user already exists
     for (let i = 0; i < users.length; i++) {
       if (users[i]["username"] == username || users[i]["email"].includes(email)) {
-        res.status(409).json({status: "unsuccessful", message:"An account with that username or email already exists."});
+        userExists = true;
       }
     }
-    // Creates new Date object to calculate date account was created
-    let d = new Date();
 
-    // Gets current date and time and stores it in dateTime
-    let dateTime = new Date().toLocaleDateString(undefined, {
-      day: 'numeric',
-      month: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    if (!userExists) {
+      // Creates new Date object to calculate date account was created
+      let d = new Date();
 
-    // Creates variable user to store info
-    let user =  '{ \"username\":\"' + username + '\",' +
-                '\"email\":\"' + email + '\",' +
-                '\"dateJoined\":\"' + d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear() + '\"' +
-                '}';
+      // Gets current date and time and stores it in dateTime
+      let dateTime = new Date().toLocaleDateString(undefined, {
+        day: 'numeric',
+        month: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
 
-    // Turns user into a JSON object
-    let userJSON = JSON.parse(user);
+      // Creates variable user to store info
+      let user =  '{ \"username\":\"' + username + '\",' +
+                  '\"email\":\"' + email + '\",' +
+                  '\"dateJoined\":\"' + d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear() + '\"' +
+                  '}';
 
-    // Encrypts password with 10 salt rounds and stores in userJSON
-    bcrypt.hash(req.body.password, 10, (err, hash) => {
+      // Turns user into a JSON object
+      let userJSON = JSON.parse(user);
+
+      // Encrypts password with 10 salt rounds and stores in userJSON
+      let hash = bcrypt.hashSync(req.body.password, 10);
+
       userJSON["password"] = hash;
-    });
 
-    // Adds userJSON to users and their username to signedIn
-    users.push(userJSON);
-    signedIn.push(userJSON['username']);
+      // Adds userJSON to users and their username to signedIn
+      users.push(userJSON);
+      signedIn.push(userJSON['username']);
 
-    // Creates unique user token using secret
-    var token = jwt.sign({id: username}, config.secret , {
-      expiresIn: 86400 // Expires in 24 hours
-    });
+      // Creates unique user token using secret
+      var token = jwt.sign({id: username}, config.secret , {
+        expiresIn: 86400 // Expires in 24 hours
+      });
 
-    // Logs to server console that the user has created an account and logged in
-    console.log('> New user \'' + userJSON['username'] + '\' logged in on ' + dateTime);
-    res.status(200).json({status: "success", message: "Account created successfully.", token: token});
+      // Logs to server console that the user has created an account and logged in
+      console.log('> New user \'' + userJSON['username'] + '\' logged in on ' + dateTime);
+      res.status(200).json({status: "success", message: "Account created successfully.", token: token});
+    } else {
+      res.status(409).json({status: "unsuccessful", message:"An account with that username or email already exists."});
+    }
   }
   // Catches and handles errors
   catch (error) {
@@ -138,7 +144,6 @@ app.post('/signIn', function(req, res) {
 
     // Stores username of user trying to sign in
     let username = req.body.signInUsername;
-    let signInPassword = req.body.signInPassword;
 
     // Variable to determine whether user already exists
     let userExists = false;
