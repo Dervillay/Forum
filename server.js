@@ -6,7 +6,6 @@ const jwt = require('jsonwebtoken');
 const config = require('./config');
 const app = express();
 
-// Adds all necessary packages
 app.use(express.static('client'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -20,11 +19,12 @@ let messages = [];
 // List to track currently signed in users
 let signedIn = [];
 
-// Defines search query as initially empty string
+// Variable for storing search queries
 let query = '';
 
-// Adds message and its metadata to list
-app.post('/addMessage', function(req, res) {
+
+// Adds a message and its metadata to list messages
+app.post('/addMessage', (req, res) => {
   try {
     // Gets current date and time and stores it in dateTime
     let dateTime = new Date().toLocaleDateString(undefined, {
@@ -41,20 +41,21 @@ app.post('/addMessage', function(req, res) {
                 '\"datePosted\":\"' + dateTime + '\"' +
                 '}';
 
-    // Turns message into a JSON object and pushes it to messages
+    // Turns message into JSON
     let messageJSON = JSON.parse(message);
 
-    // Tries to get token from header and checks if one has been provided
+    // Tries to get token from header and checks if one has been provided, sends response if not
     var token = req.headers['x-access-token'];
     if (!token) {
       return res.status(401).json({status: "unsuccessful", message: "No token provided."});
     }
 
     // Attempts to verify the token and outputs a response appropriately
-    jwt.verify(token, config.secret, function(err, decoded) {
+    jwt.verify(token, config.secret, (err, decoded) => {
       if (err) {
         return res.status(500).json({status: "unsuccessful", message: "Failed to authenticate token."});
       }
+      // If token verified successfully, pushes message to messages and sends response
       messages.push(messageJSON);
       return res.status(200).json({status: "successful", message: "Post submitted successfully."});
     });
@@ -65,8 +66,9 @@ app.post('/addMessage', function(req, res) {
   }
 });
 
-// Adds user to users
-app.post('/addUser', function(req, res) {
+
+// Adds a user to users
+app.post('/addUser', (req, res) => {
   try {
     // Gets username from HTML form
     let username = req.body.username;
@@ -98,12 +100,12 @@ app.post('/addUser', function(req, res) {
     // Turns user into a JSON object
     let userJSON = JSON.parse(user);
 
-    // Encrypts password with 10 salt rounds and stores in userJSON
+    // Encrypts password asynchronously with 10 salt rounds and stores in userJSON
     bcrypt.hash(req.body.password, 10)
-      .then(function(hash, err) {
+      .then((hash, err) => {
         userJSON["password"] = hash;
 
-      // Creates unique user token using secret
+      // Creates unique user token using secret in config
       var token = jwt.sign({id: username}, config.secret , {
         expiresIn: 86400 // Expires in 24 hours
       });
@@ -116,20 +118,21 @@ app.post('/addUser', function(req, res) {
       console.log('> New user \'' + userJSON['username'] + '\' logged in on ' + dateTime);
       return res.status(200).json({status: "success", message: "Account creation was successful.", token: token});
     })
-    // Catches and handles errors
+    // Catches and handles errors during hashing, sending server error response
     .catch(err => {
       throw (new Error(err));
       return res.status(500).json({status: "unsuccessful", message: "The server encountered an error. Account creation unsuccessful."});
     });
   }
-  // Catches and handles errors
+  // Catches and handles errors, sending server error response
   catch (error) {
     return res.status(500).json({status: "unsuccessful", message: "The server encountered an error. Account creation unsuccessful."});
   }
 });
 
+
 // Signs a user in
-app.post('/signIn', function(req, res) {
+app.post('/signIn', (req, res) => {
   try {
     // Gets current date and time and stores it in dateTime
     let dateTime = new Date().toLocaleDateString(undefined, {
@@ -154,15 +157,15 @@ app.post('/signIn', function(req, res) {
       }
     }
 
-    // Checks if user matching the username submitted exists
+    // If submitted username doesn't exist, sends a 404 error response
     if (!userExists) {
       return res.status(404).json({status: "unsuccessful", message: "No user with that username could be found."});
     }
 
-    // Compares the inputted password and encrypted password
+    // Compares the inputted password and encrypted password asynchronously
     bcrypt.compare(req.body.signInPassword, password, (err, resp) => {
       if (resp) {
-        // Creates unique user token using secret
+        // Creates unique user token using secret in config
         var token = jwt.sign({id: username}, config.secret , {
           expiresIn: 86400 // Expires in 24 hours
         });
@@ -170,24 +173,60 @@ app.post('/signIn', function(req, res) {
         // Adds the current user to signedIn after checking they aren't already signed in from elsewhere
         if (!signedIn.includes(username)) {
           signedIn.push(username);
+        } else {
+          return res.status(409).json({status: "unsuccessful", message: "That user is already signed in from elsewhere."});
         }
 
         // Logs to server console that the user has logged in
         console.log('> User \'' + username + '\' logged in on ' + dateTime);
 
-        // Sends successful response with sign in success message
+        // Sends successful response with sign in success message and token
         return res.status(200).json({status: "success", message: "Sign in successful.", token: token});
       } else {
         // Sends unsuccessful response with incorrect password message
         return res.status(403).json({status: "unsuccessful", message: "The password entered was incorrect, please try again."});
       }
     });
+  // Catches errors and sends server error response
   } catch (error) {
-    return res.status(500).json({status: "unsuccessful", message: "Sign in unsuccessful. Server encountered an error"});
+    return res.status(500).json({status: "unsuccessful", message: "Sign in unsuccessful. Server encountered an error."});
   }
 });
 
-app.post('/sendQuery', function(req, res) {
+
+// Signs out user
+app.post('/signOut', (req, res) => {
+  try {
+    // Gets current date and time and stores it in dateTime
+    let dateTime = new Date().toLocaleDateString(undefined, {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    // Takes user from parameter passed to method
+    let user = req.body.user;
+
+    // Removes user from list of signed in users
+    signedIn.splice(signedIn.indexOf(user), 1);
+
+    // Logs to server that this user has logged out
+    console.log('> User \'' + user + '\' logged out at ' + dateTime);
+
+    // Sends success response
+    return res.status(200).json({status: "successful", message: "Sign out successful."});
+  }
+  // Catches any errors and sends server error repsonse
+  catch (error) {
+    return res.status(500).json({status: "successful", message: "Sign out unsuccessful. The server encountered an error."});
+  }
+});
+
+
+// Posts a search query to the server
+app.post('/sendQuery', (req, res) => {
   try {
     // Sets server variable query to query sent in body
     query = req.body.query;
@@ -199,7 +238,7 @@ app.post('/sendQuery', function(req, res) {
     }
 
     // Attempts to verify the token and outputs a response appropriately
-    jwt.verify(token, config.secret, function(err, decoded) {
+    jwt.verify(token, config.secret, (err, decoded) => {
       if (err) {
         return res.status(500).json({status: "unsuccessful", message: "Failed to authenticate token."});
       } else {
@@ -213,7 +252,9 @@ app.post('/sendQuery', function(req, res) {
   }
 });
 
-app.get('/googleSignIn/:user', function(req, res) {
+
+// Logs that a user has signed in via Google to the server console
+app.get('/googleSignIn/:user', (req, res) => {
   // Gets current date and time and stores it in dateTime
   let dateTime = new Date().toLocaleDateString(undefined, {
     day: 'numeric',
@@ -233,7 +274,9 @@ app.get('/googleSignIn/:user', function(req, res) {
   res.status(200).json(signedIn);
 });
 
-app.get('/googleSignOut:user', function(req, res) {
+
+// Logs that a user has signed out via Google to the server console
+app.get('/googleSignOut:user', (req, res) => {
   // Gets current date and time and stores it in dateTime
   let dateTime = new Date().toLocaleDateString(undefined, {
     day: 'numeric',
@@ -254,8 +297,9 @@ app.get('/googleSignOut:user', function(req, res) {
   return res.status(200).json({status: "successful", message: "Signed out successfully."});
 });
 
+
 // Gets list of users
-app.get('/users', function(req, res) {
+app.get('/users', (req, res) => {
   try {
     // Tries to get token from header and checks if one has been provided
     var token = req.headers['x-access-token'];
@@ -264,7 +308,7 @@ app.get('/users', function(req, res) {
     }
 
     // Attempts to verify the token and outputs a response appropriately
-    jwt.verify(token, config.secret, function(err, decoded) {
+    jwt.verify(token, config.secret, (err, decoded) => {
       if (err) {
         return res.status(500).json({status: "unsuccessful", message: "Failed to authenticate token."});
       } else {
@@ -278,8 +322,9 @@ app.get('/users', function(req, res) {
   }
 });
 
+
 // Gets list of messages
-app.get('/messages', function(req, res) {
+app.get('/messages', (req, res) => {
   try {
     // Tries to get token from header and checks if one has been provided
     var token = req.headers['x-access-token'];
@@ -288,7 +333,7 @@ app.get('/messages', function(req, res) {
     }
 
     // Attempts to verify the token and outputs a response appropriately
-    jwt.verify(token, config.secret, function(err, decoded) {
+    jwt.verify(token, config.secret, (err, decoded) => {
       if (err) {
         return res.status(500).json({status: "unsuccessful", message: "Failed to authenticate token."});
       } else {
@@ -302,8 +347,9 @@ app.get('/messages', function(req, res) {
   }
 });
 
+
 // Gets list of currently signed in users
-app.get('/signedIn', function(req, res) {
+app.get('/signedIn', (req, res) => {
   try {
     // Tries to get token from header and checks if one has been provided
     var token = req.headers['x-access-token'];
@@ -312,7 +358,7 @@ app.get('/signedIn', function(req, res) {
     }
 
     // Attempts to verify the token and outputs a response appropriately
-    jwt.verify(token, config.secret, function(err, decoded) {
+    jwt.verify(token, config.secret, (err, decoded) => {
       if (err) {
         return res.status(500).json({status: "unsuccessful", message: "Failed to authenticate token."});
       } else {
@@ -326,32 +372,9 @@ app.get('/signedIn', function(req, res) {
   }
 });
 
-// Signs out user
-app.get('/signOut/:user', function(req, res) {
-  // Gets current date and time and stores it in dateTime
-  let dateTime = new Date().toLocaleDateString(undefined, {
-    day: 'numeric',
-    month: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-
-  // Takes user from parameter passed to method
-  let user = req.params.user;
-
-  // Removes user from list of signed in users
-  signedIn.splice(signedIn.indexOf(user), 1);
-
-  // Logs to server that this user has logged out
-  console.log('> User \'' + user + '\' logged out at ' + dateTime);
-
-  // Sends success response
-  res.status(200).json(signedIn);
-});
 
 // Gets current value of query
-app.get('/query', function(req, res) {
+app.get('/getQuery', (req, res) => {
   try {
     // Tries to get token from header and checks if one has been provided
     var token = req.headers['x-access-token'];
@@ -360,7 +383,7 @@ app.get('/query', function(req, res) {
     }
 
     // Attempts to verify the token and outputs a response appropriately
-    jwt.verify(token, config.secret, function(err, decoded) {
+    jwt.verify(token, config.secret, (err, decoded) => {
       if (err) {
         return res.status(500).json({status: "unsuccessful", message: "Failed to authenticate token."});
       } else {
@@ -368,10 +391,12 @@ app.get('/query', function(req, res) {
       }
     });
   }
+  // Catches server errors and sends appropriate response
   catch (error) {
     return res.status(500).json({status: "unsuccessful", message: "Unable to get query. The server encountered an error."});
   }
 });
+
 
 // Listens on port 8090
 app.listen(8090, () => {
