@@ -56,12 +56,12 @@ app.post('/addMessage', function(req, res) {
         return res.status(500).json({status: "unsuccessful", message: "Failed to authenticate token."});
       }
       messages.push(messageJSON);
-      res.status(200).json({status: "successful", message: "Post submitted successfully."});
+      return res.status(200).json({status: "successful", message: "Post submitted successfully."});
     });
   }
   // Catches errors and sends appropriate response code
   catch (error) {
-    res.status(500).json({status: "unsuccessful", message: "Message was not posted. Server encountered an error"});
+    return res.status(500).json({status: "unsuccessful", message: "Message was not posted. Server encountered an error"});
   }
 });
 
@@ -72,61 +72,59 @@ app.post('/addUser', function(req, res) {
     let username = req.body.username;
     let email = req.body.email;
 
-    let userExists = false;
-
-    // Checks if user already exists
+    // Checks if user already exists and if they do sends a 409 error response
     for (let i = 0; i < users.length; i++) {
-      if (users[i]["username"] == username || users[i]["email"].includes(email)) {
-        userExists = true;
-      }
+      return res.status(409).json({status: "unsuccessful", message:"An account with that username or email already exists."});
     }
 
-    if (!userExists) {
-      // Creates new Date object to calculate date account was created
-      let d = new Date();
+    // Creates new Date object to calculate date account was created
+    let d = new Date();
 
-      // Gets current date and time and stores it in dateTime
-      let dateTime = new Date().toLocaleDateString(undefined, {
-        day: 'numeric',
-        month: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+    // Gets current date and time and stores it in dateTime
+    let dateTime = new Date().toLocaleDateString(undefined, {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
 
-      // Creates variable user to store info
-      let user =  '{ \"username\":\"' + username + '\",' +
-                  '\"email\":\"' + email + '\",' +
-                  '\"dateJoined\":\"' + d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear() + '\"' +
-                  '}';
+    // Creates variable user to store info
+    let user =  '{ \"username\":\"' + username + '\",' +
+                '\"email\":\"' + email + '\",' +
+                '\"dateJoined\":\"' + d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear() + '\"' +
+                '}';
 
-      // Turns user into a JSON object
-      let userJSON = JSON.parse(user);
+    // Turns user into a JSON object
+    let userJSON = JSON.parse(user);
 
-      // Encrypts password with 10 salt rounds and stores in userJSON
-      let hash = bcrypt.hashSync(req.body.password, 10);
-
-      userJSON["password"] = hash;
-
-      // Adds userJSON to users and their username to signedIn
-      users.push(userJSON);
-      signedIn.push(userJSON['username']);
+    // Encrypts password with 10 salt rounds and stores in userJSON
+    bcrypt.hash(req.body.password, 10)
+      .then(function(hash, err) {
+        userJSON["password"] = hash;
 
       // Creates unique user token using secret
       var token = jwt.sign({id: username}, config.secret , {
         expiresIn: 86400 // Expires in 24 hours
       });
 
+      // Adds userJSON to users and their username to signedIn
+      users.push(userJSON);
+      signedIn.push(userJSON['username']);
+
       // Logs to server console that the user has created an account and logged in
       console.log('> New user \'' + userJSON['username'] + '\' logged in on ' + dateTime);
-      res.status(200).json({status: "success", message: "Account created successfully.", token: token});
-    } else {
-      res.status(409).json({status: "unsuccessful", message:"An account with that username or email already exists."});
-    }
+      return res.status(200).json({status: "success", message: "Account creation was successful.", token: token});
+    })
+    // Catches and handles errors
+    .catch(err => {
+      throw (new Error(err));
+      return res.status(500).json({status: "unsuccessful", message: "The server encountered an error. Account creation unsuccessful."});
+    });
   }
   // Catches and handles errors
   catch (error) {
-    res.status(500).json({status: "unsuccessful", message: "The server encountered an error. Account creation unsuccessful."});
+    return res.status(500).json({status: "unsuccessful", message: "The server encountered an error. Account creation unsuccessful."});
   }
 });
 
