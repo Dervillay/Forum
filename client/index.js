@@ -1,4 +1,4 @@
-/* Local variable to store tokens recieved from server */
+/* Variable to store tokens recieved from server */
 let token;
 
 /* Asynchronous function to update page with all users and messages.
@@ -6,8 +6,13 @@ let token;
  * messages. It then iterates through them and inserts the final posts
  * in index.html */
 async function refreshPage() {
-  // Uses GET method 'messages' to receive list of messages
-  let messagesResponse = await fetch("http://127.0.0.1:8090/messages");
+  // Uses GET method 'messages' to receive list of messages using token
+  let messagesResponse = await fetch("http://127.0.0.1:8090/messages", {
+    method: 'get',
+    headers: {
+      'x-access-token': token
+    }
+  });
   let messagesBody = await messagesResponse.text();
   let messagesPost = JSON.parse(messagesBody);
 
@@ -52,28 +57,36 @@ async function refreshPage() {
 
 async function searchPage() {
   let query = document.getElementById("search");
-  // Submits form
+  // Submits sendQuery post request with token
   await $.ajax({
     type: "POST",
     url: "http://127.0.0.1:8090/sendQuery",
     data: {query: query.value},
     dataType: "json",
-    success: function(response_data_json) {
-      // Gets response data from post request and checks for success
-      view_data = response_data_json;
-      // If post request was unsuccessful, alerts user
-      if (view_data["status"] != "success") {
-        alert("Search request unsuccessful, please try again");
-      }
+    beforeSend: function(request) {
+      request.setRequestHeader("x-access-token", token);
+    },
+    error: function(error) {
+      alert(error["responseJSON"]["message"]);
     }
   });
 
-  // Uses GET method 'messages' to receive list of messages
-  let messagesResponse = await fetch("http://127.0.0.1:8090/messages");
+  // Uses GET method 'messages' to receive list of messages using token
+  let messagesResponse = await fetch("http://127.0.0.1:8090/messages", {
+    method: 'get',
+    headers: {
+      'x-access-token': token
+    }
+  });
   let messagesBody = await messagesResponse.text();
 
-  // Uses GET method 'query' to receive search query
-  let queryResponse = await fetch("http://127.0.0.1:8090/query");
+  // Uses GET method 'query' to receive search query using token
+  let queryResponse = await fetch("http://127.0.0.1:8090/query", {
+    method: 'get',
+    headers: {
+      'x-access-token': token
+    }
+  });
   let queryBody = await queryResponse.text();
 
   // Parses data received by GET methods into JS objects
@@ -151,42 +164,17 @@ async function addMessage() {
   });
 }
 
-// /* Checks if user with inputted username or email exists */
-// async function checkSignInUsername() {
-//   // Gets input from sign in form
-//   var signInUsername = await document.getElementById("signInUsername").value;
-//
-//   // Fetches existing users' information using stored token and formats it to JSON
-//   let usersResponse = await fetch("http://127.0.0.1:8090/users", {
-//     method: 'get',
-//     headers: {
-//       'x-access-token': token
-//     }
-//   });
-//
-//   let usersBody = await usersResponse.text();
-//   let usersJSON = JSON.parse(usersBody);
-//
-//   // Loops through all users returned to usersResponse
-//   for (let i = 0; i < usersJSON.length; i++) {
-//     // Checks if user's username matches that in the form
-//     if (usersJSON[i]["username"] == signInUsername) {
-//       return true;
-//     } else if (usersJSON[i]["email"] == signInUsername) {
-//       return true;
-//     }
-//   }
-//
-//   // If not, returns false
-//   return false;
-// }
-
 async function checkSignedIn() {
 
   let username = document.getElementById("signInUsername").value;
 
-  // Gets signedIn from server
-  let signedInResponse = await fetch("http://127.0.0.1:8090/signedIn");
+  // Gets signedIn from server using token
+  let signedInResponse = await fetch("http://127.0.0.1:8090/signedIn", {
+    method: 'get',
+    headers: {
+      'x-access-token': token
+    }
+  });
   let signedInBody = await signedInResponse.text();
   let signedInPost = JSON.parse(signedInBody);
 
