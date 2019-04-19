@@ -51,10 +51,9 @@ async function refreshPage() {
 }
 
 /* Searches page for posts with content matching query string.
- * Takes current query value and compares it to currnently held
+ * Takes current query value and compares it to currently held
  * values for users and messages, rendering posts that match.
  */
-
 async function searchPage() {
   let query = document.getElementById("search");
   // Submits sendQuery post request with token
@@ -103,24 +102,25 @@ async function searchPage() {
       }
   }
 
+  // If any matching messages found, renders them on the messsage board
   if (matchingMessages.length > 0) {
     // Clears out message board area and initialises list of messages
     document.getElementById("content").innerHTML = "<ul id=\"posts\">";
 
-    // Iterates and updates all posts in matching lists
+    // Renders all posts in matchingMessages
     for (let i = 0; i < matchingMessages.length; i++) {
 
       document.getElementById("content").innerHTML +=
       `
       <li>
       <a>
-      <div class=\"container-fluid\">
-        <div class=\"jumbotron post p-3 parent\">
-          <img src=\"images/default_user.jpeg\" alt=\"user_icon\" class=\"user\">
-          <div class=\"child inline-block-child p-3\">
+      <div class="container-fluid">
+        <div class="jumbotron post p-3 parent">
+          <img src="images/default_user.jpeg" alt="user_icon" class="user">
+          <div class="child inline-block-child p-3">
             <p>` + matchingMessages[i]["postedBy"] + `</p>
           </div>
-          <div class=\"child inline-block-child date-text p-3\">
+          <div class="child inline-block-child date-text p-3">
             <p>Posted ` + matchingMessages[i]["datePosted"] + `</p>
           </div>
           <div class="jumbotron comment p-3">
@@ -134,7 +134,7 @@ async function searchPage() {
     };
     document.getElementById("content").innerHTML += "</ul>";
   } else {
-    // Clears out message board area
+    // Clears out message board area to show there were no matching results
     document.getElementById("content").innerHTML = null;
   }
 }
@@ -144,6 +144,7 @@ async function addMessage() {
   let user = await document.getElementById("welcome").innerHTML.slice(29, -5);
   let message = await document.getElementById("message");
 
+  // Uses post method addMessage to send message to the server with token
   $.ajax({
     type: "POST",
     url: "http://127.0.0.1:8090/addMessage",
@@ -159,31 +160,10 @@ async function addMessage() {
       refreshPage();
     },
     error: function(error) {
+      // Sends response message on error
       alert(error["responseJSON"]["message"]);
     }
   });
-}
-
-async function checkSignedIn() {
-
-  let username = document.getElementById("signInUsername").value;
-
-  // Gets signedIn from server using token
-  let signedInResponse = await fetch("http://127.0.0.1:8090/signedIn", {
-    method: 'get',
-    headers: {
-      'x-access-token': token
-    }
-  });
-  let signedInBody = await signedInResponse.text();
-  let signedInPost = JSON.parse(signedInBody);
-
-  // Checks that user is in signedIn
-  if (signedInPost.includes(username)) {
-    return true;
-  } else {
-    return false;
-  }
 }
 
 /* Checks if email inputs are matching */
