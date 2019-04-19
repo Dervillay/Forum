@@ -65,7 +65,7 @@ async function searchPage() {
     beforeSend: function(request) {
       request.setRequestHeader("x-access-token", token);
     },
-    error: function(error) {
+    error: (error) => {
       alert(error["responseJSON"]["message"]);
     }
   });
@@ -80,7 +80,7 @@ async function searchPage() {
   let messagesBody = await messagesResponse.text();
 
   // Uses GET method 'query' to receive search query using token
-  let queryResponse = await fetch("http://127.0.0.1:8090/query", {
+  let queryResponse = await fetch("http://127.0.0.1:8090/getQuery", {
     method: 'get',
     headers: {
       'x-access-token': token
@@ -153,13 +153,13 @@ async function addMessage() {
     beforeSend: function(request) {
       request.setRequestHeader("x-access-token", token);
     },
-    success: function(view_data) {
+    success: (view_data) => {
       // If post was successful, closes sign up form, shows sign out button and alerts user
       alert(view_data["message"]);
       closeMessageForm();
       refreshPage();
     },
-    error: function(error) {
+    error: (error) => {
       // Sends response message on error
       alert(error["responseJSON"]["message"]);
     }
@@ -253,14 +253,14 @@ async function submitSignUp() {
       url: "http://127.0.0.1:8090/addUser",
       data: {username: username.value, email: email.value, password: password.value},
       dataType: "json",
-      success: function(view_data) {
+      success: (view_data) => {
         // If post was successful, closes sign up form, stores response token and alerts user
         token = view_data["token"];
         closeSignUp();
         successfulSignIn(username.value);
         alert(view_data["message"]);
       },
-      error: function(error) {
+      error: (error) => {
         // If post was unsuccessful, shows reason for this in alert
         alert(error["responseJSON"]["message"]);
       }
@@ -279,14 +279,14 @@ async function submitSignIn() {
     url: "http://127.0.0.1:8090/signIn",
     data: {signInUsername: signInUsername.value, signInPassword: signInPassword.value},
     dataType: "json",
-    success: function(view_data) {
+    success: (view_data) => {
       // If post was successful, closes sign up form, shows sign out button and alerts user
       token = view_data["token"];
       closeSignIn();
       successfulSignIn(signInUsername.value);
       alert(view_data["message"]);
     },
-    error: function(error) {
+    error: (error) => {
       // If post was unsuccessful, shows reason for this in alert
       alert(error["responseJSON"]["message"]);
     }
@@ -302,8 +302,22 @@ async function signOut() {
   } else if (document.getElementById("signInUsername").value != '') {
     var user = document.getElementById("signInUsername").value;
   }
-  // Calls get method signOut with user as parameter
-  await fetch('http://127.0.0.1:8090/signOut/' + user);
+
+  await $.ajax({
+    type: "POST",
+    url: "http://127.0.0.1:8090/signOut",
+    data: {user: user},
+    dataType: "json",
+    beforeSend: function(request) {
+      request.setRequestHeader("x-access-token", token);
+    },
+    success: (view_data) => {
+      alert(view_data["message"]);
+    },
+    error: (error) => {
+      alert(error["responseJSON"]["message"]);
+    }
+  });
 
   document.getElementById("signUpBar").style.display = "block";
   document.getElementById("signOut").style.display = "none";
@@ -379,9 +393,14 @@ async function googleSignOut() {
 
 /* Listens for a page refresh and signs the user out
  * using asynchronous function */
-window.addEventListener('beforeunload', async function(e) {
-  // Gets signedIn from server
-  let signedInResponse = await fetch("http://127.0.0.1:8090/signedIn");
+window.addEventListener('beforeunload', async function() {
+  // Gets signedIn from server using token
+  let signedInResponse = await fetch("http://127.0.0.1:8090/signedIn", {
+    method: 'get',
+    headers: {
+      'x-access-token': token
+    }
+  });
   let signedInBody = await signedInResponse.text();
   let signedInPost = JSON.parse(signedInBody);
 
@@ -395,7 +414,21 @@ window.addEventListener('beforeunload', async function(e) {
   // Checks if user is already signed in
   if (signedInPost.includes(user)) {
     // Calls get method signOut with user as parameter
-    await fetch('http://127.0.0.1:8090/signOut/' + user);
+    await $.ajax({
+      type: "POST",
+      url: "http://127.0.0.1:8090/signOut",
+      data: {user: user},
+      dataType: "json",
+      beforeSend: function(request) {
+        request.setRequestHeader("x-access-token", token);
+      },
+      success: (view_data) => {
+        alert(view_data["message"]);
+      },
+      error: (error) => {
+        alert(error["responseJSON"]["message"]);
+      }
+    });
   }
 
   // returnValue reuired for Google Chrome
