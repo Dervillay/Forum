@@ -136,11 +136,11 @@ app.post('/googleSignIn', (req, res) => {
 
     // Logs to server that this user has logged in
     console.log('> User \'' + user + '\' logged in via Google on ' + dateTime);
-    res.status(200).json({status: "success", message: "Signed in successfully via Google.", token: token});
+    return res.status(200).json({status: "success", message: "Signed in successfully via Google.", token: token});
   }
   // Catches errors are sends server error response
   catch (error) {
-    res.status(500).json({status: "unsuccessful", message: "Sign in unsuccessful. The server encountered an error."});
+    return res.status(500).json({status: "unsuccessful", message: "Sign in unsuccessful. The server encountered an error."});
   }
 });
 
@@ -287,25 +287,11 @@ app.post('/sendQuery', (req, res) => {
   try {
     // Sets server variable query to query sent in body
     query = req.body.query;
-
-    // Tries to get token from header and checks if one has been provided
-    var token = req.headers['x-access-token'];
-    if (!token) {
-      return res.status(401).json({status: "unsuccessful", message: "No token provided."});
-    }
-
-    // Attempts to verify the token and outputs a response appropriately
-    jwt.verify(token, config.secret, (err, decoded) => {
-      if (err) {
-        return res.status(500).json({status: "unsuccessful", message: "Failed to authenticate token."});
-      } else {
-        return res.status(200).json({status: "success"});
-      }
-    });
+    return res.status(200).json({status: "success"});
   }
   // Catches errors and sends appropriate response code
   catch (error) {
-    res.status(500).json({status: "unsuccessful", message: "Search unsuccessful. The server encountered an error."})
+    return res.status(500).json({status: "unsuccessful", message: "Search unsuccessful. The server encountered an error."})
   }
 });
 
@@ -313,20 +299,8 @@ app.post('/sendQuery', (req, res) => {
 // Gets current value of query
 app.get('/getQuery', (req, res) => {
   try {
-    // Tries to get token from header and checks if one has been provided
-    var token = req.headers['x-access-token'];
-    if (!token) {
-      return res.status(401).json({status: "unsuccessful", message: "No token provided."});
-    }
-
-    // Attempts to verify the token and outputs a response appropriately
-    jwt.verify(token, config.secret, (err, decoded) => {
-      if (err) {
-        return res.status(500).json({status: "unsuccessful", message: "Failed to authenticate token."});
-      } else {
-        return res.status(200).json({result: query.toLowerCase()});
-      }
-    });
+    // Returns string stored in query in lower case
+    return res.status(200).json({result: query.toLowerCase()});
   }
   // Catches server errors and sends appropriate response
   catch (error) {

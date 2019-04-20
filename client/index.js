@@ -248,7 +248,7 @@ async function submitSignUp() {
     let confirmPassword = document.getElementById("confirmPassword");
 
     // Uses AJAX to post this data to the server and handles the response on success
-    await $.ajax({
+    $.ajax({
       type: "POST",
       url: "./addUser",
       data: {username: username.value, email: email.value, password: password.value},
