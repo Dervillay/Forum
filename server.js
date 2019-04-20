@@ -254,47 +254,59 @@ app.post('/sendQuery', (req, res) => {
 
 
 // Logs that a user has signed in via Google to the server console
-app.get('/googleSignIn/:user', (req, res) => {
-  // Gets current date and time and stores it in dateTime
-  let dateTime = new Date().toLocaleDateString(undefined, {
-    day: 'numeric',
-    month: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+app.post('/googleSignIn', (req, res) => {
+  try {
+    // Gets current date and time and stores it in dateTime
+    let dateTime = new Date().toLocaleDateString(undefined, {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
 
-  });
+    });
 
-  // Takes user from parameter passed to method and pushes it to signedIn
-  let user = req.params.user;
-  signedIn.push(user);
+    // Takes user from parameter passed to method and pushes it to signedIn
+    let user = req.body.user;
+    signedIn.push(user);
 
-  // Logs to server that this user has logged in
-  console.log('> User \'' + user + '\' logged in via Google on ' + dateTime);
-  res.status(200).json(signedIn);
+    // Logs to server that this user has logged in
+    console.log('> User \'' + user + '\' logged in via Google on ' + dateTime);
+    res.status(200).json({status: "success", message: "Signed in successfully via Google.", token: token});
+  }
+  // Catches errors are sends server error response
+  catch (error) {
+    res.status(500).json({status: "unsuccessful", message: "Sign in unsuccessful. The server encountered an error."});
+  }
 });
 
 
 // Logs that a user has signed out via Google to the server console
-app.get('/googleSignOut:user', (req, res) => {
-  // Gets current date and time and stores it in dateTime
-  let dateTime = new Date().toLocaleDateString(undefined, {
-    day: 'numeric',
-    month: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+app.post('/googleSignOut', (req, res) => {
+  try {
+    // Gets current date and time and stores it in dateTime
+    let dateTime = new Date().toLocaleDateString(undefined, {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
 
-  // Takes user from parameter passed to method
-  let user = req.params.user;
+    // Takes user from parameter passed to method
+    let user = req.body.user;
 
-  // Removes user from signedIn
-  signedIn.splice(signedIn.indexOf(user), 1);
+    // Removes user from signedIn
+    signedIn.splice(signedIn.indexOf(user), 1);
 
-  // Logs to server that this user has logged out
-  console.log('> User \'' + user + '\' logged out via Google on ' + dateTime);
-  return res.status(200).json({status: "successful", message: "Signed out successfully."});
+    // Logs to server that this user has logged out
+    console.log('> User \'' + user + '\' logged out via Google on ' + dateTime);
+    return res.status(200).json({status: "successful", message: "Signed out successfully."});
+  }
+  // Catches errors are sends server error response
+  catch (error) {
+    return res.status(500).json({status: "unsuccessful", message: "Sign out unsuccessful. The server encountered an error."});
+  }
 });
 
 

@@ -7,8 +7,8 @@ let token;
  * in index.html */
 async function refreshPage() {
   // Uses GET method 'messages' to receive list of messages using token
-  let messagesResponse = await fetch("http://127.0.0.1:8090/messages", {
-    method: 'get',
+  let messagesResponse = await fetch("./messages", {
+    method: 'GET',
     headers: {
       'x-access-token': token
     }
@@ -59,7 +59,7 @@ async function searchPage() {
   // Submits sendQuery post request with token
   await $.ajax({
     type: "POST",
-    url: "http://127.0.0.1:8090/sendQuery",
+    url: "./sendQuery",
     data: {query: query.value},
     dataType: "json",
     beforeSend: function(request) {
@@ -71,8 +71,8 @@ async function searchPage() {
   });
 
   // Uses GET method 'messages' to receive list of messages using token
-  let messagesResponse = await fetch("http://127.0.0.1:8090/messages", {
-    method: 'get',
+  let messagesResponse = await fetch("./messages", {
+    method: 'GET',
     headers: {
       'x-access-token': token
     }
@@ -80,8 +80,8 @@ async function searchPage() {
   let messagesBody = await messagesResponse.text();
 
   // Uses GET method 'query' to receive search query using token
-  let queryResponse = await fetch("http://127.0.0.1:8090/getQuery", {
-    method: 'get',
+  let queryResponse = await fetch("./getQuery", {
+    method: 'GET',
     headers: {
       'x-access-token': token
     }
@@ -145,9 +145,9 @@ async function addMessage() {
   let message = await document.getElementById("message");
 
   // Uses post method addMessage to send message to the server with token
-  $.ajax({
+  await $.ajax({
     type: "POST",
-    url: "http://127.0.0.1:8090/addMessage",
+    url: "./addMessage",
     data: {postUsername: user, message: message.value},
     dataType: "json",
     beforeSend: function(request) {
@@ -248,9 +248,9 @@ async function submitSignUp() {
     let confirmPassword = document.getElementById("confirmPassword");
 
     // Uses AJAX to post this data to the server and handles the response on success
-    $.ajax({
+    await $.ajax({
       type: "POST",
-      url: "http://127.0.0.1:8090/addUser",
+      url: "./addUser",
       data: {username: username.value, email: email.value, password: password.value},
       dataType: "json",
       success: (view_data) => {
@@ -274,9 +274,9 @@ async function submitSignIn() {
   let signInUsername = document.getElementById("signInUsername");
   let signInPassword = document.getElementById("signInPassword");
   // Submits form and informs user that the account creation was successful, then sets up page appropriately
-  $.ajax({
+   await $.ajax({
     type: "POST",
-    url: "http://127.0.0.1:8090/signIn",
+    url: "./signIn",
     data: {signInUsername: signInUsername.value, signInPassword: signInPassword.value},
     dataType: "json",
     success: (view_data) => {
@@ -305,7 +305,7 @@ async function signOut() {
 
   await $.ajax({
     type: "POST",
-    url: "http://127.0.0.1:8090/signOut",
+    url: "./signOut",
     data: {user: user},
     dataType: "json",
     beforeSend: function(request) {
@@ -358,8 +358,21 @@ async function googleSignIn(googleUser) {
   var profile = googleUser.getBasicProfile();
   var id_token = googleUser.getAuthResponse().id_token;
 
-  // Signs user in using get method
-  await fetch("http://localhost:8090/googleSignIn/" + profile.getName());
+  // Signs user into server using ajax method
+  await $.ajax({
+    type: "POST",
+    url: "./googleSignIn",
+    data: {user: profile.getName()},
+    dataType: "json",
+    success: (view_data) => {
+      token = view_data["token"];
+      console.log(token);
+      alert(view_data["message"]);
+    },
+    error: (error) => {
+      alert(error["responseJSON"]["message"]);
+    }
+  });
 
   // Sets up items in navbar to inform user they are signed in
   document.getElementById("welcome").innerHTML = "<h6 class=\"welcome\">Welcome, " + profile.getName() + " </h6>";
@@ -380,8 +393,19 @@ async function googleSignOut() {
   // Gets currently signed in user's username
   var user = document.getElementById("welcome").innerHTML.slice(29, -6);
 
-  // Signs user out using get method
-  await fetch("http://localhost:8090/googleSignOut/" + user);
+  // Signs user out from server using ajax method
+  await $.ajax({
+    type: "POST",
+    url: "./googleSignOut",
+    data: {user: user},
+    dataType: "json",
+    success: (view_data) => {
+      alert(view_data["message"]);
+    },
+    error: (error) => {
+      alert(error["responseJSON"]["message"]);
+    }
+  });
 
     // Sets up items in navbar to inform user they are signed out
   document.getElementById("welcome").innerHTML = null;
@@ -395,8 +419,8 @@ async function googleSignOut() {
  * using asynchronous function */
 window.addEventListener('beforeunload', async function() {
   // Gets signedIn from server using token
-  let signedInResponse = await fetch("http://127.0.0.1:8090/signedIn", {
-    method: 'get',
+  let signedInResponse = await fetch("./signedIn", {
+    method: 'GET',
     headers: {
       'x-access-token': token
     }
@@ -416,7 +440,7 @@ window.addEventListener('beforeunload', async function() {
     // Calls get method signOut with user as parameter
     await $.ajax({
       type: "POST",
-      url: "http://127.0.0.1:8090/signOut",
+      url: "./signOut",
       data: {user: user},
       dataType: "json",
       beforeSend: function(request) {
