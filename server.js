@@ -23,6 +23,157 @@ let signedIn = [];
 let query = '';
 
 
+// Signs a user in
+app.post('/signIn', (req, res) => {
+  try {
+    // Gets current date and time and stores it in dateTime
+    let dateTime = new Date().toLocaleDateString(undefined, {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    // Stores username of user trying to sign in
+    let username = req.body.signInUsername;
+
+    // Variable to determine whether user already exists
+    let userExists = false;
+
+    // Iterates through all users and gets the correct encrypted password
+    for (let i = 0; i < users.length; i++) {
+      if (users[i]["username"] == username) {
+        var password = users[i]["password"];
+        userExists = true;
+      }
+    }
+
+    // If submitted username doesn't exist, sends a 404 error response
+    if (!userExists) {
+      return res.status(404).json({status: "unsuccessful", message: "No user with that username could be found."});
+    }
+
+    // Compares the inputted password and encrypted password asynchronously
+    bcrypt.compare(req.body.signInPassword, password, (err, resp) => {
+      if (resp) {
+        // Creates unique user token using secret in config
+        var token = jwt.sign({id: username}, config.secret , {
+          expiresIn: 86400 // Expires in 24 hours
+        });
+
+        // Adds the current user to signedIn after checking they aren't already signed in from elsewhere
+        if (!signedIn.includes(username)) {
+          signedIn.push(username);
+        } else {
+          return res.status(409).json({status: "unsuccessful", message: "That user is already signed in from elsewhere."});
+        }
+
+        // Logs to server console that the user has logged in
+        console.log('> User \'' + username + '\' logged in on ' + dateTime);
+
+        // Sends successful response with sign in success message and token
+        return res.status(200).json({status: "success", message: "Sign in successful.", token: token});
+      } else {
+        // Sends unsuccessful response with incorrect password message
+        return res.status(403).json({status: "unsuccessful", message: "The password entered was incorrect, please try again."});
+      }
+    });
+  // Catches errors and sends server error response
+  } catch (error) {
+    return res.status(500).json({status: "unsuccessful", message: "Sign in unsuccessful. Server encountered an error."});
+  }
+});
+
+
+// Signs out user
+app.post('/signOut', (req, res) => {
+  try {
+    // Gets current date and time and stores it in dateTime
+    let dateTime = new Date().toLocaleDateString(undefined, {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    // Takes user from parameter passed to method
+    let user = req.body.user;
+
+    // Removes user from list of signed in users
+    signedIn.splice(signedIn.indexOf(user), 1);
+
+    // Logs to server that this user has logged out
+    console.log('> User \'' + user + '\' logged out at ' + dateTime);
+
+    // Sends success response
+    return res.status(200).json({status: "successful", message: "Sign out successful."});
+  }
+  // Catches any errors and sends server error repsonse
+  catch (error) {
+    return res.status(500).json({status: "successful", message: "Sign out unsuccessful. The server encountered an error."});
+  }
+});
+
+
+// Logs that a user has signed in via Google to the server console
+app.post('/googleSignIn', (req, res) => {
+  try {
+    // Gets current date and time and stores it in dateTime
+    let dateTime = new Date().toLocaleDateString(undefined, {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+
+    });
+
+    // Takes user from parameter passed to method and pushes it to signedIn
+    let user = req.body.user;
+    signedIn.push(user);
+
+    // Logs to server that this user has logged in
+    console.log('> User \'' + user + '\' logged in via Google on ' + dateTime);
+    res.status(200).json({status: "success", message: "Signed in successfully via Google.", token: token});
+  }
+  // Catches errors are sends server error response
+  catch (error) {
+    res.status(500).json({status: "unsuccessful", message: "Sign in unsuccessful. The server encountered an error."});
+  }
+});
+
+
+// Logs that a user has signed out via Google to the server console
+app.post('/googleSignOut', (req, res) => {
+  try {
+    // Gets current date and time and stores it in dateTime
+    let dateTime = new Date().toLocaleDateString(undefined, {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    // Takes user from parameter passed to method
+    let user = req.body.user;
+
+    // Removes user from signedIn
+    signedIn.splice(signedIn.indexOf(user), 1);
+
+    // Logs to server that this user has logged out
+    console.log('> User \'' + user + '\' logged out via Google on ' + dateTime);
+    return res.status(200).json({status: "successful", message: "Signed out successfully."});
+  }
+  // Catches errors are sends server error response
+  catch (error) {
+    return res.status(500).json({status: "unsuccessful", message: "Sign out unsuccessful. The server encountered an error."});
+  }
+});
+
+
 // Adds a message and its metadata to list messages
 app.post('/addMessage', (req, res) => {
   try {
@@ -131,100 +282,6 @@ app.post('/addUser', (req, res) => {
 });
 
 
-// Signs a user in
-app.post('/signIn', (req, res) => {
-  try {
-    // Gets current date and time and stores it in dateTime
-    let dateTime = new Date().toLocaleDateString(undefined, {
-      day: 'numeric',
-      month: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-
-    // Stores username of user trying to sign in
-    let username = req.body.signInUsername;
-
-    // Variable to determine whether user already exists
-    let userExists = false;
-
-    // Iterates through all users and gets the correct encrypted password
-    for (let i = 0; i < users.length; i++) {
-      if (users[i]["username"] == username) {
-        var password = users[i]["password"];
-        userExists = true;
-      }
-    }
-
-    // If submitted username doesn't exist, sends a 404 error response
-    if (!userExists) {
-      return res.status(404).json({status: "unsuccessful", message: "No user with that username could be found."});
-    }
-
-    // Compares the inputted password and encrypted password asynchronously
-    bcrypt.compare(req.body.signInPassword, password, (err, resp) => {
-      if (resp) {
-        // Creates unique user token using secret in config
-        var token = jwt.sign({id: username}, config.secret , {
-          expiresIn: 86400 // Expires in 24 hours
-        });
-
-        // Adds the current user to signedIn after checking they aren't already signed in from elsewhere
-        if (!signedIn.includes(username)) {
-          signedIn.push(username);
-        } else {
-          return res.status(409).json({status: "unsuccessful", message: "That user is already signed in from elsewhere."});
-        }
-
-        // Logs to server console that the user has logged in
-        console.log('> User \'' + username + '\' logged in on ' + dateTime);
-
-        // Sends successful response with sign in success message and token
-        return res.status(200).json({status: "success", message: "Sign in successful.", token: token});
-      } else {
-        // Sends unsuccessful response with incorrect password message
-        return res.status(403).json({status: "unsuccessful", message: "The password entered was incorrect, please try again."});
-      }
-    });
-  // Catches errors and sends server error response
-  } catch (error) {
-    return res.status(500).json({status: "unsuccessful", message: "Sign in unsuccessful. Server encountered an error."});
-  }
-});
-
-
-// Signs out user
-app.post('/signOut', (req, res) => {
-  try {
-    // Gets current date and time and stores it in dateTime
-    let dateTime = new Date().toLocaleDateString(undefined, {
-      day: 'numeric',
-      month: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-
-    // Takes user from parameter passed to method
-    let user = req.body.user;
-
-    // Removes user from list of signed in users
-    signedIn.splice(signedIn.indexOf(user), 1);
-
-    // Logs to server that this user has logged out
-    console.log('> User \'' + user + '\' logged out at ' + dateTime);
-
-    // Sends success response
-    return res.status(200).json({status: "successful", message: "Sign out successful."});
-  }
-  // Catches any errors and sends server error repsonse
-  catch (error) {
-    return res.status(500).json({status: "successful", message: "Sign out unsuccessful. The server encountered an error."});
-  }
-});
-
-
 // Posts a search query to the server
 app.post('/sendQuery', (req, res) => {
   try {
@@ -253,59 +310,27 @@ app.post('/sendQuery', (req, res) => {
 });
 
 
-// Logs that a user has signed in via Google to the server console
-app.post('/googleSignIn', (req, res) => {
+// Gets current value of query
+app.get('/getQuery', (req, res) => {
   try {
-    // Gets current date and time and stores it in dateTime
-    let dateTime = new Date().toLocaleDateString(undefined, {
-      day: 'numeric',
-      month: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    // Tries to get token from header and checks if one has been provided
+    var token = req.headers['x-access-token'];
+    if (!token) {
+      return res.status(401).json({status: "unsuccessful", message: "No token provided."});
+    }
 
+    // Attempts to verify the token and outputs a response appropriately
+    jwt.verify(token, config.secret, (err, decoded) => {
+      if (err) {
+        return res.status(500).json({status: "unsuccessful", message: "Failed to authenticate token."});
+      } else {
+        return res.status(200).json({result: query.toLowerCase()});
+      }
     });
-
-    // Takes user from parameter passed to method and pushes it to signedIn
-    let user = req.body.user;
-    signedIn.push(user);
-
-    // Logs to server that this user has logged in
-    console.log('> User \'' + user + '\' logged in via Google on ' + dateTime);
-    res.status(200).json({status: "success", message: "Signed in successfully via Google.", token: token});
   }
-  // Catches errors are sends server error response
+  // Catches server errors and sends appropriate response
   catch (error) {
-    res.status(500).json({status: "unsuccessful", message: "Sign in unsuccessful. The server encountered an error."});
-  }
-});
-
-
-// Logs that a user has signed out via Google to the server console
-app.post('/googleSignOut', (req, res) => {
-  try {
-    // Gets current date and time and stores it in dateTime
-    let dateTime = new Date().toLocaleDateString(undefined, {
-      day: 'numeric',
-      month: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-
-    // Takes user from parameter passed to method
-    let user = req.body.user;
-
-    // Removes user from signedIn
-    signedIn.splice(signedIn.indexOf(user), 1);
-
-    // Logs to server that this user has logged out
-    console.log('> User \'' + user + '\' logged out via Google on ' + dateTime);
-    return res.status(200).json({status: "successful", message: "Signed out successfully."});
-  }
-  // Catches errors are sends server error response
-  catch (error) {
-    return res.status(500).json({status: "unsuccessful", message: "Sign out unsuccessful. The server encountered an error."});
+    return res.status(500).json({status: "unsuccessful", message: "Unable to get query. The server encountered an error."});
   }
 });
 
@@ -381,31 +406,6 @@ app.get('/signedIn', (req, res) => {
   // Catches server errors and sends appropriate response
   catch (error) {
     return res.status(500).json({status: "unsuccessful", message: "Unable to get signed in users. The server encountered an error."});
-  }
-});
-
-
-// Gets current value of query
-app.get('/getQuery', (req, res) => {
-  try {
-    // Tries to get token from header and checks if one has been provided
-    var token = req.headers['x-access-token'];
-    if (!token) {
-      return res.status(401).json({status: "unsuccessful", message: "No token provided."});
-    }
-
-    // Attempts to verify the token and outputs a response appropriately
-    jwt.verify(token, config.secret, (err, decoded) => {
-      if (err) {
-        return res.status(500).json({status: "unsuccessful", message: "Failed to authenticate token."});
-      } else {
-        return res.status(200).json({result: query.toLowerCase()});
-      }
-    });
-  }
-  // Catches server errors and sends appropriate response
-  catch (error) {
-    return res.status(500).json({status: "unsuccessful", message: "Unable to get query. The server encountered an error."});
   }
 });
 
