@@ -2,17 +2,14 @@
 let token;
 
 /* Asynchronous function to update page with all users and messages.
- * Uses GET methods of server to recieve current list of users and
- * messages. It then iterates through them and inserts the final posts
+ * Uses GET methods of server to recieve current list of messages,
+ * it then iterates through them and inserts the final posts
  * in index.html */
 async function refreshPage() {
-  // Uses GET method 'messages' to receive list of messages using token
-  let messagesResponse = await fetch("./messages", {
-    method: 'GET',
-    headers: {
-      'x-access-token': token
-    }
-  });
+  // Uses GET method 'messages' to receive list of messages
+  let messagesResponse = await fetch("./messages");
+
+  // Gets JSON in response body and parses it
   let messagesBody = await messagesResponse.text();
   let messagesPost = JSON.parse(messagesBody);
 
@@ -22,7 +19,7 @@ async function refreshPage() {
     // Creates <ul> tag with id 'posts' in main body of HTML
     document.getElementById("content").innerHTML = "<ul id=\"posts\">";
 
-    // Iterates through users and messages and prduces forum posts using their information
+    // Iterates through users and messages and produces forum posts using their information
     for (let i = 0; i < messagesPost.length; i++) {
       document.getElementById("content").innerHTML +=
       `
@@ -50,54 +47,27 @@ async function refreshPage() {
   }
 }
 
-/* Searches page for posts with content matching query string.
- * Takes current query value and compares it to currently held
- * values for users and messages, rendering posts that match.
- */
-async function searchPage() {
-  let query = document.getElementById("search");
-  // Submits sendQuery post request with token
-  await $.ajax({
-    type: "POST",
-    url: "./sendQuery",
-    data: {query: query.value},
-    dataType: "json",
-    beforeSend: function(request) {
-      request.setRequestHeader("x-access-token", token);
-    },
-    error: (error) => {
-      alert(error["responseJSON"]["message"]);
-    }
-  });
 
-  // Uses GET method 'messages' to receive list of messages using token
-  let messagesResponse = await fetch("./messages", {
-    method: 'GET',
-    headers: {
-      'x-access-token': token
-    }
-  });
+/* Searches page asynchronously for posts with content matching query string.
+ * Takes current query value, gets messages from the server and renders messages
+ * that match. */
+async function searchPage() {
+  let query = document.getElementById("search").value;
+
+  // Uses GET method 'messages' to receive list of messages
+  let messagesResponse = await fetch("./messages");
   let messagesBody = await messagesResponse.text();
 
-  // Uses GET method 'query' to receive search query using token
-  let queryResponse = await fetch("./getQuery", {
-    method: 'GET',
-    headers: {
-      'x-access-token': token
-    }
-  });
-  let queryBody = await queryResponse.text();
-
-  // Parses data received by GET methods into JS objects
+  // Parses JSON data received by GET method
   let messagesPost = JSON.parse(messagesBody);
-  let queryPost = JSON.parse(queryBody)
 
-  // New list to store users and messages matching the query
-  var matchingMessages = []
+  // New list to store messages matching the query
+  var matchingMessages = [];
 
-  // Iterates through (lower case versions of) all users and messages and finds matches
+  // Iterates through (lower case versions of) all messages and finds matches
   for (let i = 0; i < messagesPost.length; i++) {
-      if (messagesPost[i]["postedBy"].toLowerCase().includes(queryPost["result"]) || messagesPost[i]["content"].toLowerCase().includes(queryPost["result"])) {
+      if (messagesPost[i]["postedBy"].toLowerCase().includes(query) || messagesPost[i]["content"].toLowerCase().includes(query)) {
+        // Pushes matches to matchingMessages
         matchingMessages.push(messagesPost[i]);
       }
   }
@@ -139,34 +109,41 @@ async function searchPage() {
   }
 }
 
+/* Asynchronous function to add a message from 'make a post'
+ * form to the message board area */
 async function addMessage() {
   // Gets currently logged in user's name and submitted message
   let user = await document.getElementById("welcome").innerHTML.slice(29, -5);
   let message = await document.getElementById("message");
 
-  // Uses post method addMessage to send message to the server with token
+  // Uses post method addMessage to send message to the server with token for auth
   await $.ajax({
     type: "POST",
     url: "./addMessage",
     data: {postUsername: user, message: message.value},
     dataType: "json",
     beforeSend: function(request) {
-      request.setRequestHeader("x-access-token", token);
+      // Sends token only if it exists
+      if (token) {
+        request.setRequestHeader("x-access-token", token);
+      }
     },
     success: (view_data) => {
       // If post was successful, closes sign up form, shows sign out button and alerts user
       alert(view_data["message"]);
       closeMessageForm();
+      // Refreshes page to show message
       refreshPage();
     },
     error: (error) => {
-      // Sends response message on error
+      // Sends server response message on error
       alert(error["responseJSON"]["message"]);
     }
   });
 }
 
-/* Checks if email inputs are matching */
+/* Checks if email inputs in sign up form are matching
+ * and of a valid format */
 function checkEmail() {
   // Gets email inputs and stores them in variables
   var email = document.getElementById("email").value;
@@ -184,6 +161,7 @@ function checkEmail() {
   } else if (!email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
     alert("Please enter a valid email address");
     return false;
+  // Returns true if no issues found
   } else {
     return true;
   }
@@ -195,43 +173,18 @@ function checkPassword() {
   var password = document.getElementById("password").value;
   var confirmPassword = document.getElementById("confirmPassword").value;
 
-  // Checks if both input fields are equal
-  if (password != confirmPassword) {
-    alert('Inputted passwords do not match');
-    return false;
-  } else if (password == "") {
+  // Checks if password is blank
+  if (password == "") {
     alert('Please enter a password');
     return false;
+  // Checks if both input fields are equal
+  } else if (password != confirmPassword) {
+    alert('Inputted passwords do not match');
+    return false;
+  // Returns true if no issues found
   } else {
     return true;
   }
-}
-
-/* Opens pop-up form by setting sign up form's display
- * to 'block' and both sign in & defaultTexts' display to 'none' */
-function openSignUp() {
-  document.getElementById("signup").setAttribute('style', 'display:block !important');
-  document.getElementById("signin").style.display = "none";
-}
-
-/* Opens pop-up form by setting sign in form's display
- * to 'block', and both sign up & defaultTexts' display to 'none' */
-function openSignIn() {
-  document.getElementById("signin").setAttribute('style', 'display:block !important');
-  document.getElementById("signup").style.display = "none";
-}
-
-/* Closes pop-up form by setting sign up form's display
- * value to 'none' */
-function closeSignUp() {
-  document.getElementById("signup").setAttribute('style', 'display: none !important');
-}
-
-/* Closes pop-up form by setting sign up form's display
- * value to 'none' */
-async function closeSignIn() {
-  // Closes sign in form
-  document.getElementById("signin").setAttribute('style', 'display: none !important');
 }
 
 /* Submits sign up form if information is valid and
@@ -248,7 +201,7 @@ async function submitSignUp() {
     let confirmPassword = document.getElementById("confirmPassword");
 
     // Uses AJAX to post this data to the server and handles the response on success
-    $.ajax({
+    await $.ajax({
       type: "POST",
       url: "./addUser",
       data: {username: username.value, email: email.value, password: password.value},
@@ -293,25 +246,27 @@ async function submitSignIn() {
   });
 }
 
-/* Calls get method signOut and stores the response to check
- * whether the sign out was successful */
+/* Calls post method signOut and alerts user to inform
+ * them whether the sign out was successful */
 async function signOut() {
-  // Grabs current user's username from sign in or sign up form
-  if (document.getElementById("username").value != '') {
-    var user = document.getElementById("username").value;
-  } else if (document.getElementById("signInUsername").value != '') {
-    var user = document.getElementById("signInUsername").value;
-  }
+  // Gets currently signed in user's username
+  var user = document.getElementById("welcome").innerHTML.slice(29, -6);
 
+  // Uses AJAX to sign out using token for auth
   await $.ajax({
     type: "POST",
     url: "./signOut",
     data: {user: user},
     dataType: "json",
     beforeSend: function(request) {
-      request.setRequestHeader("x-access-token", token);
+      // Sends token only if it exists
+      if (token) {
+        request.setRequestHeader("x-access-token", token);
+      }
     },
     success: (view_data) => {
+      // Resets token to prevent protected methods from being called whilst logged out
+      token = null;
       alert(view_data["message"]);
     },
     error: (error) => {
@@ -325,31 +280,6 @@ async function signOut() {
   document.getElementById("makePost").setAttribute('style', 'display:none !important');
   document.getElementById("welcome").innerHTML = null;
 
-}
-
-/* Sets the display qualities of items in the
- * navbar when a successful sign-in occurs */
-function successfulSignIn(username) {
-  document.getElementById("signUpBar").style.display = "none";
-  document.getElementById("googleSignIn").setAttribute('style', 'display:none');
-  document.getElementById("makePost").setAttribute('style', 'display:block !important');
-  document.getElementById("signOut").setAttribute('style', 'display:block !important');
-  document.getElementById("welcome").innerHTML = "<h6 class=\"welcome\">Welcome, " + username + " </h6>";
-}
-
-/* Opens pop-up message form by setting form's display to 'block'
- * and both makePost and defaultText's display to 'none' */
-function openMessageForm() {
-  document.getElementById("messageForm").setAttribute('style', 'display:block !important');
-  document.getElementById("makePost").style.display = "none";
-  document.getElementById("signUpBar").style.display = "none";
-}
-
-/* Closes pop-up message form by setting form's display to 'none'
- * and both makePost and defaultTest's display to 'none' */
-function closeMessageForm() {
-  document.getElementById("messageForm").style.display = "none";
-  document.getElementById("makePost").setAttribute('style', 'display:block !important');
 }
 
 /* Google sign-in function.
@@ -400,19 +330,77 @@ async function googleSignOut() {
     data: {user: user},
     dataType: "json",
     success: (view_data) => {
+      // Resets token to prevent protected methods from being called whilst logged out
+      token = null;
+      successfulSignOut();
       alert(view_data["message"]);
     },
     error: (error) => {
       alert(error["responseJSON"]["message"]);
     }
   });
+}
 
-    // Sets up items in navbar to inform user they are signed out
+
+/* Opens sign up form by setting sign up form's display
+ * to 'block' and sign in's display to 'none' */
+function openSignUp() {
+  document.getElementById("signup").setAttribute('style', 'display:block !important');
+  document.getElementById("signin").style.display = "none";
+}
+
+/* Closes sign up form by setting sign up form's display
+ * value to 'none' */
+function closeSignUp() {
+  document.getElementById("signup").setAttribute('style', 'display: none !important');
+}
+
+/* Opens sign in form by setting sign in form's display
+ * to 'block', and sign up's display to 'none' */
+function openSignIn() {
+  document.getElementById("signin").setAttribute('style', 'display:block !important');
+  document.getElementById("signup").style.display = "none";
+}
+
+/* Closes sign in form by setting sign in form's display
+ * value to 'none' */
+function closeSignIn() {
+  document.getElementById("signin").setAttribute('style', 'display: none !important');
+}
+
+/* Sets the display qualities of items in the
+ * navbar when a successful sign-in occurs */
+function successfulSignIn(username) {
+  document.getElementById("signUpBar").style.display = "none";
+  document.getElementById("googleSignIn").setAttribute('style', 'display:none');
+  document.getElementById("makePost").setAttribute('style', 'display:block !important');
+  document.getElementById("signOut").setAttribute('style', 'display:block !important');
+  document.getElementById("welcome").innerHTML = "<h6 class=\"welcome\">Welcome, " + username + " </h6>";
+}
+
+/* Sets the display qualities of items in the
+ * navbar when a successful sign-in occurs */
+function successfulSignOut() {
   document.getElementById("welcome").innerHTML = null;
   document.getElementById("googleSignOut").style.display = "none";
   document.getElementById("makePost").style.display= "none";
   document.getElementById("googleSignIn").style.display = "block";
   document.getElementById("signUpBar").style.display = "block";
+}
+
+/* Opens pop-up message form by setting form's display to 'block'
+ * and both makePost and defaultText's display to 'none' */
+function openMessageForm() {
+  document.getElementById("messageForm").setAttribute('style', 'display:block !important');
+  document.getElementById("makePost").style.display = "none";
+  document.getElementById("signUpBar").style.display = "none";
+}
+
+/* Closes pop-up message form by setting form's display to 'none'
+ * and both makePost and defaultTest's display to 'none' */
+function closeMessageForm() {
+  document.getElementById("messageForm").style.display = "none";
+  document.getElementById("makePost").setAttribute('style', 'display:block !important');
 }
 
 /* Listens for a page refresh and signs the user out
@@ -444,7 +432,10 @@ window.addEventListener('beforeunload', async function() {
       data: {user: user},
       dataType: "json",
       beforeSend: function(request) {
-        request.setRequestHeader("x-access-token", token);
+        // Sends token only if it exists
+        if (token) {
+          request.setRequestHeader("x-access-token", token);
+        }
       },
       success: (view_data) => {
         alert(view_data["message"]);
