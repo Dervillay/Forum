@@ -227,7 +227,9 @@ app.post('/addUser', (req, res) => {
 
     // Checks if user already exists and if they do sends a 409 error response
     for (let i = 0; i < users.length; i++) {
-      return res.status(409).json({status: "unsuccessful", message:"An account with that username or email already exists."});
+      if (users[i]["username"] == username || users[i]["email"] == email) {
+        return res.status(409).json({status: "unsuccessful", message:"An account with that username or email already exists."});
+      }
     }
 
     // Creates new Date object to calculate date account was created
@@ -282,33 +284,6 @@ app.post('/addUser', (req, res) => {
 });
 
 
-// Posts a search query to the server
-app.post('/sendQuery', (req, res) => {
-  try {
-    // Sets server variable query to query sent in body
-    query = req.body.query;
-    return res.status(200).json({status: "success"});
-  }
-  // Catches errors and sends appropriate response code
-  catch (error) {
-    return res.status(500).json({status: "unsuccessful", message: "Search unsuccessful. The server encountered an error."})
-  }
-});
-
-
-// Gets current value of query
-app.get('/getQuery', (req, res) => {
-  try {
-    // Returns string stored in query in lower case
-    return res.status(200).json({result: query.toLowerCase()});
-  }
-  // Catches server errors and sends appropriate response
-  catch (error) {
-    return res.status(500).json({status: "unsuccessful", message: "Unable to get query. The server encountered an error."});
-  }
-});
-
-
 // Gets list of users
 app.get('/users', (req, res) => {
   try {
@@ -337,20 +312,8 @@ app.get('/users', (req, res) => {
 // Gets list of messages
 app.get('/messages', (req, res) => {
   try {
-    // Tries to get token from header and checks if one has been provided
-    var token = req.headers['x-access-token'];
-    if (!token) {
-      return res.status(401).json({status: "unsuccessful", message: "No token provided."});
-    }
-
-    // Attempts to verify the token and outputs a response appropriately
-    jwt.verify(token, config.secret, (err, decoded) => {
-      if (err) {
-        return res.status(500).json({status: "unsuccessful", message: "Failed to authenticate token."});
-      } else {
-        return res.status(200).json(messages);
-      }
-    });
+    // Returns JSON content of variable messages
+    return res.status(200).json(messages);
   }
   // Catches server errors and sends appropriate response
   catch (error) {
