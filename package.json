@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "pretest": "eslint server.js client/index.js"
   },
   "repository": {
     "type": "git",
@@ -17,11 +18,10 @@
     "url": "https://github.com/Dervillay/Forum/issues"
   },
   "homepage": "https://github.com/Dervillay/Forum#readme",
-  "devDependencies": {
+  "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "jsonwebtoken": "^8.5.1",
     "standard": "^11.0.1"
-  },
-  "dependencies": {}
+  }
 }
