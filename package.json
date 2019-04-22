@@ -18,6 +18,13 @@
     "url": "https://github.com/Dervillay/Forum/issues"
   },
   "homepage": "https://github.com/Dervillay/Forum#readme",
+  "devDependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "jsonwebtoken": "^8.5.1",
+    "standard": "^11.0.1"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
