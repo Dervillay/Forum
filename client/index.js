@@ -119,6 +119,12 @@ async function addMessage() {
 	let user = await document.getElementById('welcome').innerHTML.slice(29, -5);
 	let message = await document.getElementById('message');
 
+	// If message is empty, alerts user and returns
+	if (message.value == '') {
+		alert('Message cannot be empty.');
+		return;
+	}
+
 	// Uses post method addMessage to send message to the server with token for auth
 	await $.ajax({
 		type: 'POST',
@@ -274,7 +280,12 @@ async function signOut() {
 		},
 		error: (error) => {
 			// If post was unsuccessful, shows reason for this in alert
-			alert(error['responseJSON']['message']);
+			if (error) {
+				console.log(error);
+				alert(error['responseJSON']['message']);
+			} else {
+				alert('Connection to the server lost. Please restarting the server and try again.');
+			}
 		}
 	});
 
