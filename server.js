@@ -13,17 +13,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // List to track all signed up users
 let users = [];
 
+
 // List to track all messages posted to the forum
 let messages = [];
+
 
 // List to track currently signed in users
 let signedIn = [];
 
-// Variable for storing search queries
-let query = '';
 
-
-// Signs a user in
+// Signs a user in and sends a JavaScript Web Token
 app.post('/signIn', (req, res) => {
   try {
     // Gets current date and time and stores it in dateTime
@@ -58,7 +57,7 @@ app.post('/signIn', (req, res) => {
     bcrypt.compare(req.body.signInPassword, password, (err, resp) => {
       if (resp) {
         // Creates unique user token using secret in config
-        var token = jwt.sign({id: username}, config.secret , {
+        var token = jwt.sign({id: username}, config.secret, {
           expiresIn: 86400 // Expires in 24 hours
         });
 
@@ -86,7 +85,7 @@ app.post('/signIn', (req, res) => {
 });
 
 
-// Signs out user
+// Signs out user. Requires token
 app.post('/signOut', (req, res) => {
   try {
     // Gets current date and time and stores it in dateTime
@@ -101,14 +100,27 @@ app.post('/signOut', (req, res) => {
     // Takes user from parameter passed to method
     let user = req.body.user;
 
-    // Removes user from list of signed in users
-    signedIn.splice(signedIn.indexOf(user), 1);
+    // Tries to get token from header and checks if one has been provided, sends response if not
+    var token = req.headers['x-access-token'];
+    if (!token) {
+      // Returned if no token provided or a sign out is attempted without being logged in
+      return res.status(401).json({status: "unsuccessful", message: "No token provided."});
+    }
 
-    // Logs to server that this user has logged out
-    console.log('> User \'' + user + '\' logged out at ' + dateTime);
+    // Attempts to verify the token and outputs a response appropriately
+    jwt.verify(token, config.secret, (err, decoded) => {
+      if (err) {
+        return res.status(500).json({status: "unsuccessful", message: "Failed to authenticate token."});
+      }
+      // If token verified successfully, removes user from list of signed in users
+      signedIn.splice(signedIn.indexOf(user), 1);
 
-    // Sends success response
-    return res.status(200).json({status: "successful", message: "Sign out successful."});
+      // Logs to server that this user has logged out
+      console.log('> User \'' + user + '\' logged out at ' + dateTime);
+
+      // Sends success response
+      return res.status(200).json({status: "successful", message: "Sign out successful."});
+    });
   }
   // Catches any errors and sends server error repsonse
   catch (error) {
@@ -117,7 +129,7 @@ app.post('/signOut', (req, res) => {
 });
 
 
-// Logs that a user has signed in via Google to the server console
+// Logs that a user has signed in via Google to the server console and sends token for authentication
 app.post('/googleSignIn', (req, res) => {
   try {
     // Gets current date and time and stores it in dateTime
@@ -127,7 +139,11 @@ app.post('/googleSignIn', (req, res) => {
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
+    });
 
+    // Creates unique user token using secret in config
+    var token = jwt.sign({id: username}, config.secret, {
+      expiresIn: 86400 // Expires in 24 hours
     });
 
     // Takes user from parameter passed to method and pushes it to signedIn
@@ -146,6 +162,7 @@ app.post('/googleSignIn', (req, res) => {
 
 
 // Logs that a user has signed out via Google to the server console
+// (does not require token since Google handles its own authorization via OAuth2)
 app.post('/googleSignOut', (req, res) => {
   try {
     // Gets current date and time and stores it in dateTime
@@ -174,7 +191,7 @@ app.post('/googleSignOut', (req, res) => {
 });
 
 
-// Adds a message and its metadata to list messages
+// Adds a message and its metadata to list messages. Requires token
 app.post('/addMessage', (req, res) => {
   try {
     // Gets current date and time and stores it in dateTime
@@ -218,8 +235,8 @@ app.post('/addMessage', (req, res) => {
 });
 
 
-// Adds a user to users
-app.post('/addUser', (req, res) => {
+// Adds a user to users and sends a JavaScript Web Token
+app.post('/signUp', (req, res) => {
   try {
     // Gets username from HTML form
     let username = req.body.username;
@@ -259,7 +276,7 @@ app.post('/addUser', (req, res) => {
         userJSON["password"] = hash;
 
       // Creates unique user token using secret in config
-      var token = jwt.sign({id: username}, config.secret , {
+      var token = jwt.sign({id: username}, config.secret, {
         expiresIn: 86400 // Expires in 24 hours
       });
 
@@ -284,7 +301,7 @@ app.post('/addUser', (req, res) => {
 });
 
 
-// Gets list of users
+// Gets list of users. Requires token
 app.get('/users', (req, res) => {
   try {
     // Tries to get token from header and checks if one has been provided
@@ -310,6 +327,7 @@ app.get('/users', (req, res) => {
 
 
 // Gets list of messages
+// (does not require token as messages can be viewed without an account)
 app.get('/messages', (req, res) => {
   try {
     // Returns JSON content of variable messages
@@ -322,7 +340,7 @@ app.get('/messages', (req, res) => {
 });
 
 
-// Gets list of currently signed in users
+// Gets list of currently signed in users. Requires token
 app.get('/signedIn', (req, res) => {
   try {
     // Tries to get token from header and checks if one has been provided

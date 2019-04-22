@@ -209,7 +209,7 @@ async function submitSignUp() {
     // Uses AJAX to post this data to the server and handles the response on success
     await $.ajax({
       type: "POST",
-      url: "./addUser",
+      url: "./signUp",
       data: {username: username.value, email: email.value, password: password.value},
       dataType: "json",
       success: (view_data) => {
