@@ -367,6 +367,6 @@ app.get('/signedIn', (req, res) => {
 
 
 // Listens on port 8090
-app.listen(8090, () => {
-	console.log('> Listening on localhost:8090');
+app.listen(8080, () => {
+	console.log('> Listening on port 8080');
 });
