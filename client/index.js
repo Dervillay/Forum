@@ -1,12 +1,16 @@
-/* letiable to store tokens recieved from server */
+/**
+* Variable to store tokens recieved from server
+*/
 let token;
 
-/* Calls setNavbarHeight to begin loop */
+/**
+ * Calls setNavbarHeight to begin loop
+ */
 setNavbarHeight();
 
-/* Asynchronous function to update page with all users and messages.
+/** Asynchronous function to update page with all users and messages.
  * Uses GET methods of server to recieve current list of messages,
- * it then iterates through them and inserts the final posts
+ * it then iterates through them and inserts them as posts
  * in index.html */
 async function refreshPage() {
 	// Uses GET method 'messages' to receive list of messages
@@ -51,7 +55,7 @@ async function refreshPage() {
 }
 
 
-/* Searches page asynchronously for posts with content matching query string.
+/** Searches page asynchronously for posts with content matching query string.
  * Takes current query value, gets messages from the server and renders messages
  * that match. */
 async function searchPage() {
@@ -112,8 +116,9 @@ async function searchPage() {
 	}
 }
 
-/* Asynchronous function to add a message from 'make a post'
- * form to the message board area */
+/** Asynchronous function to add a message from 'make a post'
+ * form to the message board area. Submits stored token for
+ * verification (if it exists) */
 async function addMessage() {
 	// Gets currently logged in user's name and submitted message
 	let user = await document.getElementById('welcome').innerHTML.slice(29, -5);
@@ -151,10 +156,10 @@ async function addMessage() {
 	});
 }
 
-/* Checks if email inputs in sign up form are matching
+/** Checks if email inputs in sign up form are matching
  * and of a valid format */
 function checkEmail() {
-	// Gets email inputs and stores them in letiables
+	// Gets email inputs and stores them in variables
 	let email = document.getElementById('email').value;
 	let confirmEmail = document.getElementById('confirmEmail').value;
 
@@ -176,9 +181,10 @@ function checkEmail() {
 	}
 }
 
-/* Checks if password inputs are matching */
+/** Checks if password inputs in sign up
+ * form are are matching and not blank */
 function checkPassword() {
-	// Gets email inputs and stores them in letiables
+	// Gets email inputs and stores them in variables
 	let password = document.getElementById('password').value;
 	let confirmPassword = document.getElementById('confirmPassword').value;
 
@@ -196,8 +202,9 @@ function checkPassword() {
 	}
 }
 
-/* Submits sign up form if information is valid and
- * creates an alert appropriate to the outcome. */
+/** Submits sign up form asynchronously if information is valid and
+ * creates an alert appropriate to the outcome, receiving and storing
+ * a JavaScript Web Token on success */
 async function submitSignUp() {
 	// Checks if the inputted emails and passwords are valid
 	if (checkEmail() && checkPassword()) {
@@ -230,8 +237,9 @@ async function submitSignUp() {
 	}
 }
 
-/* Submits sign in form if information is valid and
- * creates an alert appropriate to the outcome. */
+/** Submits sign in form asynchrously if information is valid and
+ * creates an alert appropriate to the outcome, receiving and storing
+ * a JavaScript Web Token on success */
 async function submitSignIn() {
 	let signInUsername = document.getElementById('signInUsername');
 	let signInPassword = document.getElementById('signInPassword');
@@ -255,8 +263,9 @@ async function submitSignIn() {
 	});
 }
 
-/* Calls post method signOut and alerts user to inform
- * them whether the sign out was successful */
+/** Asynchronously calls post method signOut, sends verification token
+ * (if it exists) and alerts user to inform them whether the sign out
+ * was successful */
 async function signOut() {
 	// Gets currently signed in user's username
 	let user = document.getElementById('welcome').innerHTML.slice(29, -6);
@@ -288,17 +297,15 @@ async function signOut() {
 			}
 		}
 	});
-
-	document.getElementById('signUpBar').style.display = 'block';
-	document.getElementById('signOut').style.display = 'none';
-	document.getElementById('googleSignIn').setAttribute('style', 'display:block !important');
-	document.getElementById('makePost').setAttribute('style', 'display:none !important');
-	document.getElementById('welcome').innerHTML = null;
+	// Adjusts the HTML page to inform user of successful sign out
+	successfulSignOut();
 
 }
 
-/* Google sign-in function.
- * Gets user's name and puts it in the navbar */
+/** Asynchronously signs a user in via Google sign in, updates the page to inform them
+ * of a successful sign in, then gets user's name and puts it in the navbar. Recieves
+ * and stores JavaScript Web Token from server's response.
+ * @param googleUser - Passed in by Google API on sign in via HTML page */
 async function googleSignIn(googleUser) {
 	let profile = googleUser.getBasicProfile();
 	let id_token = googleUser.getAuthResponse().id_token;
@@ -320,17 +327,12 @@ async function googleSignIn(googleUser) {
 	});
 
 	// Sets up items in navbar to inform user they are signed in
-	document.getElementById('welcome').innerHTML = '<h6 class="welcome">Welcome, ' + profile.getName() + ' </h6>';
-	document.getElementById('googleSignIn').setAttribute('style', 'display:none');
-	document.getElementById('googleSignOut').setAttribute('style', 'display:block !important');
-	document.getElementById('makePost').setAttribute('style', 'display:block !important');
-	document.getElementById('signUpBar').style.display = 'none';
-	document.getElementById('signin').style.display = 'none';
+	successfulGoogleSignIn(profile.getName());
 }
 
-/* Google sign-out function.
- * Signs user out, hides the sign out button
- * and displays the sign in button again */
+/** Asynchronously signs user out via Google, hides the
+ * sign out button, displays the sign in button again and
+ * destroys currently held token */
 async function googleSignOut() {
 	let auth2 = gapi.auth2.getAuthInstance();
 	auth2.signOut();
@@ -358,33 +360,33 @@ async function googleSignOut() {
 }
 
 
-/* Opens sign up form by setting sign up form's display
+/** Opens sign up form by setting sign up form's display
  * to 'block' and sign in's display to 'none' */
 function openSignUp() {
 	document.getElementById('signup').setAttribute('style', 'display:block !important');
 	document.getElementById('signin').style.display = 'none';
 }
 
-/* Closes sign up form by setting sign up form's display
+/** Closes sign up form by setting sign up form's display
  * value to 'none' */
 function closeSignUp() {
 	document.getElementById('signup').setAttribute('style', 'display: none !important');
 }
 
-/* Opens sign in form by setting sign in form's display
+/** Opens sign in form by setting sign in form's display
  * to 'block', and sign up's display to 'none' */
 function openSignIn() {
 	document.getElementById('signin').setAttribute('style', 'display:block !important');
 	document.getElementById('signup').style.display = 'none';
 }
 
-/* Closes sign in form by setting sign in form's display
+/** Closes sign in form by setting sign in form's display
  * value to 'none' */
 function closeSignIn() {
 	document.getElementById('signin').setAttribute('style', 'display: none !important');
 }
 
-/* Opens pop-up message form by setting form's display to 'block'
+/** Opens pop-up message form by setting form's display to 'block'
  * and both makePost and defaultText's display to 'none' */
 function openMessageForm() {
 	document.getElementById('messageForm').setAttribute('style', 'display:block !important');
@@ -392,17 +394,18 @@ function openMessageForm() {
 	document.getElementById('signUpBar').style.display = 'none';
 }
 
-/* Closes pop-up message form by setting form's display to 'none'
- * and both makePost and defaultTest's display to 'none' */
+/** Closes pop-up message form by setting form's display to 'none'
+ * and makePost button's display to 'block' */
 function closeMessageForm() {
 	document.getElementById('messageForm').style.display = 'none';
 	document.getElementById('makePost').setAttribute('style', 'display:block !important');
 }
 
-/* Sets the display qualities of items in the
+/** Sets the display values of items in the
  * navbar when a successful sign-in occurs. Takes
  * the user's username as a parameter to setup the
- * welcome bar at the top of the page */
+ * welcome bar at the top of the page
+ * @param {string} - User attempting to log in's username */
 function successfulSignIn(username) {
 	document.getElementById('signUpBar').style.display = 'none';
 	document.getElementById('googleSignIn').setAttribute('style', 'display:none');
@@ -411,7 +414,21 @@ function successfulSignIn(username) {
 	document.getElementById('welcome').innerHTML = '<h6 class="welcome">Welcome, ' + username + ' </h6>';
 }
 
-/* Sets the display qualities of items in the
+/** Sets the display values of items in the
+ * navbar when a successful Google sign-in occurs. Takes
+ * the user's username as a parameter to setup the
+ * welcome bar at the top of the page
+ * @param {string} - User attempting to log in's Google username */
+function successfulGoogleSignIn(username) {
+	document.getElementById('welcome').innerHTML = '<h6 class="welcome">Welcome, ' + username + ' </h6>';
+	document.getElementById('googleSignIn').setAttribute('style', 'display:none');
+	document.getElementById('googleSignOut').setAttribute('style', 'display:block !important');
+	document.getElementById('makePost').setAttribute('style', 'display:block !important');
+	document.getElementById('signUpBar').style.display = 'none';
+	document.getElementById('signin').style.display = 'none';
+}
+
+/** Sets the display values of items in the
  * navbar when a successful sign-out occurs */
 function successfulSignOut() {
 	document.getElementById('welcome').innerHTML = null;
@@ -419,10 +436,11 @@ function successfulSignOut() {
 	document.getElementById('makePost').style.display= 'none';
 	document.getElementById('googleSignIn').style.display = 'block';
 	document.getElementById('signUpBar').style.display = 'block';
+	document.getElementById('signOut').style.display = 'none';
 }
 
-/* Listens for a page refresh and signs the user out
- * using asynchronous function */
+/** Listens for a page refresh and signs the user out
+ * using asynchronous function and token for verification */
 window.addEventListener('beforeunload', async () => {
 	// Gets signedIn from server using token
 	let signedInResponse = await fetch('./signedIn', {
@@ -465,8 +483,8 @@ window.addEventListener('beforeunload', async () => {
 	}
 });
 
-/* Adapts the height of message posts to appear below navbar
- * by checking header position every 500ms and adjusting content
+/** Adapts the height of message posts to appear below the navbar
+ * by checking the header's position every 0.5s and adjusting content's
  * position */
 function setNavbarHeight() {
 	$(document).ready( () => {
