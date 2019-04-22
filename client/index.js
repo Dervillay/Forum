@@ -1,6 +1,12 @@
 /* Variable to store tokens recieved from server */
 let token;
 
+/* Variable for repeatedly calling setNavbarHeight */
+let repeater;
+
+/* Calls setNavbarHeight to begin loop */
+setNavbarHeight();
+
 /* Asynchronous function to update page with all users and messages.
  * Uses GET methods of server to recieve current list of messages,
  * it then iterates through them and inserts the final posts
@@ -136,7 +142,7 @@ async function addMessage() {
       refreshPage();
     },
     error: (error) => {
-      // Sends server response message on error
+      // If post was unsuccessful, shows reason for this in alert
       alert(error["responseJSON"]["message"]);
     }
   });
@@ -233,7 +239,7 @@ async function submitSignIn() {
     data: {signInUsername: signInUsername.value, signInPassword: signInPassword.value},
     dataType: "json",
     success: (view_data) => {
-      // If post was successful, closes sign up form, shows sign out button and alerts user
+      // If post was successful, closes sign up form, calls successful sign in and alerts user
       token = view_data["token"];
       closeSignIn();
       successfulSignIn(signInUsername.value);
@@ -265,11 +271,12 @@ async function signOut() {
       }
     },
     success: (view_data) => {
-      // Resets token to prevent protected methods from being called whilst logged out
+      // Destroys token to prevent protected methods from being called whilst logged out
       token = null;
       alert(view_data["message"]);
     },
     error: (error) => {
+      // If post was unsuccessful, shows reason for this in alert
       alert(error["responseJSON"]["message"]);
     }
   });
@@ -296,10 +303,10 @@ async function googleSignIn(googleUser) {
     dataType: "json",
     success: (view_data) => {
       token = view_data["token"];
-      console.log(token);
       alert(view_data["message"]);
     },
     error: (error) => {
+      // If post was unsuccessful, shows reason for this in alert
       alert(error["responseJSON"]["message"]);
     }
   });
@@ -330,12 +337,13 @@ async function googleSignOut() {
     data: {user: user},
     dataType: "json",
     success: (view_data) => {
-      // Resets token to prevent protected methods from being called whilst logged out
+      // Destroys token to prevent protected methods from being called whilst logged out
       token = null;
       successfulSignOut();
       alert(view_data["message"]);
     },
     error: (error) => {
+      // If post was unsuccessful, shows reason for this in alert
       alert(error["responseJSON"]["message"]);
     }
   });
@@ -368,26 +376,6 @@ function closeSignIn() {
   document.getElementById("signin").setAttribute('style', 'display: none !important');
 }
 
-/* Sets the display qualities of items in the
- * navbar when a successful sign-in occurs */
-function successfulSignIn(username) {
-  document.getElementById("signUpBar").style.display = "none";
-  document.getElementById("googleSignIn").setAttribute('style', 'display:none');
-  document.getElementById("makePost").setAttribute('style', 'display:block !important');
-  document.getElementById("signOut").setAttribute('style', 'display:block !important');
-  document.getElementById("welcome").innerHTML = "<h6 class=\"welcome\">Welcome, " + username + " </h6>";
-}
-
-/* Sets the display qualities of items in the
- * navbar when a successful sign-in occurs */
-function successfulSignOut() {
-  document.getElementById("welcome").innerHTML = null;
-  document.getElementById("googleSignOut").style.display = "none";
-  document.getElementById("makePost").style.display= "none";
-  document.getElementById("googleSignIn").style.display = "block";
-  document.getElementById("signUpBar").style.display = "block";
-}
-
 /* Opens pop-up message form by setting form's display to 'block'
  * and both makePost and defaultText's display to 'none' */
 function openMessageForm() {
@@ -403,9 +391,31 @@ function closeMessageForm() {
   document.getElementById("makePost").setAttribute('style', 'display:block !important');
 }
 
+/* Sets the display qualities of items in the
+ * navbar when a successful sign-in occurs. Takes
+ * the user's username as a parameter to setup the
+ * welcome bar at the top of the page */
+function successfulSignIn(username) {
+  document.getElementById("signUpBar").style.display = "none";
+  document.getElementById("googleSignIn").setAttribute('style', 'display:none');
+  document.getElementById("makePost").setAttribute('style', 'display:block !important');
+  document.getElementById("signOut").setAttribute('style', 'display:block !important');
+  document.getElementById("welcome").innerHTML = "<h6 class=\"welcome\">Welcome, " + username + " </h6>";
+}
+
+/* Sets the display qualities of items in the
+ * navbar when a successful sign-out occurs */
+function successfulSignOut() {
+  document.getElementById("welcome").innerHTML = null;
+  document.getElementById("googleSignOut").style.display = "none";
+  document.getElementById("makePost").style.display= "none";
+  document.getElementById("googleSignIn").style.display = "block";
+  document.getElementById("signUpBar").style.display = "block";
+}
+
 /* Listens for a page refresh and signs the user out
  * using asynchronous function */
-window.addEventListener('beforeunload', async function() {
+window.addEventListener('beforeunload', async () => {
   // Gets signedIn from server using token
   let signedInResponse = await fetch("./signedIn", {
     method: 'GET',
@@ -417,15 +427,11 @@ window.addEventListener('beforeunload', async function() {
   let signedInPost = JSON.parse(signedInBody);
 
   // Finds currently loggin in user's username
-  if (document.getElementById("username").value != '') {
-    var user = document.getElementById("username").value;
-  } else if (document.getElementById("signInUsername").value != '') {
-    var user = document.getElementById("signInUsername").value;
-  }
+  let user = await document.getElementById("welcome").innerHTML.slice(29, -5);
 
   // Checks if user is already signed in
   if (signedInPost.includes(user)) {
-    // Calls get method signOut with user as parameter
+    // Calls get method signOut with user in body and token for authentication
     await $.ajax({
       type: "POST",
       url: "./signOut",
@@ -438,33 +444,35 @@ window.addEventListener('beforeunload', async function() {
         }
       },
       success: (view_data) => {
+        // Destroys token to prevent protected methods from being called whilst logged out
+        token = null;
         alert(view_data["message"]);
       },
       error: (error) => {
+        // If post was unsuccessful, shows reason for this in alert
         alert(error["responseJSON"]["message"]);
       }
     });
   }
-
-  // returnValue reuired for Google Chrome
+  // returnValue required for Google Chrome compatibility
   e.returnValue = '';
 })
 
-// Variable for repeatedly calling setNavbarHeight
-let repeater;
-
-/* Adapts the height of message posts to appear below navbar */
+/* Adapts the height of message posts to appear below navbar
+ * by checking header position every 500ms and adjusting content
+ * position */
 function setNavbarHeight() {
-  $(document).ready(function() {
-      const contentPlacement = $('#header').position().top + $('#header').height() - 50;
+  $(document).ready( () => {
+      // Gets position of header and stores it in contentPlacement
+      let contentPlacement = $('#header').position().top + $('#header').height() - 50;
       if (contentPlacement >= 0) {
+        // Sets content's padding-top CSS value to that stored in contentPlacement
         $('#content').css('padding-top', contentPlacement);
       } else {
+        // Sets content's padding-top CSS value to 0
         $('#content').css('padding-top', 0);
       }
+      // Repeats this check every 500ms
       repeater = setTimeout(setNavbarHeight, 500);
   });
 }
-
-/* Calls setNavbarHeight to begin loop */
-setNavbarHeight();
