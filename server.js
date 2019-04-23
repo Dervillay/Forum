@@ -10,15 +10,18 @@ app.use(express.static('client'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-/** Array to track all signed up users */
+/** Array to track all signed up users
+ * @name users*/
 let users = [];
 
 
-/** Array to track all messages posted to the forum */
+/** Array to track all messages posted to the forum
+ * @name messages */
 let messages = [];
 
 
-/** Array to track currently signed in users */
+/** Array to track currently signed in users
+ * @name signedIn*/
 let signedIn = [];
 
 
@@ -26,9 +29,18 @@ let signedIn = [];
  * name in the request body exists and checks if their encrypted
  * password matches that saved in users. On Successful sign in, a
  * token is generated and sent in the response.
- * @return {JSON} HTTP code of response, 'status' (successful or unsuccessful),
- * 'message', detailing the result of the response and 'token', a JavaScript
- * Web Token that expires in 24 hours. */
+ * @name POST Sign in
+ * @path {POST} /signIn
+ * @body {String} signInUsername The user signing in's username
+ * @body {String} signInPassword The user signing in's password
+ * @code {200} if sign in is successful
+ * @code {404} if no user matching signInUsername can be found
+ * @code {409} if the user attempting to log in is already logged in elsewhere
+ * @code {403} if password is incorrect
+ * @code {500} if server encounters an error
+ * @response {JSON} status Whether request was successful or unsuccessful
+ * @response {JSON} message Details the result of the request
+ * @response {JSON} token (on success) A JavaScript Web Token that expires in 24 hours */
 app.post('/signIn', (req, res) => {
 	try {
 		// Gets current date and time and stores it in dateTime
@@ -91,10 +103,18 @@ app.post('/signIn', (req, res) => {
 });
 
 
-/** Attempts to sign user out. Requires token in header to check if user is
- *  logged in, then removes the user from signedIn and sends a response.
- * @return {JSON} HTTP code of response, 'status' (successful or unsuccessful),
- * and 'message' detailing the result of the request. */
+/** Attempts to sign user out by removing the user from signedIn.
+ * @name POST Sign out
+ * @path {POST} /signOut
+ * @code {200} if sign out is successful
+ * @code {401} if no token is provided
+ * @code {400} if token cannot be authenticated
+ * @code {500} if server encounters an error
+ * @auth This route requires JavaScript Web Token authentication.
+ * @header x-access-token The JavaScript Web Token sent on a successful sign in/up
+ * @body {String} user The user signing out's user name.
+ * @response {JSON} status Whether request was successful or unsuccessful
+ * @response {JSON} message Details the result of the request */
 app.post('/signOut', (req, res) => {
 	try {
 		// Gets current date and time and stores it in dateTime
@@ -119,7 +139,7 @@ app.post('/signOut', (req, res) => {
 		// Attempts to verify the token and outputs a response appropriately
 		jwt.verify(token, config.secret, (err) => {
 			if (err) {
-				return res.status(500).json({status: 'unsuccessful', message: 'Failed to authenticate token.'});
+				return res.status(400).json({status: 'unsuccessful', message: 'Failed to authenticate token.'});
 			}
 			// If token verified successfully, removes user from array of signed in users
 			signedIn.splice(signedIn.indexOf(user), 1);
@@ -140,8 +160,14 @@ app.post('/signOut', (req, res) => {
 
 /** Logs that a user has signed in via Google to the server console and
  * sends a token for authorising the user's subsequent actions.
- * @return {JSON} HTTP code of response, 'status' (successful or unsuccessful),
- * 'message' detailing the result of the request and 'token' (if successful) */
+ * @name POST Google sign in
+ * @path {POST} /googleSignIn
+ * @code {200} if Google sign in is successful
+ * @code {500} if server encounters an error
+ * @body {String} user The user signing in's username.
+ * @response {JSON} status Whether request was successful or unsuccessful
+ * @response {JSON} message Details the result of the request
+ * @response {JSON} token (on success) A JavaScript Web Token that expires in 24 hours */
 app.post('/googleSignIn', (req, res) => {
 	try {
 		// Gets current date and time and stores it in dateTime
@@ -176,9 +202,14 @@ app.post('/googleSignIn', (req, res) => {
 
 
 /** Logs that a user has signed out via Google to the server console.
- * Does not require a token since Google handles its own authorisation via OAuth2.
- * @return {JSON} HTTP code of response, 'status' (successful or unsuccessful)
- * and 'message' detailing the result of the request. */
+ * Does not require a token since Google handles its own authorisation through OAuth2.
+ * @name POST Google sign out
+ * @path {POST} /googleSignIn
+ * @code {200} if Google sign in is successful
+ * @code {500} if server encounters an error
+ * @body {String} user The user signing out's username.
+ * @response {JSON} status Whether request was successful or unsuccessful
+ * @response {JSON} message Details the result of the request */
 app.post('/googleSignOut', (req, res) => {
 	try {
 		// Gets current date and time and stores it in dateTime
@@ -208,9 +239,18 @@ app.post('/googleSignOut', (req, res) => {
 
 
 /** Adds the message in the request body and its metadata to the array 'messages'.
- * This method requires a valid token to be submitted in the header.
- * @return {JSON} HTTP code of response, 'status' (successful or unsuccessful)
- * and 'message' detailing the result of the request. */
+ * @name POST Add message
+ * @path {POST} /addMessage
+ * @code {200} if message is added successfully
+ * @code {401} if no token is provided
+ * @code {400} if token cannot be authenticated
+ * @code {500} if server encounters an error
+ * @auth This route requires JavaScript Web Token authentication.
+ * @header x-access-token The JavaScript Web Token sent on a successful sign in/up
+ * @body {String} postUsername Username of the user submitting the message.
+ * @body {String} message Content of the message
+ * @response {JSON} status Whether request was successful or unsuccessful
+ * @response {JSON} message Details the result of the request */
 app.post('/addMessage', (req, res) => {
 	try {
 		// Gets current date and time and stores it in dateTime
@@ -240,7 +280,7 @@ app.post('/addMessage', (req, res) => {
 		// Attempts to verify the token and outputs a response appropriately
 		jwt.verify(token, config.secret, (err) => {
 			if (err) {
-				return res.status(500).json({status: 'unsuccessful', message: 'Failed to authenticate token.'});
+				return res.status(400).json({status: 'unsuccessful', message: 'Failed to authenticate token.'});
 			}
 			// If token verified successfully, pushes message to messages and sends response
 			messages.push(messageJSON);
@@ -258,8 +298,17 @@ app.post('/addMessage', (req, res) => {
  * checking if the submitted email or username already exist in users. If successful,
  * the submitted password is encrypted with 10 salt rounds, the user is added to users
  * and a token is sent in the response to validate methods whilst the user is logged in.
- * @return {JSON} HTTP code of response, 'status' (successful or unsuccessful),
- * 'message' detailing the result of the request and 'token' (if successful) */
+ * @name POST Sign up
+ * @path {POST} /signUp
+ * @code {200} if sign up is successful
+ * @code {409} if an account with username or email matching those submitted already exists
+ * @code {500} if server encounters an error
+ * @body {String} username The user's username.
+ * @body {String} email The user's email
+ * @body {String} password The user's password
+ * @response {JSON} status Whether request was successful or unsuccessful
+ * @response {JSON} message Details the result of the request
+ * @response {JSON} token (on success) A JavaScript Web Token that expires in 24 hours */
 app.post('/signUp', (req, res) => {
 	try {
 		// Gets username from HTML form
@@ -324,9 +373,18 @@ app.post('/signUp', (req, res) => {
 });
 
 
-/** Gets array of all registered users. Expects token in header.
- * @return {JSON} On failure: HTTP code of response, 'status' (unsuccessful)
- * and 'message' detailing the error. On success: returns array users */
+/** Gets array of all registered users.
+ * @name GET users
+ * @path {GET} /users
+ * @code {200} if users are sent successfully
+ * @code {401} if no token is provided
+ * @code {400} if token cannot be authenticated
+ * @code {500} if server encounters an error
+ * @auth This route requires JavaScript Web Token authentication.
+ * @header x-access-token The JavaScript Web Token sent on a successful sign in/up
+ * @response {JSON} users (on success) All users registered with the forum
+ * @response {JSON} status (on failure) Whether request was successful or unsuccessful
+ * @response {JSON} message (on failure) Details the result of the request */
 app.get('/users', (req, res) => {
 	try {
 		// Tries to get token from header and checks if one has been provided
@@ -338,7 +396,7 @@ app.get('/users', (req, res) => {
 		// Attempts to verify the token and outputs a response appropriately
 		jwt.verify(token, config.secret, (err) => {
 			if (err) {
-				return res.status(500).json({status: 'unsuccessful', message: 'Failed to authenticate token.'});
+				return res.status(400).json({status: 'unsuccessful', message: 'Failed to authenticate token.'});
 			} else {
 				return res.status(200).json(users);
 			}
@@ -354,8 +412,13 @@ app.get('/users', (req, res) => {
 /** Gets array of all submitted messages. Does not expect a token since
  * messages can be viewed by all users regardless of whether they have
  * an account.
- * @return {JSON} On failure: HTTP code of response, 'status' (unsuccessful)
- * and 'message' detailing the error. On success: returns array messages */
+ * @name GET messages
+ * @code {200} if messages are sent successfully
+ * @code {500} if server encounters an error
+ * @path {GET} /messages
+ * @response {JSON} messages (on success) All messages stored on the forum
+ * @response {JSON} status (on failure) Whether request was successful or unsuccessful
+ * @response {JSON} message (on failure) Details the result of the request */
 app.get('/messages', (req, res) => {
 	try {
 		// Returns JSON content of variable messages
@@ -368,9 +431,20 @@ app.get('/messages', (req, res) => {
 });
 
 
-/** Gets array of all currently signed in users. Expects token in header.
- * @return {JSON} On failure: HTTP code of response, 'status' (unsuccessful)
- * and 'message' detailing the error. On success: returns array signedIn */
+/**
+ * Gets array of all currently signed in users. Expects token in header.
+ *
+ * @name GET signed in users
+ * @path {GET} /signedIn
+ * @code {200} if signedIn is sent successfully
+ * @code {401} if no token is provided
+ * @code {400} if token cannot be authenticated
+ * @code {500} if server encounters an error
+ * @auth This route requires JavaScript Web Token authentication.
+ * @header x-access-token The JavaScript Web Token sent on a successful sign in/up
+ * @response {JSON} users (on success) All currently signed in users
+ * @response {JSON} status (on failure) Whether request was successful or unsuccessful
+ * @response {JSON} message (on failure) Details the result of the request */
 app.get('/signedIn', (req, res) => {
 	try {
 		// Tries to get token from header and checks if one has been provided
@@ -382,7 +456,7 @@ app.get('/signedIn', (req, res) => {
 		// Attempts to verify the token and outputs a response appropriately
 		jwt.verify(token, config.secret, (err) => {
 			if (err) {
-				return res.status(500).json({status: 'unsuccessful', message: 'Failed to authenticate token.'});
+				return res.status(400).json({status: 'unsuccessful', message: 'Failed to authenticate token.'});
 			} else {
 				return res.status(200).json(signedIn);
 			}
