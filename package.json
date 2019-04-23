@@ -19,7 +19,8 @@
   },
   "homepage": "https://github.com/Dervillay/Forum#readme",
   "devDependencies": {
-    "jsdoc": "^3.5.5"
+    "jsdoc": "^3.5.5",
+    "jsdoc-http-plugin": "^0.3.0"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
