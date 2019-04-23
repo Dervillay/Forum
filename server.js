@@ -10,19 +10,25 @@ app.use(express.static('client'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// List to track all signed up users
+/** List to track all signed up users */
 let users = [];
 
 
-// List to track all messages posted to the forum
+/** List to track all messages posted to the forum */
 let messages = [];
 
 
-// List to track currently signed in users
+/** List to track currently signed in users */
 let signedIn = [];
 
 
-// Signs a user in and sends a JavaScript Web Token
+/** Attempts to sign a user in, checks if an account with the
+ * name in the request body exists and checks if their encrypted
+ * password matches that saved in users. On Successful sign in, a
+ * token is generated and sent in the response.
+ * @return {JSON} HTTP code of response, 'status' (successful or unsuccessful),
+ * 'message', detailing the result of the response and 'token', a JavaScript
+ * Web Token that expires in 24 hours. */
 app.post('/signIn', (req, res) => {
 	try {
 		// Gets current date and time and stores it in dateTime
@@ -85,7 +91,10 @@ app.post('/signIn', (req, res) => {
 });
 
 
-// Signs out user. Requires token
+/** Attempts to sign user out. Requires token in header to check if user is
+ *  logged in, then removes the user from signedIn and sends a response.
+ * @return {JSON} HTTP code of response, 'status' (successful or unsuccessful),
+ * and 'message' detailing the result of the request. */
 app.post('/signOut', (req, res) => {
 	try {
 		// Gets current date and time and stores it in dateTime
@@ -129,7 +138,10 @@ app.post('/signOut', (req, res) => {
 });
 
 
-// Logs that a user has signed in via Google to the server console and sends token for authentication
+/** Logs that a user has signed in via Google to the server console and
+ * sends a token for authorising the user's subsequent actions.
+ * @return {JSON} HTTP code of response, 'status' (successful or unsuccessful),
+ * 'message' detailing the result of the request and 'token' (if successful) */
 app.post('/googleSignIn', (req, res) => {
 	try {
 		// Gets current date and time and stores it in dateTime
@@ -163,8 +175,10 @@ app.post('/googleSignIn', (req, res) => {
 });
 
 
-// Logs that a user has signed out via Google to the server console
-// (does not require token since Google handles its own authorization via OAuth2)
+/** Logs that a user has signed out via Google to the server console.
+ * Does not require a token since Google handles its own authorisation via OAuth2.
+ * @return {JSON} HTTP code of response, 'status' (successful or unsuccessful)
+ * and 'message' detailing the result of the request. */
 app.post('/googleSignOut', (req, res) => {
 	try {
 		// Gets current date and time and stores it in dateTime
@@ -193,7 +207,10 @@ app.post('/googleSignOut', (req, res) => {
 });
 
 
-// Adds a message and its metadata to list messages. Requires token
+/** Adds the message in the request body and its metadata to the list 'messages'.
+ * This method requires a valid token to be submitted in the header.
+ * @return {JSON} HTTP code of response, 'status' (successful or unsuccessful)
+ * and 'message' detailing the result of the request. */
 app.post('/addMessage', (req, res) => {
 	try {
 		// Gets current date and time and stores it in dateTime
@@ -237,7 +254,12 @@ app.post('/addMessage', (req, res) => {
 });
 
 
-// Adds a user to users and sends a JavaScript Web Token
+/** Attempts to add a new user to users with the details submitted in the request body,
+ * checking if the submitted email or username already exist in users. If successful,
+ * the submitted password is encrypted with 10 salt rounds, the user is added to users
+ * and a token is sent in the response to validate methods whilst the user is logged in.
+ * @return {JSON} HTTP code of response, 'status' (successful or unsuccessful),
+ * 'message' detailing the result of the request and 'token' (if successful) */
 app.post('/signUp', (req, res) => {
 	try {
 		// Gets username from HTML form
@@ -368,5 +390,5 @@ app.get('/signedIn', (req, res) => {
 
 // Listens on port 8090
 app.listen(process.env.PORT || 8090, () => {
-	console.log('> Listening on port' + process.env.PORT);
+	console.log('> Listening on port ' + (process.env.PORT || 8090));
 });
