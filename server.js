@@ -10,15 +10,15 @@ app.use(express.static('client'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-/** List to track all signed up users */
+/** Array to track all signed up users */
 let users = [];
 
 
-/** List to track all messages posted to the forum */
+/** Array to track all messages posted to the forum */
 let messages = [];
 
 
-/** List to track currently signed in users */
+/** Array to track currently signed in users */
 let signedIn = [];
 
 
@@ -121,7 +121,7 @@ app.post('/signOut', (req, res) => {
 			if (err) {
 				return res.status(500).json({status: 'unsuccessful', message: 'Failed to authenticate token.'});
 			}
-			// If token verified successfully, removes user from list of signed in users
+			// If token verified successfully, removes user from array of signed in users
 			signedIn.splice(signedIn.indexOf(user), 1);
 
 			// Logs to server that this user has logged out
@@ -207,7 +207,7 @@ app.post('/googleSignOut', (req, res) => {
 });
 
 
-/** Adds the message in the request body and its metadata to the list 'messages'.
+/** Adds the message in the request body and its metadata to the array 'messages'.
  * This method requires a valid token to be submitted in the header.
  * @return {JSON} HTTP code of response, 'status' (successful or unsuccessful)
  * and 'message' detailing the result of the request. */
@@ -324,7 +324,9 @@ app.post('/signUp', (req, res) => {
 });
 
 
-// Gets list of users. Requires token
+/** Gets array of all registered users. Expects token in header.
+ * @return {JSON} On failure: HTTP code of response, 'status' (unsuccessful)
+ * and 'message' detailing the error. On success: returns array users */
 app.get('/users', (req, res) => {
 	try {
 		// Tries to get token from header and checks if one has been provided
@@ -349,8 +351,11 @@ app.get('/users', (req, res) => {
 });
 
 
-// Gets list of messages
-// (does not require token as messages can be viewed without an account)
+/** Gets array of all submitted messages. Does not expect a token since
+ * messages can be viewed by all users regardless of whether they have
+ * an account.
+ * @return {JSON} On failure: HTTP code of response, 'status' (unsuccessful)
+ * and 'message' detailing the error. On success: returns array messages */
 app.get('/messages', (req, res) => {
 	try {
 		// Returns JSON content of variable messages
@@ -363,7 +368,9 @@ app.get('/messages', (req, res) => {
 });
 
 
-// Gets list of currently signed in users. Requires token
+/** Gets array of all currently signed in users. Expects token in header.
+ * @return {JSON} On failure: HTTP code of response, 'status' (unsuccessful)
+ * and 'message' detailing the error. On success: returns array signedIn */
 app.get('/signedIn', (req, res) => {
 	try {
 		// Tries to get token from header and checks if one has been provided
