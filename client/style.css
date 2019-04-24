@@ -146,6 +146,8 @@ input[type=text]:focus, input[type=password]:focus {
 .form-popup {
   text-align: center;
   overflow: auto;
+  width: 70%;
+  height: 80%;
 }
 
 .form-content {
