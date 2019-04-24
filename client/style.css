@@ -162,6 +162,17 @@ input[type=text]:focus, input[type=password]:focus {
 
 .form-buttons {
   text-align: center;
+  float: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.g-signin2{
+  width: 100%;
+}
+
+.g-signin2 > div{
+  margin: 0 auto;
 }
 
 .bottom {

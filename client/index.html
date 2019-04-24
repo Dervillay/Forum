@@ -94,12 +94,11 @@
             <label for="signInPassword">Password</label>
             <input id="signInPassword" name="signInPassword" type="password" placeholder="Enter password" class="p-2 round-corners form-input" required><br>
 
-            <div class="form-buttons container">
-              <div class="row">
-              <div id="googleSignIn" class="g-signin2 col-xs-6" data-onsuccess="googleSignIn" data-theme="dark"></div>
-              <button type="button" class="btn btn-primary col-xs-6" onclick="submitSignIn()">Sign In</button>
+              <div id="googleSignIn" class="g-signin2" data-onsuccess="googleSignIn" data-theme="dark"></div>
+              <div class="form-buttons container">
+                <button type="button" class="btn btn-primary" onclick="submitSignIn()">Sign In</button>
+                <button type="button" class="btn btn-secondary" onclick="closeSignIn()">Close</button>
               </div>
-              <button type="button" class="btn btn-secondary cancel" onclick="closeSignIn()">Close</button>
             </div>
           </div>
         </form>
