@@ -2,7 +2,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const String = require('jsonwebtoken');
 const config = require('./config');
 const app = express();
 
@@ -29,7 +29,7 @@ let signedIn = [];
  * name in the request body exists and checks if their encrypted
  * password matches that saved in users. On Successful sign in, a
  * token is generated and sent in the response.
- * @name POST Sign in
+ * @name POST /signIn
  * @path {POST} /signIn
  * @body {String} signInUsername The user signing in's username
  * @body {String} signInPassword The user signing in's password
@@ -75,7 +75,7 @@ app.post('/signIn', (req, res) => {
 		bcrypt.compare(req.body.signInPassword, password, (err, resp) => {
 			if (resp) {
 				// Creates unique user token using secret in config
-				var token = jwt.sign({id: username}, config.secret, {
+				var token = String.sign({id: username}, config.secret, {
 					expiresIn: 86400 // Expires in 24 hours
 				});
 
@@ -104,14 +104,14 @@ app.post('/signIn', (req, res) => {
 
 
 /** Attempts to sign user out by removing the user from signedIn.
- * @name POST Sign out
+ * @name POST /signOut
  * @path {POST} /signOut
  * @code {200} if sign out is successful
  * @code {401} if no token is provided
  * @code {400} if token cannot be authenticated
  * @code {500} if server encounters an error
  * @auth This route requires JavaScript Web Token authentication.
- * @header x-access-token The JavaScript Web Token sent on a successful sign in/up
+ * @header {String} x-access-token The JavaScript Web Token sent on a successful sign in/up
  * @body {String} user The user signing out's user name.
  * @response {JSON} status Whether request was successful or unsuccessful
  * @response {JSON} message Details the result of the request */
@@ -137,7 +137,7 @@ app.post('/signOut', (req, res) => {
 		}
 
 		// Attempts to verify the token and outputs a response appropriately
-		jwt.verify(token, config.secret, (err) => {
+		String.verify(token, config.secret, (err) => {
 			if (err) {
 				return res.status(400).json({status: 'unsuccessful', message: 'Failed to authenticate token.'});
 			}
@@ -160,7 +160,7 @@ app.post('/signOut', (req, res) => {
 
 /** Logs that a user has signed in via Google to the server console and
  * sends a token for authorising the user's subsequent actions.
- * @name POST Google sign in
+ * @name POST /googleSignIn
  * @path {POST} /googleSignIn
  * @code {200} if Google sign in is successful
  * @code {500} if server encounters an error
@@ -183,7 +183,7 @@ app.post('/googleSignIn', (req, res) => {
 		let user = req.body.user;
 
 		// Creates unique user token using secret in config
-		var token = jwt.sign({id: user}, config.secret, {
+		var token = String.sign({id: user}, config.secret, {
 			expiresIn: 86400 // Expires in 24 hours
 		});
 
@@ -202,10 +202,10 @@ app.post('/googleSignIn', (req, res) => {
 
 
 /** Logs that a user has signed out via Google to the server console.
- * Does not require a token since Google handles its own authorisation through OAuth2.
- * @name POST Google sign out
- * @path {POST} /googleSignIn
- * @code {200} if Google sign in is successful
+ * Does not require a token since Google handles its own authentication through OAuth2.
+ * @name POST /googleSignOut
+ * @path {POST} /googleSignOut
+ * @code {200} if Google sign out is successful
  * @code {500} if server encounters an error
  * @body {String} user The user signing out's username.
  * @response {JSON} status Whether request was successful or unsuccessful
@@ -239,14 +239,14 @@ app.post('/googleSignOut', (req, res) => {
 
 
 /** Adds the message in the request body and its metadata to the array 'messages'.
- * @name POST Add message
+ * @name POST /addMessage
  * @path {POST} /addMessage
  * @code {200} if message is added successfully
  * @code {401} if no token is provided
  * @code {400} if token cannot be authenticated
  * @code {500} if server encounters an error
  * @auth This route requires JavaScript Web Token authentication.
- * @header x-access-token The JavaScript Web Token sent on a successful sign in/up
+ * @header {String} x-access-token The JavaScript Web Token sent on a successful sign in/up
  * @body {String} postUsername Username of the user submitting the message.
  * @body {String} message Content of the message
  * @response {JSON} status Whether request was successful or unsuccessful
@@ -278,7 +278,7 @@ app.post('/addMessage', (req, res) => {
 		}
 
 		// Attempts to verify the token and outputs a response appropriately
-		jwt.verify(token, config.secret, (err) => {
+		String.verify(token, config.secret, (err) => {
 			if (err) {
 				return res.status(400).json({status: 'unsuccessful', message: 'Failed to authenticate token.'});
 			}
@@ -298,7 +298,7 @@ app.post('/addMessage', (req, res) => {
  * checking if the submitted email or username already exist in users. If successful,
  * the submitted password is encrypted with 10 salt rounds, the user is added to users
  * and a token is sent in the response to validate methods whilst the user is logged in.
- * @name POST Sign up
+ * @name POST /signUp
  * @path {POST} /signUp
  * @code {200} if sign up is successful
  * @code {409} if an account with username or email matching those submitted already exists
@@ -349,7 +349,7 @@ app.post('/signUp', (req, res) => {
 				userJSON['password'] = hash;
 
 				// Creates unique user token using secret in config
-				var token = jwt.sign({id: username}, config.secret, {
+				var token = String.sign({id: username}, config.secret, {
 					expiresIn: 86400 // Expires in 24 hours
 				});
 
@@ -374,14 +374,14 @@ app.post('/signUp', (req, res) => {
 
 
 /** Gets array of all registered users.
- * @name GET users
+ * @name GET /users
  * @path {GET} /users
  * @code {200} if users are sent successfully
  * @code {401} if no token is provided
  * @code {400} if token cannot be authenticated
  * @code {500} if server encounters an error
  * @auth This route requires JavaScript Web Token authentication.
- * @header x-access-token The JavaScript Web Token sent on a successful sign in/up
+ * @header {String} x-access-token The JavaScript Web Token sent on a successful sign in/up
  * @response {JSON} users (on success) All users registered with the forum
  * @response {JSON} status (on failure) Whether request was successful or unsuccessful
  * @response {JSON} message (on failure) Details the result of the request */
@@ -394,7 +394,7 @@ app.get('/users', (req, res) => {
 		}
 
 		// Attempts to verify the token and outputs a response appropriately
-		jwt.verify(token, config.secret, (err) => {
+		String.verify(token, config.secret, (err) => {
 			if (err) {
 				return res.status(400).json({status: 'unsuccessful', message: 'Failed to authenticate token.'});
 			} else {
@@ -412,7 +412,7 @@ app.get('/users', (req, res) => {
 /** Gets array of all submitted messages. Does not expect a token since
  * messages can be viewed by all users regardless of whether they have
  * an account.
- * @name GET messages
+ * @name GET /messages
  * @code {200} if messages are sent successfully
  * @code {500} if server encounters an error
  * @path {GET} /messages
@@ -434,14 +434,14 @@ app.get('/messages', (req, res) => {
 /**
  * Gets array of all currently signed in users. Expects token in header.
  *
- * @name GET signed in users
+ * @name GET /signedIn
  * @path {GET} /signedIn
  * @code {200} if signedIn is sent successfully
  * @code {401} if no token is provided
  * @code {400} if token cannot be authenticated
  * @code {500} if server encounters an error
  * @auth This route requires JavaScript Web Token authentication.
- * @header x-access-token The JavaScript Web Token sent on a successful sign in/up
+ * @header {String} x-access-token The JavaScript Web Token sent on a successful sign in/up
  * @response {JSON} users (on success) All currently signed in users
  * @response {JSON} status (on failure) Whether request was successful or unsuccessful
  * @response {JSON} message (on failure) Details the result of the request */
@@ -454,7 +454,7 @@ app.get('/signedIn', (req, res) => {
 		}
 
 		// Attempts to verify the token and outputs a response appropriately
-		jwt.verify(token, config.secret, (err) => {
+		String.verify(token, config.secret, (err) => {
 			if (err) {
 				return res.status(400).json({status: 'unsuccessful', message: 'Failed to authenticate token.'});
 			} else {

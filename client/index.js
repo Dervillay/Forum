@@ -11,9 +11,9 @@ setNavbarHeight();
  * Uses GET methods of server to receive current list of messages,
  * it then iterates through them and inserts them as posts
  * in index.html
- * @function refreshPage
+ * @function updatePage
  * @async */
-async function refreshPage() {
+async function updatePage() {
 	// Uses GET method 'messages' to receive list of messages
 	let messagesResponse = await fetch('./messages');
 
@@ -125,8 +125,8 @@ async function searchPage() {
  * verification (if it exists)
  * @async
  * @function addMessage
- * @param {String} user Name of user attempting to post the message taken from the welcome bar in index.html
- * @param {String} message Content of the message to post, taken from text area input of message pop-up  */
+ * @param {String} user Name of user attempting to post the message from index.html
+ * @param {String} message Content of the message to post, taken from text area input of message pop-up in index.html  */
 async function addMessage() {
 	// Gets currently logged in user's name and submitted message
 	let user = await document.getElementById('welcome').innerHTML.slice(29, -5);
@@ -155,7 +155,7 @@ async function addMessage() {
 			alert(view_data['message']);
 			closeMessageForm();
 			// Refreshes page to show message
-			refreshPage();
+			updatePage();
 		},
 		error: (error) => {
 			// If post was unsuccessful, shows reason for this in alert
@@ -196,7 +196,7 @@ function checkEmail() {
 /** Checks if password inputs in sign up
  * form are are matching and not blank
  * @function checkPassword
- * @return {Boolean} If passwords in password and confirmPassword fields of the sign up form match
+ * @return {Boolean} If passwords in password and confirmPassword fields of the sign up form are valid
  * @param {String} password Password taken from sign up form in index.html
  * @param {String} confirmPassword Confirmation password taken from sign up form in index.html */
 function checkPassword() {
@@ -295,7 +295,7 @@ async function submitSignIn() {
  * was successful
  * @function signOut
  * @async
- * @param {String} user Username of currently signed in user taken from welcome section in index.html */
+ * @param {String} user Username of currently signed in user from index.html */
 async function signOut() {
 	// Gets currently signed in user's username
 	let user = document.getElementById('welcome').innerHTML.slice(29, -6);
@@ -367,7 +367,7 @@ async function googleSignIn(googleUser) {
  * destroys currently held token
  * @function googleSignOut
  * @async
- * @param {String} user Username of currently signed in user taken from welcome section in index.html */
+ * @param {String} user Username of currently signed in user from index.html */
 async function googleSignOut() {
 	let auth2 = gapi.auth2.getAuthInstance();
 	auth2.signOut();
@@ -446,7 +446,7 @@ function closeMessageForm() {
  * navbar when a successful sign-in occurs. Takes
  * the user's username as a parameter to setup the
  * welcome bar at the top of the page
- * @param {String} - User attempting to log in's username
+ * @param {String} username user attempting to log in's username
  * @function successfulSignIn */
 function successfulSignIn(username) {
 	document.getElementById('signUpBar').style.display = 'none';
@@ -460,7 +460,7 @@ function successfulSignIn(username) {
  * navbar when a successful Google sign-in occurs. Takes
  * the user's username as a parameter to setup the
  * welcome bar at the top of the page
- * @param {String} - User attempting to log in's Google username
+ * @param {String} username user attempting to log in's Google username
  * @function successfulGoogleSignIn */
 function successfulGoogleSignIn(username) {
 	document.getElementById('welcome').innerHTML = '<h6 class="welcome">Welcome, ' + username + ' </h6>';
@@ -487,7 +487,7 @@ function successfulSignOut() {
  * using asynchronous function and token for verification
  * @function signOutOnRefresh
  * @async
- * @param {String} user Username of currently signed in user taken from welcome section in index.html */
+ * @param {String} user Username of currently signed in user from index.html */
 window.addEventListener('beforeunload', async () => {
 	// Gets signedIn from server using token
 	let signedInResponse = await fetch('./signedIn', {
