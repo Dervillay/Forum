@@ -4,7 +4,7 @@
   "description": "A dynamic forum web-site",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "node server.js",
     "pretest": "eslint server.js client/index.js"
   },
@@ -23,11 +23,15 @@
     "jsdoc-http-plugin": "^0.3.0"
   },
   "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "jest": "^24.7.1",
     "jsonwebtoken": "^8.5.1",
-    "standard": "^11.0.1"
+    "standard": "^11.0.1",
+    "superagent": "^5.0.2",
+    "supertest": "^4.0.2"
   }
 }
