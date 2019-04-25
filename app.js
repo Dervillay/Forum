@@ -12,17 +12,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 /** Array to track all signed up users
  * @name users*/
-let users = [];
-
+let users = [{ username: 'SampleUser',	email: 'sample@user.com', dateJoined: '01/01/2019', password:'$2a$10$.UL67koNiMxcpBp.fTC6J.KZy78V4ipd7uCdTa26uZ9jCLxU3MFbi' },
+	{ username: 'SampleUser2',	email: 'sample@user.com', dateJoined: '01/01/2019', password:'$2a$10$.UL67koNiMxcpBp.fTC6J.KZy78V4ipd7uCdTa26uZ9jCLxU3MFbi' }];
+// Passwords are encrypted form of 'password123'
+// Contains sample users for jest testing
 
 /** Array to track all messages posted to the forum
  * @name messages */
-let messages = [];
-
+let messages = [{postedBy: 'SampleUser', content: 'Welcome to Forum! This is a sample message.', datePosted: '01/01/2019'}];
+// Contains sample message for jest testing
 
 /** Array to track currently signed in users
  * @name signedIn*/
-let signedIn = [];
+let signedIn = ['SampleUser'];
 
 
 /** Attempts to sign a user in, checks if an account with the
