@@ -477,6 +477,7 @@ function successfulGoogleSignIn(username) {
 function successfulSignOut() {
 	document.getElementById('welcome').innerHTML = null;
 	document.getElementById('googleSignOut').style.display = 'none';
+	document.getElementById('messageForm').style.display = 'none';
 	document.getElementById('makePost').style.display= 'none';
 	document.getElementById('googleSignIn').style.display = 'block';
 	document.getElementById('signUpBar').style.display = 'block';
