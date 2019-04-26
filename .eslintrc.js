@@ -14,7 +14,9 @@ module.exports = {
 		'ecmaVersion': 2018
 	},
 	'globals': {
-		"gapi": true // Sets Google API (gapi) as a global to avoid undefined error
+		"gapi": true, // Sets Google API (gapi) as a global to avoid undefined error
+		"describe": true,
+		"test": true
 	},
 	'rules': {
 		'no-console':
