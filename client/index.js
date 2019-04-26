@@ -4,6 +4,9 @@
 */
 let token;
 
+// Variable to store whether errors have alreday been caught serverside
+let errorCaught;
+
 // Calls setNavbarHeight to begin loop
 setNavbarHeight();
 
@@ -14,44 +17,51 @@ setNavbarHeight();
  * @function updatePage
  * @async */
 async function updatePage() {
-	// Uses GET method 'messages' to receive list of messages
-	let messagesResponse = await fetch('./messages');
+	// Attempts to update the page
+	try {
+		// Uses GET method 'messages' to receive list of messages
+		let messagesResponse = await fetch('./messages');
 
-	// Gets JSON in response body and parses it
-	let messagesBody = await messagesResponse.text();
-	let messagesPost = JSON.parse(messagesBody);
+		// Gets JSON in response body and parses it
+		let messagesBody = await messagesResponse.text();
+		let messagesPost = JSON.parse(messagesBody);
 
-	// Only updates page with posts if they exist
-	if (messagesPost.length > 0) {
+		// Only updates page with posts if they exist
+		if (messagesPost.length > 0) {
 
-		// Creates <ul> tag with id 'posts' in main body of HTML
-		document.getElementById('content').innerHTML = '<ul id="posts">';
+			// Creates <ul> tag with id 'posts' in main body of HTML
+			document.getElementById('content').innerHTML = '<ul id="posts">';
 
-		// Iterates through users and messages and produces forum posts using their information
-		for (let i = 0; i < messagesPost.length; i++) {
-			document.getElementById('content').innerHTML +=
-      `
-      <li>
-      <a>
-      <div class="container-fluid">
-        <div class="jumbotron post p-3 parent">
-          <img src="images/default_user.jpeg" alt="user_icon" class="user">
-          <div class="child inline-block-child p-3">
-            <p>` + messagesPost[i]['postedBy'] + `</p>
-          </div>
-          <div class="child inline-block-child date-text p-3">
-            <p>Posted ` + messagesPost[i]['datePosted'] + `</p>
-          </div>
-          <div class="jumbotron comment p-3">
-            ` + messagesPost[i]['content'] + `
+			// Iterates through users and messages and produces forum posts using their information
+			for (let i = 0; i < messagesPost.length; i++) {
+				document.getElementById('content').innerHTML +=
+        `
+        <li>
+        <a>
+        <div class="container-fluid">
+          <div class="jumbotron post p-3 parent">
+            <img src="images/default_user.jpeg" alt="user_icon" class="user">
+            <div class="child inline-block-child p-3">
+              <p>` + messagesPost[i]['postedBy'] + `</p>
+            </div>
+            <div class="child inline-block-child date-text p-3">
+              <p>Posted ` + messagesPost[i]['datePosted'] + `</p>
+            </div>
+            <div class="jumbotron comment p-3">
+              ` + messagesPost[i]['content'] + `
+            </div>
           </div>
         </div>
-      </div>
-      </a>
-      </li>
-      `;
+        </a>
+        </li>
+        `;
+			}
+			document.getElementById('content').innerHTML += '</ul>';
 		}
-		document.getElementById('content').innerHTML += '</ul>';
+	}
+	// Catches errors that occur when server is down
+	catch (error) {
+		alert('Request failed. Server cannot be reached.');
 	}
 }
 
@@ -63,6 +73,7 @@ async function updatePage() {
  * @param {String} query Search query taken from search bar in index.html
  * @function searchPage */
 async function searchPage() {
+	// Sets query equal to text in search bar
 	let query = document.getElementById('search').value;
 
 	// Uses GET method 'messages' to receive list of messages
@@ -92,31 +103,35 @@ async function searchPage() {
 		for (let i = 0; i < matchingMessages.length; i++) {
 
 			document.getElementById('content').innerHTML +=
-      `
-      <li>
-      <a>
-      <div class="container-fluid">
-        <div class="jumbotron post p-3 parent">
-          <img src="images/default_user.jpeg" alt="user_icon" class="user">
-          <div class="child inline-block-child p-3">
-            <p>` + matchingMessages[i]['postedBy'] + `</p>
-          </div>
-          <div class="child inline-block-child date-text p-3">
-            <p>Posted ` + matchingMessages[i]['datePosted'] + `</p>
-          </div>
-          <div class="jumbotron comment p-3">
-            ` + matchingMessages[i]['content'] + `
+        `
+        <li>
+        <a>
+        <div class="container-fluid">
+          <div class="jumbotron post p-3 parent">
+            <img src="images/default_user.jpeg" alt="user_icon" class="user">
+            <div class="child inline-block-child p-3">
+              <p>` + matchingMessages[i]['postedBy'] + `</p>
+            </div>
+            <div class="child inline-block-child date-text p-3">
+              <p>Posted ` + matchingMessages[i]['datePosted'] + `</p>
+            </div>
+            <div class="jumbotron comment p-3">
+              ` + matchingMessages[i]['content'] + `
+            </div>
           </div>
         </div>
-      </div>
-      </a>
-      </li>
-      `;
+        </a>
+        </li>
+        `;
 		}
 		document.getElementById('content').innerHTML += '</ul>';
 	} else {
-		// Clears out message board area to show there were no matching results
-		document.getElementById('content').innerHTML = null;
+		document.getElementById('content').innerHTML =
+    `
+    <div class="p-10">
+      <h5 id="defaultText" class="m-10 default-text center-screen back">No posts were found matching your search :(</h5>
+    </div>
+    `;
 	}
 }
 
@@ -128,40 +143,51 @@ async function searchPage() {
  * @param {String} user Name of user attempting to post the message from index.html
  * @param {String} message Content of the message to post, taken from text area input of message pop-up in index.html  */
 async function addMessage() {
-	// Gets currently logged in user's name and submitted message
-	let user = await document.getElementById('welcome').innerHTML.slice(29, -5);
-	let message = await document.getElementById('message');
+	// Attempts to add user's message to message board
+	try {
+		// Gets currently logged in user's name and submitted message
+		let user = await document.getElementById('welcome').innerHTML.slice(29, -5);
+		let message = await document.getElementById('message');
 
-	// If message is empty, alerts user and returns
-	if (message.value == '') {
-		alert('Message cannot be empty.');
-		return;
-	}
-
-	// Uses post method addMessage to send message to the server with token for auth
-	await $.ajax({
-		type: 'POST',
-		url: './addMessage',
-		data: {postUsername: user, message: message.value},
-		dataType: 'json',
-		beforeSend: (request) => {
-			// Sends token only if it exists
-			if (token) {
-				request.setRequestHeader('x-access-token', token);
-			}
-		},
-		success: (view_data) => {
-			// If post was successful, closes sign up form, shows sign out button and alerts user
-			alert(view_data['message']);
-			closeMessageForm();
-			// Refreshes page to show message
-			updatePage();
-		},
-		error: (error) => {
-			// If post was unsuccessful, shows reason for this in alert
-			alert(error['responseJSON']['message']);
+		// If message is empty, alerts user and returns
+		if (message.value == '') {
+			alert('Message cannot be empty.');
+			return;
 		}
-	});
+
+		// Uses post method addMessage to send message to the server with token for auth
+		await $.ajax({
+			type: 'POST',
+			url: './addMessage',
+			data: {postUsername: user, message: message.value},
+			dataType: 'json',
+			beforeSend: (request) => {
+				// Sends token only if it exists
+				if (token) {
+					request.setRequestHeader('x-access-token', token);
+				}
+			},
+			success: (view_data) => {
+				// If post was successful, closes sign up form, shows sign out button and alerts user
+				alert(view_data['message']);
+				closeMessageForm();
+				// Refreshes page to show message
+				updatePage();
+			},
+			error: (error) => {
+				// If post was unsuccessful, shows reason for this in alert
+				alert(error['responseJSON']['message']);
+				errorCaught = true;
+			}
+		});
+	}
+	// Catches errors that occur when server is down
+	catch (error) {
+		if (!errorCaught) {
+			alert('Request failed. Server cannot be reached.');
+		}
+		errorCaught = false;
+	}
 }
 
 /** Checks if email inputs in sign up form are matching
@@ -239,24 +265,35 @@ async function submitSignUp() {
 		let password = document.getElementById('password');
 		let confirmPassword = document.getElementById('confirmPassword');
 
-		// Uses AJAX to post this data to the server and handles the response on success
-		await $.ajax({
-			type: 'POST',
-			url: './signUp',
-			data: {username: username.value, email: email.value, password: password.value},
-			dataType: 'json',
-			success: (view_data) => {
-				// If post was successful, closes sign up form, stores response token and alerts user
-				token = view_data['token'];
-				closeSignUp();
-				successfulSignIn(username.value);
-				alert(view_data['message']);
-			},
-			error: (error) => {
-				// If post was unsuccessful, shows reason for this in alert
-				alert(error['responseJSON']['message']);
+		// Tries to submit sign up form to server
+		try {
+			// Uses AJAX to post this data to the server and handles the response on success
+			await $.ajax({
+				type: 'POST',
+				url: './signUp',
+				data: {username: username.value, email: email.value, password: password.value},
+				dataType: 'json',
+				success: (view_data) => {
+					// If post was successful, closes sign up form, stores response token and alerts user
+					token = view_data['token'];
+					closeSignUp();
+					successfulSignIn(username.value);
+					alert(view_data['message']);
+				},
+				error: (error) => {
+					// If post was unsuccessful, shows reason for this in alert
+					alert(error['responseJSON']['message']);
+					errorCaught = true;
+				}
+			});
+		}
+		// Catches errors when server is down
+		catch (error) {
+			if (!errorCaught) {
+				alert('Request failed. Server cannot be reached.');
 			}
-		});
+			errorCaught = false;
+		}
 	}
 }
 
@@ -270,24 +307,36 @@ async function submitSignUp() {
 async function submitSignIn() {
 	let signInUsername = document.getElementById('signInUsername');
 	let signInPassword = document.getElementById('signInPassword');
-	// Submits form and informs user that the account creation was successful, then sets up page appropriately
-	await $.ajax({
-		type: 'POST',
-		url: './signIn',
-		data: {signInUsername: signInUsername.value, signInPassword: signInPassword.value},
-		dataType: 'json',
-		success: (view_data) => {
-			// If post was successful, closes sign up form, calls successful sign in and alerts user
-			token = view_data['token'];
-			closeSignIn();
-			successfulSignIn(signInUsername.value);
-			alert(view_data['message']);
-		},
-		error: (error) => {
-			// If post was unsuccessful, shows reason for this in alert
-			alert(error['responseJSON']['message']);
+
+	// Attempts to sign user in
+	try {
+		// Submits form and informs user that the account creation was successful, then sets up page appropriately
+		await $.ajax({
+			type: 'POST',
+			url: './signIn',
+			data: {signInUsername: signInUsername.value, signInPassword: signInPassword.value},
+			dataType: 'json',
+			success: (view_data) => {
+				// If post was successful, closes sign up form, calls successful sign in and alerts user
+				token = view_data['token'];
+				closeSignIn();
+				successfulSignIn(signInUsername.value);
+				alert(view_data['message']);
+			},
+			error: (error) => {
+				// If post was unsuccessful, shows reason for this in alert
+				alert(error['responseJSON']['message']);
+				errorCaught = true;
+			}
+		});
+	}
+	// Catches errors if the server is down
+	catch (error) {
+		if (!errorCaught) {
+			alert('Request failed. Server cannot be reached.');
 		}
-	});
+		errorCaught = false;
+	}
 }
 
 /** Asynchronously calls post method signOut, sends verification token
@@ -300,33 +349,39 @@ async function signOut() {
 	// Gets currently signed in user's username
 	let user = document.getElementById('welcome').innerHTML.slice(29, -6);
 
-	// Uses AJAX to sign out using token for auth
-	await $.ajax({
-		type: 'POST',
-		url: './signOut',
-		data: {user: user},
-		dataType: 'json',
-		beforeSend: (request) => {
-			// Sends token only if it exists
-			if (token) {
-				request.setRequestHeader('x-access-token', token);
-			}
-		},
-		success: (view_data) => {
-			// Destroys token to prevent protected methods from being called whilst logged out
-			token = null;
-			alert(view_data['message']);
-		},
-		error: (error) => {
-			// If post was unsuccessful, shows reason for this in alert
-			if (error) {
-				console.log(error);
+	// Attempts to sign the user out
+	try {
+		// Uses AJAX to sign out using token for auth
+		await $.ajax({
+			type: 'POST',
+			url: './signOut',
+			data: {user: user},
+			dataType: 'json',
+			beforeSend: (request) => {
+				// Sends token only if it exists
+				if (token) {
+					request.setRequestHeader('x-access-token', token);
+				}
+			},
+			success: (view_data) => {
+				// Destroys token to prevent protected methods from being called whilst logged out
+				token = null;
+				alert(view_data['message']);
+			},
+			error: (error) => {
+				// If post was unsuccessful, shows reason for this in alert
 				alert(error['responseJSON']['message']);
-			} else {
-				alert('Connection to the server lost. Please restarting the server and try again.');
+				errorCaught = true;
 			}
+		});
+	}
+	// Catches any errors if the server is down
+	catch (error) {
+		if (!errorCaught) {
+			alert('Request failed. Server cannot be reached.');
 		}
-	});
+		errorCaught = false;
+	}
 	// Adjusts the HTML page to inform user of successful sign out
 	successfulSignOut();
 
@@ -339,27 +394,38 @@ async function signOut() {
  * @async
  * @param {Object} googleUser - Passed in by Google API on sign in via HTML page */
 async function googleSignIn(googleUser) {
-	let profile = googleUser.getBasicProfile();
-	let id_token = googleUser.getAuthResponse().id_token;
+	// Attempts to sign the user in via Google
+	try {
+		// Signs user into Google
+		let profile = googleUser.getBasicProfile();
+		let id_token = googleUser.getAuthResponse().id_token;
 
-	// Signs user into server using ajax method
-	await $.ajax({
-		type: 'POST',
-		url: './googleSignIn',
-		data: {user: profile.getName()},
-		dataType: 'json',
-		success: (view_data) => {
-			token = view_data['token'];
-			alert(view_data['message']);
-		},
-		error: (error) => {
-			// If post was unsuccessful, shows reason for this in alert
-			alert(error['responseJSON']['message']);
+		// Signs user into server using ajax method
+		await $.ajax({
+			type: 'POST',
+			url: './googleSignIn',
+			data: {user: profile.getName()},
+			dataType: 'json',
+			success: (view_data) => {
+				token = view_data['token'];
+				alert(view_data['message']);
+				// Sets up items in navbar to inform user they are signed in
+				successfulGoogleSignIn(profile.getName());
+			},
+			error: (error) => {
+				// If post was unsuccessful, shows reason for this in alert
+				alert(error['responseJSON']['message']);
+				errorCaught = true;
+			}
+		});
+	}
+	// Catches any errors if the server is down
+	catch (error) {
+		if (!errorCaught) {
+			alert('Request failed. Server cannot be reached.');
 		}
-	});
-
-	// Sets up items in navbar to inform user they are signed in
-	successfulGoogleSignIn(profile.getName());
+		errorCaught = false;
+	}
 }
 
 /** Asynchronously signs user out via Google, hides the
@@ -369,29 +435,41 @@ async function googleSignIn(googleUser) {
  * @async
  * @param {String} user Username of currently signed in user from index.html */
 async function googleSignOut() {
-	let auth2 = gapi.auth2.getAuthInstance();
-	auth2.signOut();
-
 	// Gets currently signed in user's username
 	let user = document.getElementById('welcome').innerHTML.slice(29, -6);
 
-	// Signs user out from server using ajax method
-	await $.ajax({
-		type: 'POST',
-		url: './googleSignOut',
-		data: {user: user},
-		dataType: 'json',
-		success: (view_data) => {
-			// Destroys token to prevent protected methods from being called whilst logged out
-			token = null;
-			successfulSignOut();
-			alert(view_data['message']);
-		},
-		error: (error) => {
-			// If post was unsuccessful, shows reason for this in alert
-			alert(error['responseJSON']['message']);
+	// Attempts to sign user out via Google
+	try {
+		// Signs user out via Google
+		let auth2 = gapi.auth2.getAuthInstance();
+		auth2.signOut();
+
+		// Signs user out from server using ajax method
+		await $.ajax({
+			type: 'POST',
+			url: './googleSignOut',
+			data: {user: user},
+			dataType: 'json',
+			success: (view_data) => {
+				// Destroys token to prevent protected methods from being called whilst logged out
+				token = null;
+				successfulSignOut();
+				alert(view_data['message']);
+			},
+			error: (error) => {
+				// If post was unsuccessful, shows reason for this in alert
+				alert(error['responseJSON']['message']);
+				errorCaught = true;
+			}
+		});
+	}
+	// Catches errors if server is down
+	catch (error) {
+		if (!errorCaught) {
+			alert('Request failed. Server cannot be reached.');
 		}
-	});
+		errorCaught = false;
+	}
 }
 
 
@@ -490,44 +568,55 @@ function successfulSignOut() {
  * @async
  * @param {String} user Username of currently signed in user from index.html */
 window.addEventListener('beforeunload', async () => {
-	// Gets signedIn from server using token
-	let signedInResponse = await fetch('./signedIn', {
-		method: 'GET',
-		headers: {
-			'x-access-token': token
-		}
-	});
-	// Parses server response
-	let signedInBody = await signedInResponse.text();
-	let signedInPost = JSON.parse(signedInBody);
-
-	// Finds currently logged in user's username
-	let user = await document.getElementById('welcome').innerHTML.slice(29, -5);
-
-	// Checks if user is already signed in
-	if (signedInPost.includes(user)) {
-		// Calls get method signOut with user in body and token for authentication
-		await $.ajax({
-			type: 'POST',
-			url: './signOut',
-			data: {user: user},
-			dataType: 'json',
-			beforeSend: (request) => {
-				// Sends token only if it exists
-				if (token) {
-					request.setRequestHeader('x-access-token', token);
-				}
-			},
-			success: (view_data) => {
-				// Destroys token to prevent protected methods from being called whilst logged out
-				token = null;
-				alert(view_data['message']);
-			},
-			error: (error) => {
-				// If post was unsuccessful, shows reason for this in alert
-				alert(error['responseJSON']['message']);
+	// Attempts to log user out on page refresh
+	try {
+		// Gets signedIn from server using token
+		let signedInResponse = await fetch('./signedIn', {
+			method: 'GET',
+			headers: {
+				'x-access-token': token
 			}
 		});
+		// Parses server response
+		let signedInBody = await signedInResponse.text();
+		let signedInPost = JSON.parse(signedInBody);
+
+		// Finds currently logged in user's username
+		let user = await document.getElementById('welcome').innerHTML.slice(29, -5);
+
+		// Checks if user is already signed in
+		if (signedInPost.includes(user)) {
+			// Calls get method signOut with user in body and token for authentication
+			await $.ajax({
+				type: 'POST',
+				url: './signOut',
+				data: {user: user},
+				dataType: 'json',
+				beforeSend: (request) => {
+					// Sends token only if it exists
+					if (token) {
+						request.setRequestHeader('x-access-token', token);
+					}
+				},
+				success: (view_data) => {
+					// Destroys token to prevent protected methods from being called whilst logged out
+					token = null;
+					alert(view_data['message']);
+				},
+				error: (error) => {
+					// If post was unsuccessful, shows reason for this in alert
+					alert(error['responseJSON']['message']);
+					errorCaught = true;
+				}
+			});
+		}
+	}
+	// Catches errors that occur when server is down
+	catch (error) {
+		if (!errorCaught) {
+			alert('Unable to sign out on refresh. Either user was not logged in or server connection failed.');
+		}
+		errorCaught = false;
 	}
 });
 
