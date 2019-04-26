@@ -1,9 +1,21 @@
-'use strict';
-
 const request = require('supertest');
 const app = require('./app.js');
 
 let token;
+
+function validToken(res) {
+	const token = res.body.token;
+
+	// Checks token is of type string
+	if (typeof token !== 'string') {
+		throw new Error('not a string');
+	}
+
+	// Checks token isn't empty
+	if (token === '') {
+		throw new Error('token should not be empty');
+	}
+}
 
 // Tests POST /signIn
 describe('Test /signIn route', () => {
@@ -40,6 +52,23 @@ describe('Test /signIn route', () => {
 				token = res.body.token;
 			})
 			.expect(200);
+	});
+
+
+	test('POST /signIn returns JSON', () => {
+		const params = {signInUsername: 'SampleUser2', signInPassword: 'password123'};
+		return request(app)
+			.post('/signIn')
+			.send(params)
+			.expect('Content-type', /json/);
+	});
+
+	test('POST /signIn returns valid token', () => {
+		const params = {signInUsername: 'SampleUser3', signInPassword: 'password123'};
+		return request(app)
+			.post('/signIn')
+			.send(params)
+			.expect(validToken);
 	});
 });
 
@@ -83,6 +112,22 @@ describe('Test /googleSignIn route', () => {
 			.send(params)
 			.expect(200);
 	});
+
+	test('POST /googleSignIn returns JSON', () => {
+		const params = {user: 'SampleUser'};
+		return request(app)
+			.post('/googleSignIn')
+			.send(params)
+			.expect('Content-type', /json/);
+	});
+
+	test('POST /googleSignIn returns valid token', () => {
+		const params = {user: 'SampleUser'};
+		return request(app)
+			.post('/googleSignIn')
+			.send(params)
+			.expect(validToken);
+	});
 });
 
 // Tests POST /googleSignOut
@@ -93,6 +138,14 @@ describe('Test /googleSignOut route', () => {
 			.post('/googleSignOut')
 			.send(params)
 			.expect(200);
+	});
+
+	test('POST /googleSignOut returns JSON', () => {
+		const params = {user: 'SampleUser'};
+		return request(app)
+			.post('/googleSignOut')
+			.send(params)
+			.expect('Content-type', /json/);
 	});
 });
 
@@ -125,6 +178,16 @@ describe('Test /addMessage route', () => {
 			.set(header)
 			.expect(200);
 	});
+
+	test('POST /addMessage returns JSON', () => {
+		const params = {postedBy: 'SampleUser', content: 'Jest test message.', datePosted: '1/01/2019'};
+		const header = {'x-access-token': token};
+		return request(app)
+			.post('/addMessage')
+			.send(params)
+			.set(header)
+			.expect('Content-type', /json/);
+	});
 });
 
 // Tests POST /signUp
@@ -138,11 +201,27 @@ describe('Test /signUp route', () => {
 	});
 
 	test('POST /signUp succeeds', () => {
-		const params = {username: 'SampleUser3', email: 'sample@user3.com', password: 'password123'};
+		const params = {username: 'SampleUser4', email: 'sample@user4.com', password: 'password123'};
 		return request(app)
 			.post('/signUp')
 			.send(params)
 			.expect(200);
+	});
+
+	test('POST /signUp returns JSON', () => {
+		const params = {username: 'SampleUser', email: 'sample@user.com', password: 'password123'};
+		return request(app)
+			.post('/signUp')
+			.send(params)
+			.expect('Content-type', /json/);
+	});
+
+	test('POST /signUp returns valid token', () => {
+		const params = {username: 'SampleUser5', email: 'sample@user5.com', password: 'password123'};
+		return request(app)
+			.post('/signUp')
+			.send(params)
+			.expect(validToken);
 	});
 });
 
