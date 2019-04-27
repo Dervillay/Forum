@@ -52,3 +52,5 @@ At any point, whether logged in or not, a user may use the search bar to narrow 
 - A secret for generating JavaScript Web Tokens has been included in the config.js file. This is not standard procedure, as typically secrets are stored locally, away from users and are just that, secret. The inclusion of this secret is just for demonstration purposes and to allow an instance of Forum to run using tokens.
 
 - The Google sign in client ID has been removed from the local version since a.) It is against Google's terms and services to disclose it, and b.) the Google sign in feature does not work when running the Forum service locally. To combat this, the fully working implementation with Google sign in has been provided in the online verison [here](https://forumprogproject.herokuapp.com).
+
+- Jest tests cover approximately 92% of the server's responses, those that are not covered are internal server errors (HTTP code 500), which cannot be tested through jest.
