@@ -156,30 +156,28 @@ async function addMessage() {
 		}
 
 		// Uses post method addMessage to send message to the server with token for auth
-		await $.ajax({
-			type: 'POST',
-			url: './addMessage',
-			data: {postUsername: user, message: message.value},
-			dataType: 'json',
-			beforeSend: (request) => {
-				// Sends token only if it exists
-				if (token) {
-					request.setRequestHeader('x-access-token', token);
-				}
+		await fetch('./addMessage', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token
 			},
-			success: (view_data) => {
+			body: JSON.stringify({
+				postUsername: user,
+				message: message.value
+			})
+		}).then(res => res.json())
+			.then(response => {
 				// If post was successful, closes sign up form, shows sign out button and alerts user
-				alert(view_data['message']);
+				alert(response['message']);
 				closeMessageForm();
 				// Refreshes page to show message
 				updatePage();
-			},
-			error: (error) => {
-				// If post was unsuccessful, shows reason for this in alert
+			}).catch(error => {
+				// If an error occurs, shows reason for this in alert
 				alert(error['responseJSON']['message']);
 				errorCaught = true;
-			}
-		});
+			});
 	}
 	// Catches errors that occur when server is down
 	catch (error) {
@@ -267,32 +265,37 @@ async function submitSignUp() {
 
 		// Tries to submit sign up form to server
 		try {
-			// Uses AJAX to post this data to the server and handles the response on success
-			await $.ajax({
-				type: 'POST',
-				url: './signUp',
-				data: {username: username.value, email: email.value, password: password.value},
-				dataType: 'json',
-				success: (view_data) => {
-					// If post was successful, closes sign up form, stores response token and alerts user
-					token = view_data['token'];
-					closeSignUp();
-					successfulSignIn(username.value);
-					alert(view_data['message']);
+			// Uses post method /signUp to submit sign up form to the server
+			await fetch('./signUp', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
 				},
-				error: (error) => {
-					// If post was unsuccessful, shows reason for this in alert
+				body: JSON.stringify({
+					username: username.value,
+					email: email.value,
+					password: password.value
+				})
+			}).then(res => res.json())
+				.then(response => {
+					// If post was successful, closes sign up form, stores response token and alerts user
+					if (response['status'] == 'success') {
+						token = response['token'];
+						closeSignUp();
+						successfulSignIn(username.value);
+						alert(response['message']);
+						// Else, informs user why post wasn't successful
+					} else {
+						alert(response['message']);
+					}
+				}).catch(error => {
+					// If an error occurs, shows reason for this in alert
 					alert(error['responseJSON']['message']);
-					errorCaught = true;
-				}
-			});
+				});
 		}
 		// Catches errors when server is down
 		catch (error) {
-			if (!errorCaught) {
-				alert('Request failed. Server cannot be reached.');
-			}
-			errorCaught = false;
+			alert('Request failed. Server cannot be reached.');
 		}
 	}
 }
@@ -311,31 +314,35 @@ async function submitSignIn() {
 	// Attempts to sign user in
 	try {
 		// Submits form and informs user that the account creation was successful, then sets up page appropriately
-		await $.ajax({
-			type: 'POST',
-			url: './signIn',
-			data: {signInUsername: signInUsername.value, signInPassword: signInPassword.value},
-			dataType: 'json',
-			success: (view_data) => {
-				// If post was successful, closes sign up form, calls successful sign in and alerts user
-				token = view_data['token'];
-				closeSignIn();
-				successfulSignIn(signInUsername.value);
-				alert(view_data['message']);
+		await fetch('./signIn', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
 			},
-			error: (error) => {
-				// If post was unsuccessful, shows reason for this in alert
+			body: JSON.stringify({
+				signInUsername: signInUsername.value,
+				signInPassword: signInPassword.value
+			})
+		}).then(res => res.json())
+			.then(response => {
+				// If post was successful, closes sign up form, stores response token and alerts user
+				if (response['status'] == 'success') {
+					token = response['token'];
+					closeSignIn();
+					successfulSignIn(signInUsername.value);
+					alert(response['message']);
+					// Else, informs user why post wasn't successful
+				} else {
+					alert(response['message']);
+				}
+			}).catch(error => {
+				// If an error occurs, shows reason for this in alert
 				alert(error['responseJSON']['message']);
-				errorCaught = true;
-			}
-		});
+			});
 	}
 	// Catches errors if the server is down
 	catch (error) {
-		if (!errorCaught) {
-			alert('Request failed. Server cannot be reached.');
-		}
-		errorCaught = false;
+		alert('Request failed. Server cannot be reached.');
 	}
 }
 
@@ -351,36 +358,34 @@ async function signOut() {
 
 	// Attempts to sign the user out
 	try {
-		// Uses AJAX to sign out using token for auth
-		await $.ajax({
-			type: 'POST',
-			url: './signOut',
-			data: {user: user},
-			dataType: 'json',
-			beforeSend: (request) => {
-				// Sends token only if it exists
-				if (token) {
-					request.setRequestHeader('x-access-token', token);
+		// Signs user out using token for auth
+		await fetch('./signOut', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token
+			},
+			body: JSON.stringify({
+				user: user
+			})
+		}).then(res => res.json())
+			.then(response => {
+				// If post was successful, closes sign up form, stores response token and alerts user
+				if (response['status'] == 'success') {
+					token = null;
+					alert(response['message']);
+					// Else, informs user why post wasn't successful
+				} else {
+					alert(response['message']);
 				}
-			},
-			success: (view_data) => {
-				// Destroys token to prevent protected methods from being called whilst logged out
-				token = null;
-				alert(view_data['message']);
-			},
-			error: (error) => {
-				// If post was unsuccessful, shows reason for this in alert
+			}).catch(error => {
+				// If an error occurs, shows reason for this in alert
 				alert(error['responseJSON']['message']);
-				errorCaught = true;
-			}
-		});
+			});
 	}
 	// Catches any errors if the server is down
 	catch (error) {
-		if (!errorCaught) {
-			alert('Request failed. Server cannot be reached.');
-		}
-		errorCaught = false;
+		alert('Request failed. Server cannot be reached.');
 	}
 	// Adjusts the HTML page to inform user of successful sign out
 	successfulSignOut();
@@ -400,31 +405,34 @@ async function googleSignIn(googleUser) {
 		let profile = googleUser.getBasicProfile();
 		let id_token = googleUser.getAuthResponse().id_token;
 
-		// Signs user into server using ajax method
-		await $.ajax({
-			type: 'POST',
-			url: './googleSignIn',
-			data: {user: profile.getName()},
-			dataType: 'json',
-			success: (view_data) => {
-				token = view_data['token'];
-				alert(view_data['message']);
-				// Sets up items in navbar to inform user they are signed in
-				successfulGoogleSignIn(profile.getName());
+		// Signs user into server
+		await fetch('./googleSignIn', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
 			},
-			error: (error) => {
-				// If post was unsuccessful, shows reason for this in alert
+			body: JSON.stringify({
+				user: profile.getName()
+			})
+		}).then(res => res.json())
+			.then(response => {
+				// If post was successful, closes sign up form, stores response token and alerts user
+				if (response['status'] == 'success') {
+					token = response['token'];
+					alert(response['message']);
+					successfulGoogleSignIn(profile.getName());
+					// Else, informs user why post wasn't successful
+				} else {
+					alert(response['message']);
+				}
+			}).catch(error => {
+				// If an error occurs, shows reason for this in alert
 				alert(error['responseJSON']['message']);
-				errorCaught = true;
-			}
-		});
+			});
 	}
 	// Catches any errors if the server is down
 	catch (error) {
-		if (!errorCaught) {
-			alert('Request failed. Server cannot be reached.');
-		}
-		errorCaught = false;
+		alert('Request failed. Server cannot be reached.');
 	}
 }
 
@@ -444,31 +452,34 @@ async function googleSignOut() {
 		let auth2 = gapi.auth2.getAuthInstance();
 		auth2.signOut();
 
-		// Signs user out from server using ajax method
-		await $.ajax({
-			type: 'POST',
-			url: './googleSignOut',
-			data: {user: user},
-			dataType: 'json',
-			success: (view_data) => {
-				// Destroys token to prevent protected methods from being called whilst logged out
-				token = null;
-				successfulSignOut();
-				alert(view_data['message']);
+		// Signs user out from server
+		await fetch('./googleSignOut', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
 			},
-			error: (error) => {
-				// If post was unsuccessful, shows reason for this in alert
+			body: JSON.stringify({
+				user: user
+			})
+		}).then(res => res.json())
+			.then(response => {
+				// If post was successful, closes sign up form, stores response token and alerts user
+				if (response['status'] == 'success') {
+					token = null;
+					successfulSignOut();
+					alert(response['message']);
+					// Else, informs user why post wasn't successful
+				} else {
+					alert(response['message']);
+				}
+			}).catch(error => {
+				// If an error occurs, shows reason for this in alert
 				alert(error['responseJSON']['message']);
-				errorCaught = true;
-			}
-		});
+			});
 	}
 	// Catches errors if server is down
 	catch (error) {
-		if (!errorCaught) {
-			alert('Request failed. Server cannot be reached.');
-		}
-		errorCaught = false;
+		alert('Request failed. Server cannot be reached.');
 	}
 }
 
@@ -586,37 +597,35 @@ window.addEventListener('beforeunload', async () => {
 
 		// Checks if user is already signed in
 		if (signedInPost.includes(user)) {
-			// Calls get method signOut with user in body and token for authentication
-			await $.ajax({
-				type: 'POST',
-				url: './signOut',
-				data: {user: user},
-				dataType: 'json',
-				beforeSend: (request) => {
-					// Sends token only if it exists
-					if (token) {
-						request.setRequestHeader('x-access-token', token);
+			// Calls post method signOut with token for auth
+			await fetch('./signOut', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'x-access-token': token
+				},
+				body: JSON.stringify({
+					user: user
+				})
+			}).then(res => res.json())
+				.then(response => {
+					// If post was successful, closes sign up form, stores response token and alerts user
+					if (response['status'] == 'success') {
+						token = null;
+						alert(response['message']);
+						// Else, informs user why post wasn't successful
+					} else {
+						alert(response['message']);
 					}
-				},
-				success: (view_data) => {
-					// Destroys token to prevent protected methods from being called whilst logged out
-					token = null;
-					alert(view_data['message']);
-				},
-				error: (error) => {
-					// If post was unsuccessful, shows reason for this in alert
+				}).catch(error => {
+					// If an error occurs, shows reason for this in alert
 					alert(error['responseJSON']['message']);
-					errorCaught = true;
-				}
-			});
+				});
 		}
 	}
 	// Catches errors that occur when server is down
 	catch (error) {
-		if (!errorCaught) {
-			alert('Unable to sign out on refresh. Either user was not logged in or server connection failed.');
-		}
-		errorCaught = false;
+		alert('Unable to sign out on refresh. Either user was not logged in or server connection failed.');
 	}
 });
 
