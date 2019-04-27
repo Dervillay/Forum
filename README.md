@@ -19,6 +19,8 @@ At any point, whether logged in or not, a user may use the search bar to narrow 
 ## Features
 - Google sign in compatability (online version only).
 
+- Forum scales dynamically to a range of viewport sizes and phone displays, making it mobile-friendly.
+
 - JavaScript Web Token authentication (users are sent tokens on sign in/sign up that last 24 hours, authorising them to make posts and get information about users and messages via requests to the API).
 
 - Welcome bar adapts to each individual user, whether signed in via Google or regularly.
