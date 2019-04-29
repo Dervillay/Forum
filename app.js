@@ -429,42 +429,9 @@ app.get('/users/:username?', (req, res) => {
 	}
 });
 
-// app.get('/users/:username', (req, res) => {
-// 	try {
-// 		// Tries to get token from header and checks if one has been provided
-// 		var token = req.headers['x-access-token'];
-// 		if (!token) {
-// 			return res.status(401).json({status: 'unsuccessful', message: 'No token provided.'});
-// 		}
-//
-// 		// Attempts to verify the token and outputs a response appropriately
-// 		jwt.verify(token, config.secret, (err) => {
-// 			if (err) {
-// 				return res.status(400).json({status: 'unsuccessful', message: 'Failed to authenticate token.'});
-// 			} else {
-// 				for (let i = 0; i < users.length; i++) {
-// 					if (users[i]['username'] == req.params.username) {
-// 						// Returns user information without their password
-// 						let user = users[i];
-// 						delete user['password'];
-// 						return res.status(200).json(user);
-// 					}
-// 				}
-// 				// Returns that user does not exist if they cannot be found
-// 				return res.status(404).json({status: 'unsuccessful', message: 'Specified user does not exist.'});
-// 			}
-// 		});
-// 	}
-// 	// Catches server errors and sends appropriate response
-// 	catch (error) {
-// 		return res.status(500).json({status: 'unsuccessful', message: 'Unable to get users. The server encountered an error.'});
-// 	}
-// });
-
-
-/** Gets array of all submitted messages. Does not expect a token since
- * messages can be viewed by all users regardless of whether they have
- * an account.
+/** Gets all messages submitted by a user if a username is specified, otherwise
+ * resturns a lits of all submitted messages. Does not expect a token since
+ * messages can be viewed by all users regardless of whether they have an account.
  * @name GET /messages
  * @code {200} if messages are sent successfully
  * @code {404} if no user matching username can be found
