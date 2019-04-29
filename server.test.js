@@ -241,7 +241,23 @@ describe('Test /users route', () => {
 			.expect(400);
 	});
 
-	test('GET /users succeeds', () => {
+	test('GET /users/:username? fails to find a non-existent user', () => {
+		const header = {'x-access-token': token};
+		return request(app)
+			.get('/users/FakeUser')
+			.set(header)
+			.expect(404);
+	});
+
+	test('GET /users/:username? succeeds in finding a specified user', () => {
+		const header = {'x-access-token': token};
+		return request(app)
+			.get('/users/SampleUser')
+			.set(header)
+			.expect(200);
+	});
+
+	test('GET /users succeeds in returning all users', () => {
 		const header = {'x-access-token': token};
 		return request(app)
 			.get('/users')
@@ -260,6 +276,18 @@ describe('Test /users route', () => {
 
 // Tests GET /messages
 describe('Test /messages route', () => {
+	test('GET /messages/:username? fails to find a non-existent user', () => {
+		return request(app)
+			.get('/messages/SampleUser6')
+			.expect(404);
+	});
+
+	test('GET /messages/:username? succeeds in finding a specified user', () => {
+		return request(app)
+			.get('/messages/SampleUser')
+			.expect(200);
+	});
+
 	test('GET /messages succeeds', () => {
 		return request(app)
 			.get('/messages')
