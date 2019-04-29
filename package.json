@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "start": "node server.js",
-    "pretest": "eslint server.js app.js client/index.js"
+    "pretest": "eslint server.js app.js app.test.js client/index.js"
   },
   "repository": {
     "type": "git",
