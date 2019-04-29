@@ -376,19 +376,23 @@ app.post('/signUp', (req, res) => {
 });
 
 
-/** Gets array of all registered users.
+/** Takes an optional parameter username, returning the information of the specified user,
+ * or if unspecified, the information of all users.
  * @name GET /users
- * @path {GET} /users
+ * @path {GET} /users/:username?
  * @code {200} if users are sent successfully
  * @code {401} if no token is provided
  * @code {400} if token cannot be authenticated
+ * @code {404} if a specified user cannot be found
  * @code {500} if server encounters an error
- * @auth This route requires JavaScript Web Token authentication.
+ * @param {String} username (optional) Gets all information about a user except their password
+ * @auth This route requires JavaScript Web Token authentication
  * @header {String} x-access-token The JavaScript Web Token sent on a successful sign in/up
  * @response {JSON} users (on success) All users registered with the forum
+ * @response {JSON} user (on success if parameter specified) Information of specified user
  * @response {JSON} status (on failure) Whether request was successful or unsuccessful
  * @response {JSON} message (on failure) Details the result of the request */
-app.get('/users', (req, res) => {
+app.get('/users/:username?', (req, res) => {
 	try {
 		// Tries to get token from header and checks if one has been provided
 		var token = req.headers['x-access-token'];
@@ -401,7 +405,21 @@ app.get('/users', (req, res) => {
 			if (err) {
 				return res.status(400).json({status: 'unsuccessful', message: 'Failed to authenticate token.'});
 			} else {
-				return res.status(200).json(users);
+				if (req.params.username) {
+					for (let i = 0; i < users.length; i++) {
+						if (users[i]['username'] == req.params.username) {
+							// Returns user information without their password
+							let user = users[i];
+							delete user['password'];
+							return res.status(200).json(user);
+						}
+					}
+					// Returns that user does not exist if they cannot be found
+					return res.status(404).json({status: 'unsuccessful', message: 'Specified user does not exist.'});
+				} else {
+					// If no parameter specified, returns full list of users
+					return res.status(200).json(users);
+				}
 			}
 		});
 	}
@@ -410,6 +428,38 @@ app.get('/users', (req, res) => {
 		return res.status(500).json({status: 'unsuccessful', message: 'Unable to get users. The server encountered an error.'});
 	}
 });
+
+// app.get('/users/:username', (req, res) => {
+// 	try {
+// 		// Tries to get token from header and checks if one has been provided
+// 		var token = req.headers['x-access-token'];
+// 		if (!token) {
+// 			return res.status(401).json({status: 'unsuccessful', message: 'No token provided.'});
+// 		}
+//
+// 		// Attempts to verify the token and outputs a response appropriately
+// 		jwt.verify(token, config.secret, (err) => {
+// 			if (err) {
+// 				return res.status(400).json({status: 'unsuccessful', message: 'Failed to authenticate token.'});
+// 			} else {
+// 				for (let i = 0; i < users.length; i++) {
+// 					if (users[i]['username'] == req.params.username) {
+// 						// Returns user information without their password
+// 						let user = users[i];
+// 						delete user['password'];
+// 						return res.status(200).json(user);
+// 					}
+// 				}
+// 				// Returns that user does not exist if they cannot be found
+// 				return res.status(404).json({status: 'unsuccessful', message: 'Specified user does not exist.'});
+// 			}
+// 		});
+// 	}
+// 	// Catches server errors and sends appropriate response
+// 	catch (error) {
+// 		return res.status(500).json({status: 'unsuccessful', message: 'Unable to get users. The server encountered an error.'});
+// 	}
+// });
 
 
 /** Gets array of all submitted messages. Does not expect a token since
