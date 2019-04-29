@@ -467,15 +467,48 @@ app.get('/users/:username?', (req, res) => {
  * an account.
  * @name GET /messages
  * @code {200} if messages are sent successfully
+ * @code {404} if no user matching username can be found
  * @code {500} if server encounters an error
- * @path {GET} /messages
+ * @path {GET} /messages/:username?
+ * @param {String} username Username of user
  * @response {JSON} messages (on success) All messages stored on the forum
+ * @response {JSON} matchingMessages (on success if username specified) All of specified user's messages
  * @response {JSON} status (on failure) Whether request was successful or unsuccessful
  * @response {JSON} message (on failure) Details the result of the request */
-app.get('/messages', (req, res) => {
+app.get('/messages/:username?', (req, res) => {
 	try {
-		// Returns JSON content of variable messages
-		return res.status(200).json(messages);
+		let username = req.params.username;
+		let userExists = false;
+
+		// If username provided, finds matching messages
+		if (username) {
+			let matchingMessages = [];
+
+			for (let i = 0; i < users.length; i++) {
+				if (users[i]['username'] == username) {
+					userExists = true;
+				}
+			}
+
+			if (userExists == true) {
+
+				for (let i = 0; i < messages.length; i++) {
+					if (messages[i]['postedBy'] == username) {
+						// Returns user information without their password
+						matchingMessages.push(messages[i]);
+					}
+				}
+				// Retuns all messages posted by specified user
+				return res.status(200).json(matchingMessages);
+			} else {
+				// Returns error if specified user does not exist
+				return res.status(404).json({status: 'unsuccessful', message: 'No user with that username could be found.'});
+			}
+
+			// If username not specified, returns all messages
+		} else {
+			return res.status(200).json(messages);
+		}
 	}
 	// Catches server errors and sends appropriate response
 	catch (error) {
