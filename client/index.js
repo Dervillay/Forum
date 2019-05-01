@@ -620,7 +620,7 @@ window.addEventListener('beforeunload', async () => {
 				}).catch(error => {
 					// If an error occurs, shows reason for this in alert
 					alert(error['responseJSON']['message']);
-          return
+					return
 				});
 		}
 	}
