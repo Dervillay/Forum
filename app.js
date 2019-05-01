@@ -156,7 +156,7 @@ app.post('/signOut', (req, res) => {
 	}
 	// Catches any errors and sends server error repsonse
 	catch (error) {
-		return res.status(500).json({status: 'successful', message: 'Sign out unsuccessful. The server encountered an error.'});
+		return res.status(500).json({status: 'unsuccessful', message: 'Sign out unsuccessful. The server encountered an error.'});
 	}
 });
 

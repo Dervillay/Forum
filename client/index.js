@@ -593,7 +593,7 @@ window.addEventListener('beforeunload', async () => {
 		let signedInPost = JSON.parse(signedInBody);
 
 		// Finds currently logged in user's username
-		let user = await document.getElementById('welcome').innerHTML.slice(29, -5);
+		let user = await document.getElementById('welcome').innerHTML.slice(29, -6);
 
 		// Checks if user is already signed in
 		if (signedInPost.includes(user)) {
@@ -620,6 +620,7 @@ window.addEventListener('beforeunload', async () => {
 				}).catch(error => {
 					// If an error occurs, shows reason for this in alert
 					alert(error['responseJSON']['message']);
+          return
 				});
 		}
 	}
