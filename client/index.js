@@ -466,7 +466,6 @@ async function googleSignOut() {
 				// If post was successful, closes sign up form, stores response token and alerts user
 				if (response['status'] == 'success') {
 					token = null;
-					successfulSignOut();
 					alert(response['message']);
 					// Else, informs user why post wasn't successful
 				} else {
@@ -476,6 +475,7 @@ async function googleSignOut() {
 				// If an error occurs, shows reason for this in alert
 				alert(error['responseJSON']['message']);
 			});
+		successfulSignOut();
 	}
 	// Catches errors if server is down
 	catch (error) {
