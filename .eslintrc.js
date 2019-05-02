@@ -23,7 +23,7 @@ module.exports = {
 		'no-console':
 			'off', // Off since server logs user activity to server console
 		'no-unused-vars':
-			'off', // Off since some functions defined in index.js are only called in index.html
+			'off', // Off since some functions defined in index.js are only called in index.html, so appear to be unused
 		'indent': [
 			'error',
 			'tab'
