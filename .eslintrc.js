@@ -16,7 +16,7 @@ module.exports = {
 	},
 	'globals': {
 		"gapi": true, // Sets Google API (gapi) as a global to avoid undefined error
-		"describe": true,
+		"describe": true, // Sets describe and true to avoid undefined error when testing
 		"test": true
 	},
 	'rules': {
