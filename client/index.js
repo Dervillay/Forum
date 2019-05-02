@@ -1,10 +1,7 @@
-/**
-* Variable to store tokens recieved from server
-* @function token
-*/
+// Variable to store tokens received from the server
 let token;
 
-// Variable to store whether errors have alreday been caught serverside
+// Variable to store whether errors have already been caught server-side
 let errorCaught;
 
 // Calls setNavbarHeight to begin loop
@@ -620,7 +617,7 @@ window.addEventListener('beforeunload', async () => {
 				}).catch(error => {
 					// If an error occurs, shows reason for this in alert
 					alert(error['responseJSON']['message']);
-					return
+					return;
 				});
 		}
 	}
