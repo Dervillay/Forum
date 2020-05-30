@@ -3,6 +3,8 @@ A dynamic forum website. Online version here: https://forumprogproject.herokuapp
 
 For in-depth documentation of the actual JavaScript code and API (index.js and app.js) check `global.html` in the `documentation` folder.
 
+![](forum-demo.gif)
+
 ## Notes for Users
 Forum allows you to post, view and search for messages. 
 A user may create their own account by clicking 'Sign up' or log in to an existing account using 'Sign in'.
